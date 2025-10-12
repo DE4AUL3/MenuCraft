@@ -33,6 +33,7 @@ export interface Category {
   description?: string;
   descriptionTk?: string;
   image: string;
+  dishPageImage?: string; // Отдельное фото для страницы блюд
   gradient: string;
   isActive: boolean;
   sortOrder: number;

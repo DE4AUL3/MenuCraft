@@ -9,16 +9,13 @@ import {
   Trash2,
   Eye,
   EyeOff,
-  Filter,
   Image as ImageIcon,
   Save,
   X,
-  Upload,
   DollarSign
 } from 'lucide-react'
 import { Dish, Category } from '@/types/common'
 import { dataService } from '@/lib/dataService'
-import { imageService } from '@/lib/imageService'
 import ImageUpload from '@/components/ui/ImageUpload'
 
 interface DishManagerProps {

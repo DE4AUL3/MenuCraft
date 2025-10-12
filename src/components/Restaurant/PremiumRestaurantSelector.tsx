@@ -117,7 +117,17 @@ export default function PremiumRestaurantSelector() {
   };
 
   return (
-  <div className="min-h-screen bg-white dark:bg-black relative">
+    <div style={{ 
+      minHeight: '100vh', 
+      background: 'var(--bg-primary)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-white/5 to-gray-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-gray-400/5 to-gray-600/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 lg:py-16">
         
@@ -133,7 +143,8 @@ export default function PremiumRestaurantSelector() {
           className="text-center mb-16"
         >
           <motion.h1 
-            className="text-3xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+            className="text-3xl lg:text-5xl font-black mb-4"
+            style={{ color: 'var(--text-primary)' }}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
@@ -142,12 +153,13 @@ export default function PremiumRestaurantSelector() {
           </motion.h1>
           
           <motion.p 
-            className="text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed"
+            style={{ color: 'var(--text-secondary)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
           >
-            {'Выберите ресторан и окунитесь в мир изысканных вкусов'}
+            Выберите ресторан и окунитесь в мир изысканных вкусов
           </motion.p>
         </motion.div>
 
@@ -166,23 +178,28 @@ export default function PremiumRestaurantSelector() {
               className="group cursor-pointer"
             >
               <motion.div
-                className="relative overflow-hidden rounded-3xl border border-black/10 dark:border-white/10 bg-transparent hover:shadow-lg transition-all duration-300"
-                whileHover={{ scale: 1.01 }}
+                className="relative overflow-hidden rounded-3xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-2xl hover:bg-white dark:hover:bg-slate-800 transition-all duration-500"
+                whileHover={{ scale: 1.02, y: -8 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => handleRestaurantSelect(restaurant.id)}
                 style={{
                   background: selectedId === restaurant.id
-                    ? (isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)')
-                    : 'transparent'
+                    ? (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)')
+                    : ''
                 }}
               >
                   
                   {/* Status Badge */}
-                  <div className={`absolute top-6 right-6 z-20 px-3 py-2 rounded-full text-xs font-semibold border bg-black/5 text-gray-800 border-black/10 dark:bg-white/10 dark:text-white dark:border-white/20`}>
+                  <div className={`absolute top-6 right-6 z-20 px-3 py-2 rounded-full text-xs font-bold ${
+                    restaurant.isOpen 
+                      ? 'bg-green-500/90 text-white' 
+                      : 'bg-red-500/90 text-white'
+                  } backdrop-blur-sm shadow-lg`}>
                     {restaurant.isOpen ? (getText('open', currentLanguage) || 'Открыт') : (getText('closed', currentLanguage) || 'Закрыт')}
                   </div>
 
                   {/* Rating Badge */}
-                  <div className="absolute top-6 left-6 z-20 px-3 py-2 rounded-full bg-black/30 backdrop-blur-md text-white">
+                  <div className="absolute top-6 left-6 z-20 px-3 py-2 rounded-full bg-black/70 backdrop-blur-md text-white shadow-lg">
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                       <span className="font-bold">{restaurant.rating}</span>
@@ -200,55 +217,63 @@ export default function PremiumRestaurantSelector() {
                       priority={index < 2}
                     />
                     
-                    {/* Neutral overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    {/* Enhanced overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
                     
-                    {/* No particles */}
+                    {/* Shine effect on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                   </div>
 
                   {/* Content */}
                     <div className="relative p-6 sm:p-8">
                     <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                      <div className="flex-1">
+                        <h3 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                           {restaurant.name}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm lg:text-base line-clamp-2 sm:line-clamp-3">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm lg:text-base line-clamp-2 sm:line-clamp-3 leading-relaxed">
                           {currentLanguage === 'tk' ? restaurant.descriptionTk : restaurant.description}
                         </p>
                       </div>
-                      <div className="ml-4 p-3 rounded-full bg-white/10 dark:bg-white/10">
-                        <ArrowRight className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                      <div className="ml-4 p-3 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                        <ArrowRight className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
                       </div>
                     </div>
 
-                    {/* Features removed for simplicity */}
+                    {/* Enhanced Features */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {restaurant.features?.slice(0, 3).map((feature, idx) => (
+                        <span key={idx} className="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-full font-medium">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
 
-                    {/* Info Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <ChefHat className="w-4 h-4 text-gray-500" />
-                        {restaurant.cuisine}
+                    {/* Enhanced Info Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mb-6">
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                        <ChefHat className="w-4 h-4 text-emerald-500" />
+                        <span className="font-medium">{restaurant.cuisine}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Clock className="w-4 h-4 text-gray-500" />
-                        {currentLanguage === 'tk' ? restaurant.deliveryTimeTk : restaurant.deliveryTime}
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                        <Clock className="w-4 h-4 text-emerald-500" />
+                        <span className="font-medium">{currentLanguage === 'tk' ? restaurant.deliveryTimeTk : restaurant.deliveryTime}</span>
                       </div>
-                      {/* phone and address removed for clean card */}
                     </div>
 
-                    {/* CTA Button */}
+                    {/* Enhanced CTA Button */}
                     <motion.button
-                      className={`w-full mt-6 py-3 sm:py-4 rounded-2xl font-semibold text-white dark:text-black text-base sm:text-lg relative overflow-hidden bg-black dark:bg-white shadow hover:shadow-lg transition-all duration-200`}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
+                      className="w-full py-4 rounded-2xl font-bold text-white text-base sm:text-lg relative overflow-hidden bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      {/* Shimmer effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                      {/* Enhanced shimmer effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
                       
-                      <span className="relative z-10">
+                      <span className="relative z-10 flex items-center justify-center gap-2">
                         {getText('viewMenu', currentLanguage)}
+                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                       </span>
                     </motion.button>
                   </div>

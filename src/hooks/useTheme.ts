@@ -1,62 +1,83 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { ThemeMode, themes, getCSSVariables } from '@/styles/simpleTheme'
 
 export function useTheme() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [theme, setTheme] = useState<ThemeMode>('light')
   const [mounted, setMounted] = useState(false)
   const [currentRestaurant, setCurrentRestaurant] = useState<string>('han-tagam')
 
   useEffect(() => {
     setMounted(true)
-
-    // Грузим выбранный ресторан (для контента), но тема от ресторана НЕ зависит
+    
+    // Загружаем выбранный ресторан
     const savedRestaurant = localStorage.getItem('selectedRestaurant') || 'han-tagam'
     setCurrentRestaurant(savedRestaurant)
-
-    // Единая тема приложения: читаем из localStorage 'theme' (fallback: light)
-    const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark' | null) || 'light'
-    const dark = savedTheme === 'dark'
-    setIsDarkMode(dark)
-    document.documentElement.classList.toggle('dark', dark)
+    
+    // Получаем сохраненную тему или системную
+    const savedTheme = localStorage.getItem('theme') as ThemeMode
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    const initialTheme = savedTheme || systemTheme
+    
+    setTheme(initialTheme)
+    applyTheme(initialTheme)
   }, [])
+
+  const applyTheme = (newTheme: ThemeMode) => {
+    const themeConfig = themes[newTheme]
+    const cssVars = getCSSVariables(themeConfig)
+    
+    // Применяем CSS переменные к root
+    Object.entries(cssVars).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value)
+    })
+    
+    // Добавляем/убираем класс dark
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
 
   const setRestaurant = (restaurant: string) => {
     setCurrentRestaurant(restaurant)
     localStorage.setItem('selectedRestaurant', restaurant)
-    // Тему больше не переключаем от ресторана — единая цветовая гамма
   }
 
   const toggleTheme = () => {
-    const newDarkMode = !isDarkMode
-    setIsDarkMode(newDarkMode)
-    document.documentElement.classList.toggle('dark', newDarkMode)
-    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light')
+    const newTheme: ThemeMode = theme === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
+    applyTheme(newTheme)
+  }
+
+  const setSpecificTheme = (newTheme: ThemeMode) => {
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
+    applyTheme(newTheme)
   }
 
   const getThemeClasses = () => {
-    // Унифицированные классы для обеих тем
-    if (isDarkMode) {
-      return {
-        background: 'bg-gray-900',
-        cardBackground: 'bg-gray-800',
-        headerBackground: 'bg-gray-800',
-        text: 'text-white',
-        border: 'border-gray-700'
-      }
-    }
+    const currentTheme = themes[theme]
     return {
-      background: 'bg-white',
-      cardBackground: 'bg-white',
-      headerBackground: 'bg-white',
-      text: 'text-gray-900',
-      border: 'border-gray-200'
+      background: `bg-[${currentTheme.colors.background.primary}]`,
+      cardBackground: `bg-[${currentTheme.colors.background.secondary}]`,
+      headerBackground: `bg-[${currentTheme.colors.background.secondary}]`,
+      text: `text-[${currentTheme.colors.text.primary}]`,
+      border: `border-[${currentTheme.colors.border.primary}]`
     }
   }
 
   return {
-    isDarkMode,
+    theme,
+    currentTheme: themes[theme],
     toggleTheme,
+    setTheme: setSpecificTheme,
+    isDark: theme === 'dark',
+    isLight: theme === 'light',
+    isDarkMode: theme === 'dark', // для обратной совместимости
     mounted,
     currentRestaurant,
     setRestaurant,

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { ReactNode, useState } from 'react'
-import { Heart, Share2, MoreHorizontal, ExternalLink } from 'lucide-react'
+import { Heart, Share2 } from 'lucide-react'
 
 interface CardProps {
   children: ReactNode

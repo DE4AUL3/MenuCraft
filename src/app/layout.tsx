@@ -2,6 +2,71 @@ import "./globals.css";
 export const metadata = {
   title: "MenuCraft — QR-меню для ресторанов",
   description: "Готовый к продакшену шаблон Next.js для QR-меню с админкой и мультиязычностью.",
+  keywords: [
+    'QR меню',
+    'ресторан',
+    'онлайн меню',
+    'заказ еды',
+    'MenuCraft',
+    'cafe',
+    'restaurant menu',
+    'digital menu',
+    'турецкая кухня',
+    'туркменская кухня'
+  ],
+  authors: [{ name: 'MenuCraft Team' }],
+  creator: 'MenuCraft',
+  publisher: 'MenuCraft',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('http://localhost:3000'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'ru': '/ru',
+      'tk': '/tk',
+    },
+  },
+  openGraph: {
+    title: 'MenuCraft — QR-меню для ресторанов',
+    description: 'Готовый к продакшену шаблон Next.js для QR-меню с админкой и мультиязычностью.',
+    url: 'http://localhost:3000',
+    siteName: 'MenuCraft',
+    images: [
+      {
+        url: '/panda_logo.jpg',
+        width: 800,
+        height: 600,
+        alt: 'MenuCraft Logo',
+      },
+    ],
+    locale: 'ru_RU',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MenuCraft — QR-меню для ресторанов',
+    description: 'Готовый к продакшену шаблон Next.js для QR-меню с админкой и мультиязычностью.',
+    images: ['/panda_logo.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'google-site-verification-code',
+    yandex: 'yandex-verification-code',
+  },
 };
 export const viewport = {
   themeColor: [
@@ -13,6 +78,7 @@ import { CartProvider } from "@/hooks/useCart";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import FloatingCartButton from '@/components/FloatingCartButton';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
+import Analytics from '@/components/Analytics';
 
 export default function RootLayout({
   children,
@@ -28,6 +94,7 @@ export default function RootLayout({
               {children}
               <FloatingCartButton />
               <PWAInstallBanner />
+              <Analytics />
             </div>
           </ErrorBoundary>
         </CartProvider>

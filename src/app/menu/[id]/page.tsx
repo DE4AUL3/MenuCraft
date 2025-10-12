@@ -7,7 +7,6 @@ import Image from 'next/image'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useTheme } from '@/hooks/useTheme'
 import { useCart } from '@/hooks/useCart'
-import { getText } from '@/i18n/translations'
 import { Category } from '@/types/menu'
 import { dataService } from '@/lib/dataService'
 import { imageService } from '@/lib/imageService'
@@ -146,9 +145,6 @@ export default function MenuPage() {
                       />
                     </div>
                   </div>
-                  
-                  {/* Shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 
                 {/* Category Info */}
@@ -156,14 +152,6 @@ export default function MenuPage() {
                   <h3 className="font-bold text-white text-sm sm:text-base mb-1 group-hover:text-orange-400 transition-colors duration-300">
                     {currentLanguage === 'tk' ? (category.nameTk || category.name) : category.name}
                   </h3>
-                  <p className="text-xs text-slate-300 opacity-90">
-                    {category.id === 'burgers' ? '2 блюда' : 
-                     category.id === 'pizza' ? '1 блюдо' :
-                     category.id === 'chicken' ? '1 блюдо' :
-                     category.id === 'sides' ? '1 блюдо' :
-                     category.id === 'desserts' ? '1 блюдо' :
-                     '1 напиток'}
-                  </p>
                 </div>
               </div>
             ))}

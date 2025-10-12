@@ -249,7 +249,8 @@ export default function CartPage() {
           
           <button
             onClick={() => setShowOrderForm(true)}
-            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="w-full text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+            style={{ background: 'var(--accent-call)' }}
           >
             Оформить заказ
           </button>

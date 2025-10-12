@@ -91,7 +91,10 @@ export default function DishCard({ dish }: DishCardProps) {
         </div>
         
         {/* Кнопка заказа */}
-        <button className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]">
+        <button 
+          className="w-full text-white py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
+          style={{ background: 'var(--accent-call)' }}
+        >
           <ShoppingCart className="w-4 h-4" />
           {t('order')}
         </button>

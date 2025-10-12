@@ -13,6 +13,7 @@ import AdminLayout from '@/components/admin/AdminLayout'
 import OverviewModule from '@/components/admin/modules/OverviewModule'
 import AnalyticsModule from '@/components/admin/modules/AnalyticsModule'
 import RestaurantModule from '@/components/admin/modules/RestaurantModule'
+import OrdersModule from '@/components/admin/modules/OrdersModule'
 
 interface PremiumAdminDashboardProps {
   activeTab?: 'overview' | 'analytics' | 'restaurant' | 'orders' | 'contacts'
@@ -63,22 +64,7 @@ export default function PremiumAdminDashboardV2({
 
       case 'orders':
         return (
-          <Card className="p-6">
-            <div className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                <FileText className="w-8 h-8 text-green-600 dark:text-green-400" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Заказы</h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                Управление заказами и уведомления
-              </p>
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  🚧 Модуль в разработке
-                </p>
-              </div>
-            </div>
-          </Card>
+          <OrdersModule />
         )
 
       case 'contacts':

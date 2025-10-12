@@ -1,5 +1,47 @@
 @import "tailwindcss";
 
+/* CSS переменные для простой темы */
+:root {
+  /* Светлая тема - как в админ панели */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  
+  /* Текст */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  
+  /* Границы */
+  --border-primary: #e2e8f0;
+  --border-secondary: #f1f5f9;
+  --border-tertiary: #f8fafc;
+  
+  /* Акцентные цвета */
+  --accent-call: #10b981;     /* Изумрудный для звонка и корзины */
+  --accent-admin: #3b82f6;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --accent-success: #10b981;
+}
+
+/* Темная тема - новые цвета */
+html.dark {
+  --bg-primary: #121212;      /* Фоновый цвет */
+  --bg-secondary: #1E1E1E;    /* Фон всех карточек */
+  --bg-tertiary: #2A2A2A;     /* Границы/разделители цвет как третичный фон */
+  
+  --text-primary: #F5F5F5;    /* Основной цвет текста */
+  --text-secondary: #B3B3B3;  /* Подзаголовки/второстепенный текст */
+  --text-tertiary: #808080;   /* Еще более слабый текст */
+  
+  --border-primary: #2A2A2A;  /* Границы/разделители */
+  --border-secondary: #1E1E1E; /* Слабые границы */
+  --border-tertiary: #121212;  /* Едва заметные границы */
+  
+  /* Акцентные цвета остаются теми же */
+}
+
 /* Нормальный скролл для приложения */
 html {
   height: 100%;
@@ -10,19 +52,9 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-}
-
-/* Светлая и темная тема - обновленные */
-body {
   background: var(--bg-primary);
-  color: var(--gray-900);
+  color: var(--text-primary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Темная тема */
-html.dark body {
-  background: var(--panda-bg);
-  color: var(--panda-text);
 }
 
 /* Тематические классы для ресторанов */
@@ -432,4 +464,36 @@ html.dark .theme-vercel {
   50% {
     box-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 0 0 30px rgba(34, 197, 94, 0.6);
   }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoom-in-95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-zoom-in-95 {
+  animation: zoom-in-95 0.3s ease-out forwards;
 }

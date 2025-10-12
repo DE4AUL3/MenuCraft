@@ -11,30 +11,32 @@ export default function FloatingCallButton() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-6 right-6 group z-50 animate-float"
+        className="fixed bottom-6 right-6 group z-40 animate-float"
         aria-label="Позвонить"
       >
-        {/* Внешнее свечение */}
-        <div className="absolute inset-0 bg-green-500 rounded-full opacity-75 animate-pulse-ring" />
-        <div className="absolute inset-1 bg-green-400 rounded-full opacity-50 animate-pulse-ring" style={{ animationDelay: '0.5s' }} />
+        {/* Внешние пульсирующие кольца */}
+        <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'var(--accent-call)', opacity: 0.3 }} />
+        <div className="absolute inset-2 rounded-full animate-ping" style={{ backgroundColor: 'var(--accent-call)', opacity: 0.4, animationDelay: '0.3s' }} />
         
         {/* Основная кнопка */}
-        <div className="relative bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-500 transform group-hover:scale-110 group-active:scale-95 animate-glow">
+        <div className="relative text-white p-5 rounded-full shadow-2xl transition-all duration-500 transform group-hover:scale-110 group-active:scale-95" style={{ 
+          background: `linear-gradient(135deg, var(--accent-call), var(--accent-call))`,
+          boxShadow: `0 25px 50px -12px var(--accent-call)50`
+        }}>
           {/* Внутреннее свечение */}
-          <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full opacity-0 group-hover:opacity-50 transition-opacity duration-300 animate-shimmer" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           
           {/* Иконка */}
           <Phone className="w-6 h-6 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
           
-          {/* Пульсирующие кольца */}
-          <div className="absolute inset-0 rounded-full border-2 border-green-300 opacity-0 group-hover:opacity-100 animate-pulse" />
-          <div className="absolute -inset-2 rounded-full border border-green-200 opacity-0 group-hover:opacity-60 animate-pulse" style={{ animationDelay: '0.2s' }} />
-          <div className="absolute -inset-4 rounded-full border border-green-100 opacity-0 group-hover:opacity-40 animate-pulse" style={{ animationDelay: '0.4s' }} />
+          {/* Анимированный border */}
+          <div className="absolute inset-0 rounded-full border-2 border-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
         
-        {/* Подсказка */}
-        <div className="absolute bottom-full right-0 mb-2 bg-black/80 text-white text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap transform translate-y-2 group-hover:translate-y-0">
+        {/* Подсказка с улучшенным дизайном */}
+        <div className="absolute bottom-full right-0 mb-3 bg-gray-900/95 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap transform translate-y-2 group-hover:translate-y-0 shadow-xl">
           Позвонить нам
+          <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900/95"></div>
         </div>
       </button>
       

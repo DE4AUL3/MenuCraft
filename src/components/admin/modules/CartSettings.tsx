@@ -15,11 +15,7 @@ import {
   MapPin, 
   DollarSign,
   Settings,
-  Truck,
-  ShoppingBag,
-  AlertCircle,
-  Check,
-  Info
+  Truck
 } from 'lucide-react';
 
 interface CartSettingsProps {

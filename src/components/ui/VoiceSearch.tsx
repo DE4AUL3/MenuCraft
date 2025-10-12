@@ -7,13 +7,10 @@ import {
   MicOff, 
   Search, 
   Volume2, 
-  VolumeX, 
   Loader2,
   AlertCircle,
   CheckCircle,
   X,
-  Settings,
-  Languages,
   Sparkles
 } from 'lucide-react'
 

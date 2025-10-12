@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Disallow admin pages from indexing
+Disallow: /admin/
+Disallow: /api/
+
+# Allow important pages
+Allow: /
+Allow: /select-restaurant
+Allow: /restaurant/
+Allow: /menu/
+Allow: /category/
+Allow: /cart
+Allow: /qr
+
+# Sitemap location
+Sitemap: http://localhost:3000/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

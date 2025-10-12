@@ -11,6 +11,7 @@ interface CategoryFormData {
   name: string;
   nameTk: string;
   image: string;
+  dishPageImage: string;
   gradient: string;
   description: string;
   descriptionTk: string;
@@ -26,6 +27,7 @@ export default function CategoryManager() {
     name: '',
     nameTk: '',
     image: '',
+    dishPageImage: '',
     gradient: 'from-blue-600 to-purple-600',
     description: '',
     descriptionTk: '',
@@ -66,6 +68,7 @@ export default function CategoryManager() {
       name: category.name,
       nameTk: category.nameTk,
       image: category.image,
+      dishPageImage: category.dishPageImage || '',
       gradient: category.gradient,
       description: category.description || '',
       descriptionTk: category.descriptionTk || '',
@@ -92,6 +95,7 @@ export default function CategoryManager() {
       name: '',
       nameTk: '',
       image: '',
+      dishPageImage: '',
       gradient: 'from-blue-600 to-purple-600',
       description: '',
       descriptionTk: '',
@@ -101,17 +105,6 @@ export default function CategoryManager() {
     setEditingId(null);
     setIsFormOpen(false);
   };
-
-  const gradientOptions = [
-    'from-blue-600 to-purple-600',
-    'from-red-600 to-pink-600',
-    'from-yellow-600 to-orange-600',
-    'from-green-600 to-blue-600',
-    'from-purple-600 to-indigo-600',
-    'from-pink-600 to-purple-600',
-    'from-orange-600 to-red-600',
-    'from-indigo-600 to-purple-600',
-  ];
 
   return (
     <div className="space-y-6">
@@ -144,7 +137,7 @@ export default function CategoryManager() {
             }`}
           >
             {/* Category Image */}
-            <div className={`h-32 bg-gradient-to-br ${category.gradient} relative`}>
+            <div className="h-32 bg-gray-200 dark:bg-gray-700 relative">
               {category.image ? (
                 <img
                   src={imageService.getImageUrl(category.image)}
@@ -152,7 +145,7 @@ export default function CategoryManager() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-2xl font-bold">
                   {category.name.charAt(0)}
                 </div>
               )}
@@ -289,34 +282,31 @@ export default function CategoryManager() {
                 {/* Image Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Изображение категории
+                    Изображение категории (для карточки)
                   </label>
                   <ImageUpload
                     currentImage={formData.image}
                     onImageChange={(imageUrl) => setFormData({ ...formData, image: imageUrl || '' })}
                     placeholder="Добавить изображение категории"
                   />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Рекомендуемый размер: 300x200px (соотношение 3:2)
+                  </p>
                 </div>
 
-                {/* Gradient */}
+                {/* Dish Page Image Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Градиент
+                    Изображение для страницы блюд (заголовок)
                   </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {gradientOptions.map((gradient) => (
-                      <button
-                        key={gradient}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, gradient })}
-                        className={`h-12 rounded-lg bg-gradient-to-r ${gradient} border-2 ${
-                          formData.gradient === gradient
-                            ? 'border-blue-500'
-                            : 'border-transparent hover:border-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
+                  <ImageUpload
+                    currentImage={formData.dishPageImage}
+                    onImageChange={(imageUrl) => setFormData({ ...formData, dishPageImage: imageUrl || '' })}
+                    placeholder="Добавить изображение для страницы блюд"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Рекомендуемый размер: 1200x300px (широкий баннер)
+                  </p>
                 </div>
 
                 {/* Sort Order and Status */}

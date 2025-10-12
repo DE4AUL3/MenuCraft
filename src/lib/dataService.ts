@@ -467,6 +467,228 @@ class DataService {
     return updatedOrder;
   }
 
+  // Удаление заказа
+  deleteOrder(id: string): boolean {
+    const orders = this.getOrders();
+    const index = orders.findIndex(order => order.id === id);
+    
+    if (index === -1) {
+      return false;
+    }
+
+    orders.splice(index, 1);
+    storageSync.setItem('orders', orders);
+    this.emitEventInternal('order_updated', { id, deleted: true });
+    return true;
+  }
+
+  // Получение заказов по статусу
+  getOrdersByStatus(status: Order['status']): Order[] {
+    const orders = this.getOrders();
+    return orders.filter(order => order.status === status);
+  }
+
+  // Получение заказов за период
+  getOrdersByDateRange(startDate: Date, endDate: Date): Order[] {
+    const orders = this.getOrders();
+    return orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      return orderDate >= startDate && orderDate <= endDate;
+    });
+  }
+
+  // Статистика заказов
+  getOrdersStatistics() {
+    const orders = this.getOrders();
+    const today = new Date();
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const thisWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const todayOrders = orders.filter(order => 
+      new Date(order.createdAt).toDateString() === today.toDateString()
+    );
+    
+    const weekOrders = orders.filter(order => 
+      new Date(order.createdAt) >= thisWeek
+    );
+
+    const monthOrders = orders.filter(order => 
+      new Date(order.createdAt) >= thisMonth
+    );
+
+    const completedOrders = orders.filter(order => order.status === 'completed');
+
+    return {
+      total: orders.length,
+      active: orders.filter(order => 
+        ['new', 'confirmed', 'preparing', 'delivering'].includes(order.status)
+      ).length,
+      completed: completedOrders.length,
+      cancelled: orders.filter(order => order.status === 'cancelled').length,
+      today: {
+        count: todayOrders.length,
+        revenue: todayOrders.reduce((sum, order) => sum + order.totalAmount, 0)
+      },
+      week: {
+        count: weekOrders.length,
+        revenue: weekOrders.reduce((sum, order) => sum + order.totalAmount, 0)
+      },
+      month: {
+        count: monthOrders.length,
+        revenue: monthOrders.reduce((sum, order) => sum + order.totalAmount, 0)
+      },
+      totalRevenue: completedOrders.reduce((sum, order) => sum + order.totalAmount, 0),
+      averageOrderValue: completedOrders.length > 0 
+        ? completedOrders.reduce((sum, order) => sum + order.totalAmount, 0) / completedOrders.length 
+        : 0
+    };
+  }
+
+  // Создание демо заказов для тестирования
+  createDemoOrders(): void {
+    const existingOrders = this.getOrders();
+    if (existingOrders.length > 0) {
+      return; // Уже есть заказы, не создаваем демо
+    }
+
+    const demoOrders: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>[] = [
+      {
+        customerName: 'Али Мамедов',
+        customerPhone: '+993 12 34 56 78',
+        customerAddress: 'ул. Нейтралитета, 45, кв. 12',
+        items: [
+          {
+            dishId: 'dish1',
+            dishName: 'Бургер Panda Classic',
+            dishNameTk: 'Panda Classic burger',
+            price: 25.00,
+            quantity: 2,
+            total: 50.00
+          },
+          {
+            dishId: 'dish2',
+            dishName: 'Картофель фри',
+            dishNameTk: 'Kartofý fri',
+            price: 8.00,
+            quantity: 1,
+            total: 8.00
+          }
+        ],
+        subtotal: 58.00,
+        deliveryFee: 5.00,
+        totalAmount: 63.00,
+        status: 'new',
+        notes: 'Без лука, пожалуйста'
+      },
+      {
+        customerName: 'Айна Сердарова',
+        customerPhone: '+993 65 87 43 21',
+        customerAddress: 'пр. Огузхана, 78',
+        items: [
+          {
+            dishId: 'dish3',
+            dishName: 'Пицца Маргарита',
+            dishNameTk: 'Margarita pizza',
+            price: 35.00,
+            quantity: 1,
+            total: 35.00
+          },
+          {
+            dishId: 'dish4',
+            dishName: 'Кока-Кола',
+            dishNameTk: 'Koka-Kola',
+            price: 6.00,
+            quantity: 2,
+            total: 12.00
+          }
+        ],
+        subtotal: 47.00,
+        deliveryFee: 5.00,
+        totalAmount: 52.00,
+        status: 'confirmed'
+      },
+      {
+        customerName: 'Мурад Назаров',
+        customerPhone: '+993 61 23 45 67',
+        customerAddress: 'ул. Битарап Туркменистан, 123',
+        items: [
+          {
+            dishId: 'dish5',
+            dishName: 'Куриные крылышки',
+            dishNameTk: 'Towuk ganatlar',
+            price: 22.00,
+            quantity: 1,
+            total: 22.00
+          }
+        ],
+        subtotal: 22.00,
+        deliveryFee: 5.00,
+        totalAmount: 27.00,
+        status: 'preparing'
+      },
+      {
+        customerName: 'Гулнара Атаева',
+        customerPhone: '+993 12 98 76 54',
+        customerAddress: 'ул. Махтумкули, 67',
+        items: [
+          {
+            dishId: 'dish6',
+            dishName: 'Салат Цезарь',
+            dishNameTk: 'Sezar salat',
+            price: 18.00,
+            quantity: 1,
+            total: 18.00
+          }
+        ],
+        subtotal: 18.00,
+        deliveryFee: 0.00,
+        totalAmount: 18.00,
+        status: 'completed'
+      },
+      {
+        customerName: 'Берды Джумаев',
+        customerPhone: '+993 65 11 22 33',
+        customerAddress: 'ул. Андалиб, 89',
+        items: [
+          {
+            dishId: 'dish7',
+            dishName: 'Десерт Тирамису',
+            dishNameTk: 'Tiramisu desert',
+            price: 15.00,
+            quantity: 1,
+            total: 15.00
+          }
+        ],
+        subtotal: 15.00,
+        deliveryFee: 5.00,
+        totalAmount: 20.00,
+        status: 'cancelled',
+        notes: 'Клиент отменил заказ'
+      }
+    ];
+
+    // Создаем заказы с разными временными метками
+    demoOrders.forEach((orderData, index) => {
+      const hoursAgo = index * 2; // Каждый заказ на 2 часа раньше предыдущего
+      const createdAt = new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
+      
+      const order: Order = {
+        ...orderData,
+        id: `demo_order_${Date.now()}_${index}`,
+        createdAt,
+        updatedAt: createdAt,
+        ...(orderData.status === 'completed' ? { completedAt: createdAt } : {})
+      };
+
+      const orders = this.getOrders();
+      orders.unshift(order);
+      storageSync.setItem('orders', orders);
+    });
+
+    console.log('✅ Демо заказы созданы успешно');
+  }
+
   // ========================
   // НАСТРОЙКИ КОРЗИНЫ И ДОСТАВКИ
   // ========================
