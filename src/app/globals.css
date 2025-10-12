@@ -1,0 +1,435 @@
+@import "tailwindcss";
+
+/* Нормальный скролл для приложения */
+html {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Светлая и темная тема - обновленные */
+body {
+  background: var(--bg-primary);
+  color: var(--gray-900);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Темная тема */
+html.dark body {
+  background: var(--panda-bg);
+  color: var(--panda-text);
+}
+
+/* Тематические классы для ресторанов */
+.theme-panda {
+  background: var(--panda-bg);
+  color: var(--panda-text);
+}
+
+.theme-han {
+  background: var(--han-bg);
+  color: var(--han-text);
+}
+
+.theme-sweet {
+  background: var(--sweet-bg);
+  color: var(--sweet-text);
+}
+
+/* Vercel (Geist) theme — опционально включается классом .theme-vercel */
+.theme-vercel {
+  /* Акценты Vercel/Geist */
+  --primary: #0070f3;       /* link blue */
+  --primary-hover: #0366d6; /* darker blue */
+  --accent: #3291ff;        /* lighter blue, гармоничный к primary */
+
+  /* Фоны и нейтрали */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+
+  /* Синхронизация акцентов с темами ресторанов */
+  --panda-accent: #0070f3;
+  --han-accent: #0070f3;
+}
+
+html.dark .theme-vercel {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --panda-accent: #0070f3;
+  --han-accent: #0070f3;
+}
+
+/* Переменные для улучшенной цветовой палитры */
+:root {
+  /* Основные цвета - более современные и яркие */
+  --primary: #10b981; /* Emerald — единый акцент */
+  --primary-hover: #059669;
+  --secondary: #111827; /* Нейтральный темный для 30% */
+  /* Акцент гармонизирован с primary (изумрудная палитра) */
+  --accent: #34d399; /* Emerald 400 как акцент к primary 500 */
+  --success: #10b981; /* Зеленый (совпадает с primary) */
+  --warning: #f59e0b; /* Янтарный */
+  --error: #ef4444; /* Красный */
+  
+  /* Градиенты */
+  --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  --gradient-warm: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  --gradient-cool: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  
+  /* Нейтральные цвета - обновленные */
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  
+  /* Фоны */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-elevated: #ffffff;
+  
+  /* Тени */
+  --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 0 1px rgb(16 185 129 / 0.15), 0 0 20px rgb(16 185 129 / 0.25);
+  
+  /* Panda Burger - современная темная тема */
+  --panda-bg: #000000;
+  --panda-card: #1a1a1a;
+  --panda-card-hover: #2a2a2a;
+  --panda-text: #ffffff;
+  --panda-text-secondary: #a1a1aa;
+  --panda-border: #27272a;
+  --panda-accent: #10b981;
+  
+  /* Han Tagam - элегантная светлая тема */
+  --han-bg: #fefefe;
+  --han-card: #ffffff;
+  --han-card-hover: #f8fafc;
+  --han-text: #1f2937;
+  --han-text-secondary: #6b7280;
+  --han-border: #e5e7eb;
+  --han-accent: #10b981;
+  
+  /* Sweet - теплая розовая тема */
+  --sweet-bg: #fdf2f8;
+  --sweet-card: #ffffff;
+  --sweet-card-hover: #fce7f3;
+  --sweet-text: #831843;
+  --sweet-text-secondary: #be185d;
+  --sweet-border: #f3e8ff;
+  --sweet-accent: #ec4899;
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+  
+  /* Улучшенные эффекты */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .neon-glow {
+    box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary);
+  }
+  
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-large);
+  }
+  
+  .animated-gradient {
+    background: linear-gradient(-45deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Скроллбар стилизация */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+  }
+}
+  
+  .backdrop-blur-md {
+    backdrop-filter: blur(12px);
+  }
+  
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  /* Glass morphism effects */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+
+  .glass-card-dark {
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .holographic-border {
+    background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #06ffa5);
+    background-size: 400% 400%;
+    animation: holographic 4s ease infinite;
+  }
+
+  .neon-glow {
+    box-shadow: 
+      0 0 5px rgba(34, 197, 94, 0.5),
+      0 0 20px rgba(34, 197, 94, 0.3),
+      0 0 40px rgba(34, 197, 94, 0.2);
+  }
+
+  .floating-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .pulse-ring {
+    animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+
+  .shimmer-effect {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Радиальный градиент */
+  .bg-gradient-radial {
+    background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+  }
+
+  /* Мобильные оптимизации */
+  .mobile-app-feel {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Безопасные зоны для iPhone */
+  .safe-area-padding {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Кастомные скроллбары для темной темы */
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--gray-800);
+  }
+  
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--gray-600);
+  }
+  
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-500);
+  }
+
+/* Анимации */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Дополнительные стили для админ тем */
+.admin-dark {
+  color-scheme: dark;
+}
+
+.admin-dark .scrollbar-hide::-webkit-scrollbar-track {
+  background: rgba(3, 7, 18, 0.5);
+}
+
+.admin-dark .scrollbar-hide::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.8);
+  border-radius: 4px;
+}
+
+.admin-dark .scrollbar-hide::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.8);
+}
+
+.admin-mafia {
+  color-scheme: dark;
+}
+
+.admin-mafia .scrollbar-hide::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.admin-mafia .scrollbar-hide::-webkit-scrollbar-thumb {
+  background: rgba(127, 29, 29, 0.8);
+  border-radius: 4px;
+}
+
+.admin-mafia .scrollbar-hide::-webkit-scrollbar-thumb:hover {
+  background: rgba(185, 28, 28, 0.8);
+}
+
+.admin-chill {
+  color-scheme: dark;
+}
+
+.admin-chill .scrollbar-hide::-webkit-scrollbar-track {
+  background: rgba(67, 20, 7, 0.8);
+}
+
+.admin-chill .scrollbar-hide::-webkit-scrollbar-thumb {
+  background: rgba(194, 65, 12, 0.8);
+  border-radius: 4px;
+}
+
+.admin-chill .scrollbar-hide::-webkit-scrollbar-thumb:hover {
+  background: rgba(234, 88, 12, 0.8);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 0 0 30px rgba(34, 197, 94, 0.6);
+  }
+}

@@ -1,0 +1,39 @@
+<!-- SVG for Cola Fresh -->
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="colaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0e7ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#c7d2fe;stop-opacity:0.6" />
+    </linearGradient>
+  </defs>
+  <rect width="300" height="200" fill="url(#colaBg)" rx="15"/>
+  
+  <!-- Glass -->
+  <rect x="125" y="60" width="50" height="80" rx="8" fill="url(#glass)" stroke="#94a3b8" stroke-width="2"/>
+  
+  <!-- Cola liquid -->
+  <rect x="130" y="75" width="40" height="60" rx="5" fill="#2d1810"/>
+  
+  <!-- Bubbles -->
+  <circle cx="140" cy="85" r="2" fill="#ffffff" opacity="0.6"/>
+  <circle cx="155" cy="90" r="1.5" fill="#ffffff" opacity="0.4"/>
+  <circle cx="145" cy="100" r="1" fill="#ffffff" opacity="0.5"/>
+  <circle cx="160" cy="105" r="1.5" fill="#ffffff" opacity="0.3"/>
+  
+  <!-- Ice cubes -->
+  <rect x="135" y="70" width="8" height="8" fill="#e0f2fe" opacity="0.8"/>
+  <rect x="157" y="75" width="6" height="6" fill="#e0f2fe" opacity="0.7"/>
+  
+  <!-- Straw -->
+  <rect x="148" y="45" width="4" height="50" fill="#ef4444"/>
+  
+  <!-- Lemon slice -->
+  <circle cx="175" cy="90" r="8" fill="#fbbf24"/>
+  <path d="M 167 90 Q 175 82 183 90 Q 175 98 167 90" fill="#f59e0b"/>
+  
+  <text x="150" y="175" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white" font-weight="bold">Кола освежающая</text>
+</svg>

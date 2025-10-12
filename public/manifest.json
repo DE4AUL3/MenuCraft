@@ -1,0 +1,128 @@
+{
+  "name": "Catalog Cafe - Каталог ресторанов",
+  "short_name": "Catalog Cafe",
+  "description": "Премиум каталог ресторанов с заказом онлайн",
+  "theme_color": "#3B82F6",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "id": "/",
+  "categories": ["food", "business", "shopping"],
+  "lang": "ru",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/panda_logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/panda_logo.jpg", 
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/han_tagam.jpg",
+      "sizes": "256x256", 
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/Sweet.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "platform": "wide",
+      "label": "Десерты и сладости"
+    },
+    {
+      "src": "/panda_logo.jpg",
+      "sizes": "640x1136", 
+      "type": "image/jpeg",
+      "platform": "narrow",
+      "label": "Мобильная версия"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Меню ресторанов",
+      "short_name": "Меню",
+      "description": "Быстрый доступ к меню ресторанов",
+      "url": "/select-restaurant",
+      "icons": [
+        {
+          "src": "/panda-burger-logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Корзина",
+      "short_name": "Корзина", 
+      "description": "Посмотреть текущий заказ",
+      "url": "/cart",
+      "icons": [
+        {
+          "src": "/khan-tagam-logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Админ панель",
+      "short_name": "Админ",
+      "description": "Панель управления",
+      "url": "/admin",
+      "icons": [
+        {
+          "src": "/panda_logo.jpg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay"],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "file_handlers": [
+    {
+      "action": "/admin",
+      "accept": {
+        "application/json": [".json"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+catalog",
+      "url": "/restaurant/%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "images",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  }
+}

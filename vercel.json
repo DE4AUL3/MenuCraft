@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm ci",
+  "outputDirectory": ".next",
+  "routes": [
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

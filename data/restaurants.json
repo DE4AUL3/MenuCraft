@@ -1,0 +1,191 @@
+{
+  "restaurants": [
+    {
+      "id": "kemine-bistro",
+      "name": "Kemine Bistro",
+      "logo": "/images/kemine-logo.jpg",
+      "theme": "light",
+      "contacts": [
+        {
+          "id": "delivery",
+          "name": "Доставка",
+          "phone": "+996 555 123 456"
+        },
+        {
+          "id": "booking",
+          "name": "Бронь столиков",
+          "phone": "+996 555 987 654"
+        }
+      ],
+      "categories": [
+        {
+          "id": "hot-dishes",
+          "name": "Горячее",
+          "image": "/images/hot-dishes.svg",
+          "dishes": [
+            {
+              "id": "beef-steak",
+              "name": "Стейк из говядины",
+              "description": "Сочный стейк средней прожарки с овощами гриль",
+              "price": 850,
+              "image": "/images/beef-steak.svg"
+            },
+            {
+              "id": "chicken-teriyaki",
+              "name": "Курица терияки",
+              "description": "Нежная курица в соусе терияки с рисом жасмин",
+              "price": 520,
+              "image": "/images/placeholder.svg"
+            },
+            {
+              "id": "salmon-grill",
+              "name": "Лосось на гриле",
+              "description": "Филе лосося с лимонным маслом и зеленым салатом",
+              "price": 950,
+              "image": "/images/placeholder.svg"
+            }
+          ]
+        },
+        {
+          "id": "salads",
+          "name": "Салаты",
+          "image": "/images/salads.svg",
+          "dishes": [
+            {
+              "id": "caesar-salad",
+              "name": "Цезарь с курицей",
+              "description": "Классический салат с курицей, пармезаном и соусом цезарь",
+              "price": 380,
+              "image": "/images/caesar-salad.jpg"
+            },
+            {
+              "id": "greek-salad",
+              "name": "Греческий салат",
+              "description": "Свежие овощи, оливки, сыр фета и оливковое масло",
+              "price": 320,
+              "image": "/images/greek-salad.jpg"
+            }
+          ]
+        },
+        {
+          "id": "desserts",
+          "name": "Десерты",
+          "image": "/images/desserts.svg",
+          "dishes": [
+            {
+              "id": "tiramisu",
+              "name": "Тирамису",
+              "description": "Классический итальянский десерт с кофе и маскарпоне",
+              "price": 250,
+              "image": "/images/tiramisu.jpg"
+            },
+            {
+              "id": "cheesecake",
+              "name": "Чизкейк",
+              "description": "Нежный творожный торт с ягодным соусом",
+              "price": 220,
+              "image": "/images/cheesecake.jpg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alatoo-cafe",
+      "name": "Alatoo Café",
+      "logo": "/images/alatoo-logo.jpg",
+      "theme": "dark",
+      "contacts": [
+        {
+          "id": "main",
+          "name": "Основной",
+          "phone": "+996 777 111 222"
+        },
+        {
+          "id": "takeaway",
+          "name": "Самовывоз",
+          "phone": "+996 777 333 444"
+        }
+      ],
+      "categories": [
+        {
+          "id": "soups",
+          "name": "Супы",
+          "image": "/images/soups.jpg",
+          "dishes": [
+            {
+              "id": "lagman",
+              "name": "Лагман",
+              "description": "Традиционная лапша с мясом и овощами в ароматном бульоне",
+              "price": 280,
+              "image": "/images/lagman.jpg"
+            },
+            {
+              "id": "shorpo",
+              "name": "Шорпо",
+              "description": "Наваристый мясной суп с картофелем и зеленью",
+              "price": 250,
+              "image": "/images/shorpo.jpg"
+            }
+          ]
+        },
+        {
+          "id": "manty",
+          "name": "Манты",
+          "image": "/images/manty.jpg",
+          "dishes": [
+            {
+              "id": "beef-manty",
+              "name": "Манты с говядиной",
+              "description": "Сочные манты с говяжьим фаршем и луком (4 шт)",
+              "price": 180,
+              "image": "/images/beef-manty.jpg"
+            },
+            {
+              "id": "lamb-manty",
+              "name": "Манты с бараниной",
+              "description": "Традиционные манты с бараниной и специями (4 шт)",
+              "price": 200,
+              "image": "/images/lamb-manty.jpg"
+            },
+            {
+              "id": "pumpkin-manty",
+              "name": "Манты с тыквой",
+              "description": "Постные манты с тыквой и луком (4 шт)",
+              "price": 150,
+              "image": "/images/pumpkin-manty.jpg"
+            }
+          ]
+        },
+        {
+          "id": "drinks",
+          "name": "Напитки",
+          "image": "/images/drinks.jpg",
+          "dishes": [
+            {
+              "id": "green-tea",
+              "name": "Зеленый чай",
+              "description": "Ароматный зеленый чай в традиционной пиале",
+              "price": 80,
+              "image": "/images/green-tea.jpg"
+            },
+            {
+              "id": "compote",
+              "name": "Компот из сухофруктов",
+              "description": "Домашний компот из кураги, изюма и чернослива",
+              "price": 120,
+              "image": "/images/compote.jpg"
+            },
+            {
+              "id": "kumiss",
+              "name": "Кумыс",
+              "description": "Традиционный кисломолочный напиток",
+              "price": 100,
+              "image": "/images/kumiss.jpg"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

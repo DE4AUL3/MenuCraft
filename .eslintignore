@@ -1,0 +1,11 @@
+.next/
+dist/
+node_modules/
+out/
+.vscode/
+.cache/
+coverage/
+*.d.ts
+!src/**/*.d.ts
+public/sw.js
+test-functions.js

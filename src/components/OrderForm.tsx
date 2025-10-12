@@ -1,0 +1,166 @@
+'use client'
+
+import { useState } from 'react'
+import { useCart } from '@/hooks/useCart'
+import { useTheme } from '@/hooks/useTheme'
+import { db } from '@/lib/database'
+import { Phone, X } from 'lucide-react'
+
+interface OrderFormProps {
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: (orderId: string) => void
+}
+
+export default function OrderForm({ isOpen, onClose, onSuccess }: OrderFormProps) {
+  const { state, clearCart } = useCart()
+  const { currentRestaurant } = useTheme()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState({
+    phone: '',
+    name: '',
+    email: '',
+    address: '',
+    notes: ''
+  })
+
+  const isDark = currentRestaurant === 'panda-burger' || currentRestaurant === '1'
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    try {
+      const orderId = db.createOrder(
+        formData.phone,
+        state.items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        {
+          name: formData.name,
+          email: formData.email,
+          address: formData.address,
+          notes: formData.notes
+        }
+      )
+
+      clearCart()
+      setFormData({
+        phone: '',
+        name: '',
+        email: '',
+        address: '',
+        notes: ''
+      })
+      onSuccess(orderId)
+    } catch (error) {
+      console.error('Ошибка при создании заказа:', error)
+      alert('Произошла ошибка при оформлении заказа. Попробуйте еще раз.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className={`rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
+        isDark ? 'bg-[#282828]' : 'bg-white'
+      }`}>
+        <div className={`flex items-center justify-between p-6 border-b ${
+          isDark ? 'border-gray-600' : 'border-gray-200'
+        }`}>
+          <h2 className={`text-xl font-bold ${
+            isDark ? 'text-white' : 'text-gray-900'
+          }`}>
+            Оформление заказа
+          </h2>
+          <button
+            onClick={onClose}
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+              isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+            }`}
+          >
+            <X className={`w-4 h-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
+          </button>
+        </div>
+
+        <div className={`p-6 border-b ${isDark ? 'border-gray-600' : 'border-gray-200'}`}>
+          <h3 className={`font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            Ваш заказ:
+          </h3>
+          <div className="space-y-2">
+            {state.items.map((item) => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>
+                  {item.name} × {item.quantity}
+                </span>
+                <span className={isDark ? 'text-white' : 'text-gray-900'}>
+                  {item.price * item.quantity} ТМТ
+                </span>
+              </div>
+            ))}
+            <div className={`flex justify-between font-semibold pt-2 border-t ${
+              isDark ? 'border-gray-600' : 'border-gray-200'
+            }`}>
+              <span className={isDark ? 'text-white' : 'text-gray-900'}>Итого:</span>
+              <span className={isDark ? 'text-white' : 'text-gray-900'}>
+                {state.totalAmount + state.deliveryFee} ТМТ
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${
+              isDark ? 'text-gray-300' : 'text-gray-700'
+            }`}>
+              Номер телефона *
+            </label>
+            <div className="relative">
+              <Phone className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+                isDark ? 'text-gray-500' : 'text-gray-400'
+              }`} />
+              <input
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                  isDark 
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }`}
+                placeholder="+993 XX XXX XXX"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting || !formData.phone.trim()}
+            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Оформляем заказ...</span>
+              </div>
+            ) : (
+              'Подтвердить заказ'
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
