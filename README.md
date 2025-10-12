@@ -594,7 +594,7 @@ const text = getText('newKey', currentLanguage)
 
 ---
 
-**Автор проекта**: GitHub Copilot
+**Автор проекта**: DJ DE4AUL3 + DJ GITCOP
 **Дата**: 10 октября 2025 г.
 **Статус**: Готовый шаблон (демо-данные + локальный CMS)
 **Лицензия**: MIT
