@@ -80,6 +80,7 @@ import FloatingCartButton from '@/components/FloatingCartButton';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import Analytics from '@/components/Analytics';
 import { Toaster } from 'react-hot-toast';
+import ColorThemeInitializer from '@/components/ColorThemeInitializer';
 
 export default function RootLayout({
   children,
@@ -91,6 +92,7 @@ export default function RootLayout({
       <body className="h-full bg-white dark:bg-black text-gray-900 dark:text-white mobile-app-feel safe-area-padding">
         <CartProvider>
           <ErrorBoundary>
+            <ColorThemeInitializer />
             <div className="min-h-screen smooth-scroll">
               {children}
               <FloatingCartButton />
