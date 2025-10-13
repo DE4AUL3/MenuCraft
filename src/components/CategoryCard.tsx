@@ -5,7 +5,7 @@ import { useTranslation } from './LanguageToggle';
 import { useTheme } from '@/hooks/useTheme';
 import SmartImage from '@/components/ui/SmartImage';
 import Link from 'next/link';
-import { ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface CategoryCardProps {
@@ -31,39 +31,15 @@ export default function CategoryCard({ category }: CategoryCardProps) {
             ? 'bg-gray-800 border-gray-700 hover:border-orange-500/50'
             : 'bg-white border-gray-200 hover:border-orange-400/50'
         }`}
-        style={{
-          '--hover-border-color': 'var(--color-primary)',
-        } as React.CSSProperties}
       >
-        {/* Градиентная рамка при ховере */}
-        <div 
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"
-          style={{
-            background: `linear-gradient(135deg, var(--gradient-from), var(--gradient-via), var(--gradient-to))`
-          }}
-        />
-        <div className={`absolute inset-[3px] rounded-2xl transition-all duration-300 ${
-          isDarkMode ? 'bg-gray-800' : 'bg-white'
-        }`} />
-        
-        {/* Изображение */}
-        <div className="relative h-56 overflow-hidden rounded-t-2xl">
+        {/* Изображение - увеличенное и без лишних элементов */}
+        <div className="relative h-48 overflow-hidden rounded-t-2xl">
           <SmartImage
             src={category.image}
             alt={category.name}
             className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
           />
-          
-          {/* Оверлей градиент */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
-          {/* Иконка стрелки */}
-          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-            <div className="p-2 bg-white/20 backdrop-blur-sm rounded-full">
-              <ArrowRight className="w-4 h-4 text-white" />
-            </div>
-          </div>
         </div>
         
         {/* Контент */}

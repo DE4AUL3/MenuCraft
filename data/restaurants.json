@@ -87,6 +87,48 @@
               "image": "/images/cheesecake.jpg"
             }
           ]
+        },
+        {
+          "id": "pizza",
+          "name": "Пицца",
+          "image": "/images/categories/pizza.svg",
+          "dishes": [
+            {
+              "id": "margherita",
+              "name": "Маргарита",
+              "description": "Классическая пицца с томатным соусом, моцареллой и базиликом",
+              "price": 450,
+              "image": "/images/menu/margherita-royal.svg"
+            },
+            {
+              "id": "pepperoni",
+              "name": "Пепперони",
+              "description": "Острая пицца с пепперони, моцареллой и томатным соусом",
+              "price": 520,
+              "image": "/images/menu/pepperoni-supreme.svg"
+            },
+            {
+              "id": "quattro-formaggi",
+              "name": "Кватро Формаджи",
+              "description": "Пицца с четырьмя видами сыра: моцарелла, пармезан, горгонзола и рикотта",
+              "price": 590,
+              "image": "/images/placeholder.svg"
+            },
+            {
+              "id": "hawaiian",
+              "name": "Гавайская",
+              "description": "Пицца с ананасами, ветчиной и моцареллой",
+              "price": 480,
+              "image": "/images/placeholder.svg"
+            },
+            {
+              "id": "meat-lovers",
+              "name": "Мясная",
+              "description": "Пицца с пепперони, итальянской колбасой, беконом и ветчиной",
+              "price": 650,
+              "image": "/images/placeholder.svg"
+            }
+          ]
         }
       ]
     },
