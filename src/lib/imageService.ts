@@ -107,29 +107,21 @@ class ImageService {
 
   // Загрузка и обработка изображения
   async uploadImage(file: File, category: 'logos' | 'categories' | 'products' | 'other' = 'other', alt?: string): Promise<ImageUploadResult> {
-    console.log('🔄 Начинаем загрузку изображения:', file.name, file.type, file.size);
-    
     try {
       // Проверяем файл
       const validation = this.validateImageFile(file);
       if (!validation.valid) {
-        console.log('❌ Валидация не прошла:', validation.error);
         return {
           success: false,
           error: validation.error
         };
       }
-      console.log('✅ Валидация прошла успешно');
 
       // Сжимаем изображение
-      console.log('🗜️ Сжимаем изображение...');
       const compressedFile = await this.compressImage(file);
-      console.log('✅ Изображение сжато, новый размер:', compressedFile.size);
 
       // Конвертируем в base64
-      console.log('🔄 Конвертируем в base64...');
       const base64 = await this.convertToBase64(compressedFile);
-      console.log('✅ Конвертация завершена, длина:', base64.length);
 
       // Создаем временное изображение для получения размеров
       const img = new Image();
@@ -152,11 +144,9 @@ class ImageService {
         height: dimensions.height
       };
 
-      console.log('💾 Сохраняем в localStorage под ключом:', `image_${imageId}`);
       storageSync.setItem(`image_${imageId}`, imageData);
       
       const url = `local:${imageId}`;
-      console.log('✅ Изображение успешно загружено, URL:', url);
 
       return {
         success: true,
@@ -164,7 +154,6 @@ class ImageService {
       };
 
     } catch (error) {
-      console.error('❌ Ошибка при загрузке изображения:', error);
       return {
         success: false,
         error: 'Ошибка загрузки изображения: ' + (error as Error).message
@@ -188,23 +177,17 @@ class ImageService {
 
   // Получение URL изображения для отображения
   getImageUrl(imageUrl: string): string {
-    console.log('🔍 Получаем URL для изображения:', imageUrl);
-    
     if (imageUrl.startsWith('local:')) {
       const imageId = imageUrl.replace('local:', '');
-      console.log('📦 Ищем локальное изображение с ID:', imageId);
       
       const base64Data = this.getImageById(imageId);
       if (base64Data) {
-        console.log('✅ Локальное изображение найдено');
         return base64Data;
       } else {
-        console.log('❌ Локальное изображение не найдено, используем placeholder');
         return '/images/placeholder.svg';
       }
     }
     
-    console.log('🌐 Используем внешний URL:', imageUrl);
     return imageUrl;
   }
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowRight, MapPin, Phone, Star } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { getRestaurantByDomain } from '../../lib/domain';
+import SmartImage from '../ui/SmartImage';
 
 interface Restaurant {
   id: string;
@@ -137,7 +138,7 @@ export default function RestaurantSelector() {
                 {/* Restaurant Image */}
                 <div className="relative h-48 overflow-hidden">
                   <div className={`absolute inset-0 bg-gradient-to-br ${restaurant.gradient} opacity-80`} />
-                  <img
+                  <SmartImage
                     src={restaurant.image}
                     alt={restaurant.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -145,7 +146,7 @@ export default function RestaurantSelector() {
                   
                   {/* Logo */}
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-xl shadow-lg">
-                    <img
+                    <SmartImage
                       src={restaurant.logo}
                       alt={`${restaurant.name} Logo`}
                       className="w-10 h-10 object-contain"

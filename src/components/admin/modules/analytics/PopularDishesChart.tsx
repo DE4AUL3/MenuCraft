@@ -2,6 +2,7 @@
 
 import { Star, TrendingUp, Package } from 'lucide-react'
 import { DishData, formatCurrency } from './mockData'
+import SmartImage from '@/components/ui/SmartImage'
 
 interface PopularDishesChartProps {
   data: DishData[]
@@ -106,14 +107,10 @@ export default function PopularDishesChart({ data, theme = 'light' }: PopularDis
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-lg bg-gray-200/50 flex items-center justify-center overflow-hidden">
                     {dish.image ? (
-                      <img 
+                      <SmartImage 
                         src={dish.image} 
                         alt={dish.name}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                        }}
                       />
                     ) : (
                       <Package className="w-6 h-6 text-gray-400" />

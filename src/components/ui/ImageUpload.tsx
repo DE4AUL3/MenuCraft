@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Upload, X, Image as ImageIcon, AlertCircle, CheckCircle } from 'lucide-react';
 import { imageService, ImageUploadResult } from '@/lib/imageService';
+import SmartImage from './SmartImage';
 
 interface ImageUploadProps {
   currentImage?: string;
@@ -120,7 +121,7 @@ export default function ImageUpload({
           // Показываем загруженное изображение
           <div className="relative group">
             <div className="relative w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-600">
-              <img
+              <SmartImage
                 src={displayUrl}
                 alt="Preview"
                 className="w-full h-full object-cover"

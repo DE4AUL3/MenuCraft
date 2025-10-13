@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import toast from 'react-hot-toast'
 import {
   Plus,
   Search,
@@ -17,6 +18,7 @@ import {
 import { Dish, Category } from '@/types/common'
 import { dataService } from '@/lib/dataService'
 import ImageUpload from '@/components/ui/ImageUpload'
+import SmartImage from '@/components/ui/SmartImage'
 
 interface DishManagerProps {
   theme?: 'light' | 'dark'
@@ -40,10 +42,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
     categoryId: '',
     image: '',
     isActive: true,
-    isAvailable: true,
-    preparationTime: 15,
-    calories: 0,
-    weight: 0
+    isAvailable: true
   })
 
   const themeStyles = {
@@ -115,10 +114,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
         categoryId: categories[0]?.id || '',
         image: '',
         isActive: true,
-        isAvailable: true,
-        preparationTime: 15,
-        calories: 0,
-        weight: 0
+        isAvailable: true
       })
     }
     setIsModalOpen(true)
@@ -134,17 +130,17 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
       categoryId: '',
       image: '',
       isActive: true,
-      isAvailable: true,
-      preparationTime: 15,
-      calories: 0,
-      weight: 0
+      isAvailable: true
     })
   }
 
   const handleSave = async () => {
     try {
       if (!formData.name?.ru || !formData.name?.tk || !formData.categoryId) {
-        alert('Пожалуйста, заполните все обязательные поля')
+        toast.error('Пожалуйста, заполните все обязательные поля', {
+          duration: 4000,
+          position: 'top-right',
+        })
         return
       }
 
@@ -159,9 +155,16 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
       }
 
       closeModal()
+      toast.success(editingDish ? 'Блюдо обновлено!' : 'Блюдо добавлено!', {
+        duration: 3000,
+        position: 'top-right',
+      })
     } catch (error) {
       console.error('Ошибка сохранения блюда:', error)
-      alert('Ошибка сохранения блюда')
+      toast.error('Ошибка сохранения блюда', {
+        duration: 4000,
+        position: 'top-right',
+      })
     }
   }
 
@@ -171,9 +174,16 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
     try {
       await dataService.deleteDish(dishId)
       setDishes(prev => prev.filter(d => d.id !== dishId))
+      toast.success('Блюдо удалено!', {
+        duration: 3000,
+        position: 'top-right',
+      })
     } catch (error) {
       console.error('Ошибка удаления блюда:', error)
-      alert('Ошибка удаления блюда')
+      toast.error('Ошибка удаления блюда', {
+        duration: 4000,
+        position: 'top-right',
+      })
     }
   }
 
@@ -278,11 +288,14 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
               {/* Изображение блюда */}
               <div className="relative mb-4">
                 {dish.image ? (
-                  <img
-                    src={dish.image}
-                    alt={dish.name.ru}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden">
+                    <SmartImage
+                      src={dish.image}
+                      alt={dish.name.ru}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 ) : (
                   <div className={`w-full h-48 ${styles.secondaryBg} rounded-lg flex items-center justify-center`}>
                     <ImageIcon className="w-12 h-12 text-gray-400" />
@@ -319,15 +332,6 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                   <DollarSign className="w-4 h-4 text-green-600" />
                   <span className="font-bold text-lg">{dish.price} ТМТ</span>
                 </div>
-                <div className={`text-xs ${styles.textMuted}`}>
-                  {dish.preparationTime || 15} мин
-                </div>
-              </div>
-
-              {/* Дополнительная информация */}
-              <div className={`text-xs ${styles.textMuted} mb-4 grid grid-cols-2 gap-2`}>
-                {(dish.calories || 0) > 0 && <div>🔥 {dish.calories} ккал</div>}
-                {(dish.weight || 0) > 0 && <div>⚖️ {dish.weight}г</div>}
               </div>
 
               {/* Кнопки управления */}
@@ -471,48 +475,6 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                     onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
                     className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
                     placeholder="0.00"
-                  />
-                </div>
-
-                {/* Время приготовления */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Время приготовления (мин)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.preparationTime}
-                    onChange={(e) => setFormData(prev => ({ ...prev, preparationTime: parseInt(e.target.value) || 15 }))}
-                    className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                  />
-                </div>
-
-                {/* Вес */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Вес (г)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.weight}
-                    onChange={(e) => setFormData(prev => ({ ...prev, weight: parseInt(e.target.value) || 0 }))}
-                    className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                  />
-                </div>
-
-                {/* Калории */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Калории
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.calories}
-                    onChange={(e) => setFormData(prev => ({ ...prev, calories: parseInt(e.target.value) || 0 }))}
-                    className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
                   />
                 </div>
 

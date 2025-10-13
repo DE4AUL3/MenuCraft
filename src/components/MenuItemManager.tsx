@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { cms, MenuItem, Category } from '@/lib/cms';
 import { useTheme } from '@/hooks/useTheme';
+import SmartImage from './ui/SmartImage';
 
 interface MenuItemFormData {
   categoryId: string;
@@ -86,9 +88,15 @@ export default function MenuItemManager() {
       
       loadData();
       resetForm();
-      alert(editingId ? 'Товар обновлен!' : 'Товар добавлен!');
+      toast.success(editingId ? 'Товар обновлен!' : 'Товар добавлен!', {
+        duration: 3000,
+        position: 'top-right',
+      });
     } catch (error) {
-      alert('Ошибка: ' + (error as Error).message);
+      toast.error('Ошибка: ' + (error as Error).message, {
+        duration: 4000,
+        position: 'top-right',
+      });
     }
   };
 
@@ -120,7 +128,10 @@ export default function MenuItemManager() {
     if (confirm('Вы уверены, что хотите удалить этот товар?')) {
       cms.deleteMenuItem(id);
       loadData();
-      alert('Товар удален!');
+      toast.success('Товар удален!', {
+        duration: 3000,
+        position: 'top-right',
+      });
     }
   };
 
@@ -252,7 +263,7 @@ export default function MenuItemManager() {
             {/* Item Image */}
             <div className="h-32 bg-gray-200 dark:bg-gray-700 relative">
               {item.image ? (
-                <img
+                <SmartImage
                   src={item.image}
                   alt={item.name}
                   className="w-full h-full object-cover"

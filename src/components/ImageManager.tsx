@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Upload, ImageIcon, Tag, Filter, Settings } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { imageService } from '@/lib/imageService';
 import { storageSync } from '@/lib/storageSync';
 import type { ImageInfo } from '@/lib/imageService';
@@ -43,10 +44,16 @@ export default function ImageManager() {
         if (result.success) {
           console.log('✅ Изображение загружено:', file.name);
         } else {
-          alert(`Ошибка загрузки ${file.name}: ${result.error}`);
+          toast.error(`Ошибка загрузки ${file.name}: ${result.error}`, {
+            duration: 4000,
+            position: 'top-right',
+          });
         }
       } catch {
-        alert(`Ошибка загрузки ${file.name}`);
+        toast.error(`Ошибка загрузки ${file.name}`, {
+          duration: 4000,
+          position: 'top-right',
+        });
       }
     }
 

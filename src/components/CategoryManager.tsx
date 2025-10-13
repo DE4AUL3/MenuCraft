@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { dataService } from '@/lib/dataService';
 import { imageService } from '@/lib/imageService';
 import ImageUpload from '@/components/ui/ImageUpload';
+import SmartImage from '@/components/ui/SmartImage';
 import type { Category } from '@/types/common';
 
 interface CategoryFormData {
@@ -56,9 +58,15 @@ export default function CategoryManager() {
       
       loadCategories();
       resetForm();
-      alert(editingId ? 'Категория обновлена!' : 'Категория добавлена!');
+      toast.success(editingId ? 'Категория обновлена!' : 'Категория добавлена!', {
+        duration: 3000,
+        position: 'top-right',
+      });
     } catch (error) {
-      alert('Ошибка: ' + (error as Error).message);
+      toast.error('Ошибка: ' + (error as Error).message, {
+        duration: 4000,
+        position: 'top-right',
+      });
     }
   };
 
@@ -83,9 +91,15 @@ export default function CategoryManager() {
       try {
         dataService.deleteCategory(id);
         loadCategories();
-        alert('Категория удалена!');
+        toast.success('Категория удалена!', {
+          duration: 3000,
+          position: 'top-right',
+        });
       } catch (error) {
-        alert('Ошибка: ' + (error as Error).message);
+        toast.error('Ошибка: ' + (error as Error).message, {
+          duration: 4000,
+          position: 'top-right',
+        });
       }
     }
   };
@@ -139,10 +153,11 @@ export default function CategoryManager() {
             {/* Category Image */}
             <div className="h-32 bg-gray-200 dark:bg-gray-700 relative">
               {category.image ? (
-                <img
-                  src={imageService.getImageUrl(category.image)}
+                <SmartImage
+                  src={category.image}
                   alt={category.name}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-2xl font-bold">

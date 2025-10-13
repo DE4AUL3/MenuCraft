@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import {
   Bell,
   Palette,
@@ -11,7 +13,9 @@ import {
   Settings,
   LogOut,
   UserCircle,
-  HelpCircle
+  HelpCircle,
+  Home,
+  ExternalLink
 } from 'lucide-react'
 
 interface AdminHeaderProps {
@@ -54,8 +58,10 @@ export default function AdminHeader({
   currentTheme = 'light', 
   restaurantName = 'Название Ресторана' 
 }: AdminHeaderProps) {
+  const router = useRouter()
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [notificationCount] = useState(3)
 
   const theme = themes[currentTheme]
@@ -70,6 +76,9 @@ export default function AdminHeader({
       if (!target.closest('.theme-menu') && !target.closest('.theme-button')) {
         setIsThemeMenuOpen(false)
       }
+      if (!target.closest('.notifications-menu') && !target.closest('.notifications-button')) {
+        setIsNotificationsOpen(false)
+      }
     }
 
     document.addEventListener('click', handleClickOutside)
@@ -80,6 +89,34 @@ export default function AdminHeader({
     onThemeChange?.(newTheme)
     setIsThemeMenuOpen(false)
     localStorage.setItem('adminTheme', newTheme)
+    toast.success(`Тема изменена на ${themes[newTheme].name.toLowerCase()}`)
+  }
+
+  const handleLogout = () => {
+    setIsProfileMenuOpen(false)
+    toast.success('Вы успешно вышли из системы')
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
+  }
+
+  const handleGoHome = () => {
+    window.open('/', '_blank')
+  }
+
+  const handleProfileClick = () => {
+    setIsProfileMenuOpen(false)
+    toast('Переход в настройки профиля', { icon: '👤' })
+  }
+
+  const handleSettingsClick = () => {
+    setIsProfileMenuOpen(false)
+    router.push('/admin?tab=settings')
+  }
+
+  const handleHelpClick = () => {
+    setIsProfileMenuOpen(false)
+    toast('Справочная система в разработке', { icon: '❓' })
   }
 
   return (
@@ -87,11 +124,20 @@ export default function AdminHeader({
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           
-          {/* Левая часть - Название ресторана */}
-          <div className="flex items-center">
+          {/* Левая часть - Название ресторана и переход на сайт */}
+          <div className="flex items-center gap-4">
             <h1 className={`text-xl font-bold ${theme.colors.text}`}>
               {restaurantName}
             </h1>
+            <button
+              onClick={handleGoHome}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${theme.colors.hover} text-sm`}
+              title="Перейти на сайт ресторана"
+            >
+              <Home className={`w-4 h-4 ${theme.colors.textSecondary}`} />
+              <span className={theme.colors.textSecondary}>Сайт</span>
+              <ExternalLink className={`w-3 h-3 ${theme.colors.textSecondary}`} />
+            </button>
           </div>
 
           {/* Правая часть - Управление */}
@@ -143,21 +189,72 @@ export default function AdminHeader({
             </div>
 
             {/* Уведомления */}
-            <button 
-              className={`p-2 rounded-lg transition-all duration-200 ${theme.colors.hover} relative`}
-              title="Уведомления"
-            >
-              <Bell className={`w-5 h-5 ${theme.colors.text}`} />
-              {notificationCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 text-white text-xs rounded-full flex items-center justify-center font-medium bg-red-500"
-                >
-                  {notificationCount}
-                </motion.span>
-              )}
-            </button>
+            <div className="relative notifications-menu">
+              <button 
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className={`notifications-button p-2 rounded-lg transition-all duration-200 ${theme.colors.hover} relative`}
+                title="Уведомления"
+              >
+                <Bell className={`w-5 h-5 ${theme.colors.text}`} />
+                {notificationCount > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 w-5 h-5 text-white text-xs rounded-full flex items-center justify-center font-medium bg-red-500"
+                  >
+                    {notificationCount}
+                  </motion.span>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {isNotificationsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className={`absolute right-0 top-full mt-2 w-80 rounded-lg shadow-xl border overflow-hidden z-50 ${theme.colors.bg} ${theme.colors.border}`}
+                  >
+                    <div className={`p-4 border-b ${theme.colors.border}`}>
+                      <h3 className={`font-medium ${theme.colors.text}`}>Уведомления</h3>
+                    </div>
+                    
+                    <div className="max-h-96 overflow-y-auto">
+                      {[
+                        { title: 'Новый заказ #1234', message: 'Заказ на сумму 850₽', time: '2 мин назад', type: 'order' },
+                        { title: 'Низкий остаток', message: 'Пицца "Маргарита" заканчивается', time: '15 мин назад', type: 'warning' },
+                        { title: 'Новый отзыв', message: 'Клиент оставил 5 звезд', time: '1 час назад', type: 'review' }
+                      ].map((notification, index) => (
+                        <div
+                          key={index}
+                          className={`p-4 border-b last:border-b-0 ${theme.colors.border} ${theme.colors.hover} cursor-pointer`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className={`font-medium ${theme.colors.text} text-sm`}>
+                                {notification.title}
+                              </div>
+                              <div className={`text-sm ${theme.colors.textSecondary} mt-1`}>
+                                {notification.message}
+                              </div>
+                            </div>
+                            <div className={`text-xs ${theme.colors.textSecondary}`}>
+                              {notification.time}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className={`p-3 border-t ${theme.colors.border}`}>
+                      <button className={`w-full text-center text-sm ${theme.colors.textSecondary} ${theme.colors.hover} py-2 rounded`}>
+                        Показать все уведомления
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Профиль */}
             <div className="relative profile-menu">
@@ -193,22 +290,35 @@ export default function AdminHeader({
                     </div>
                     
                     <div className="py-2">
-                      {[
-                        { icon: <UserCircle className="w-4 h-4" />, label: 'Мой профиль' },
-                        { icon: <Settings className="w-4 h-4" />, label: 'Настройки' },
-                        { icon: <HelpCircle className="w-4 h-4" />, label: 'Помощь' }
-                      ].map((item, index) => (
-                        <button
-                          key={index}
-                          className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${theme.colors.hover}`}
-                        >
-                          <span className={theme.colors.textSecondary}>{item.icon}</span>
-                          <span className={theme.colors.text}>{item.label}</span>
-                        </button>
-                      ))}
+                      <button
+                        onClick={handleProfileClick}
+                        className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${theme.colors.hover}`}
+                      >
+                        <span className={theme.colors.textSecondary}><UserCircle className="w-4 h-4" /></span>
+                        <span className={theme.colors.text}>Мой профиль</span>
+                      </button>
+                      
+                      <button
+                        onClick={handleSettingsClick}
+                        className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${theme.colors.hover}`}
+                      >
+                        <span className={theme.colors.textSecondary}><Settings className="w-4 h-4" /></span>
+                        <span className={theme.colors.text}>Настройки</span>
+                      </button>
+                      
+                      <button
+                        onClick={handleHelpClick}
+                        className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${theme.colors.hover}`}
+                      >
+                        <span className={theme.colors.textSecondary}><HelpCircle className="w-4 h-4" /></span>
+                        <span className={theme.colors.text}>Помощь</span>
+                      </button>
                       
                       <div className={`border-t ${theme.colors.border} mt-2 pt-2`}>
-                        <button className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-red-100 text-red-600`}>
+                        <button 
+                          onClick={handleLogout}
+                          className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600`}
+                        >
                           <LogOut className="w-4 h-4" />
                           <span>Выйти</span>
                         </button>
