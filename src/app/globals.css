@@ -23,6 +23,17 @@
   --accent-warning: #f59e0b;
   --accent-danger: #ef4444;
   --accent-success: #10b981;
+
+  /* Управляемые цвета для системы цветов */
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-primary-light: #fed7aa;
+  --color-primary-dark: #c2410c;
+  --color-secondary: #fb923c;
+  --color-accent: #ffedd5;
+  --gradient-from: #fb923c;
+  --gradient-via: #f97316;
+  --gradient-to: #ea580c;
 }
 
 /* Темная тема - новые цвета */

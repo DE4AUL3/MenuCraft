@@ -9,7 +9,8 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  Palette
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -39,6 +40,7 @@ export default function AdminLayout({ children, activeSection = 'dashboard' }: A
   const menuItems = [
     { id: 'dashboard', name: 'Панель управления', icon: LayoutDashboard, href: '/admin/dashboard' },
     { id: 'restaurant', name: 'Ресторан', icon: UtensilsCrossed, href: '/admin/restaurant' },
+    { id: 'colors', name: 'Цвета', icon: Palette, href: '/admin/colors' },
     { id: 'contacts', name: 'Контакты', icon: Phone, href: '/admin/contacts' },
     { id: 'settings', name: 'Настройки', icon: Settings, href: '/admin/settings' },
   ];

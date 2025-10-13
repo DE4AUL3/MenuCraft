@@ -80,6 +80,7 @@ import FloatingCartButton from '@/components/FloatingCartButton';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import Analytics from '@/components/Analytics';
 import { Toaster } from 'react-hot-toast';
+import ColorThemeProvider from '@/components/ColorThemeProvider';
 
 export default function RootLayout({
   children,
@@ -89,41 +90,43 @@ export default function RootLayout({
   return (
     <html lang="ru" className="h-full">
       <body className="h-full bg-white dark:bg-black text-gray-900 dark:text-white mobile-app-feel safe-area-padding">
-        <CartProvider>
-          <ErrorBoundary>
-            <div className="min-h-screen smooth-scroll">
-              {children}
-              <FloatingCartButton />
-              <PWAInstallBanner />
-              <Analytics />
-              <Toaster 
-                position="top-right"
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: 'var(--bg-secondary)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--accent-call)',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#10b981',
-                      secondary: '#ffffff',
+        <ColorThemeProvider>
+          <CartProvider>
+            <ErrorBoundary>
+              <div className="min-h-screen smooth-scroll">
+                {children}
+                <FloatingCartButton />
+                <PWAInstallBanner />
+                <Analytics />
+                <Toaster 
+                  position="top-right"
+                  toastOptions={{
+                    duration: 3000,
+                    style: {
+                      background: 'var(--bg-secondary)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--accent-call)',
+                      fontSize: '14px',
+                      fontWeight: '500',
                     },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: '#ef4444',
-                      secondary: '#ffffff',
+                    success: {
+                      iconTheme: {
+                        primary: '#10b981',
+                        secondary: '#ffffff',
+                      },
                     },
-                  },
-                }}
-              />
-            </div>
-          </ErrorBoundary>
-        </CartProvider>
+                    error: {
+                      iconTheme: {
+                        primary: '#ef4444',
+                        secondary: '#ffffff',
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </ErrorBoundary>
+          </CartProvider>
+        </ColorThemeProvider>
       </body>
     </html>
   );

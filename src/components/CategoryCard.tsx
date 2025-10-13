@@ -31,19 +31,27 @@ export default function CategoryCard({ category }: CategoryCardProps) {
             ? 'bg-gray-800 border-gray-700 hover:border-orange-500/50'
             : 'bg-white border-gray-200 hover:border-orange-400/50'
         }`}
+        style={{
+          '--hover-border-color': 'var(--color-primary)',
+        } as React.CSSProperties}
       >
         {/* Градиентная рамка при ховере */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
+        <div 
+          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"
+          style={{
+            background: `linear-gradient(135deg, var(--gradient-from), var(--gradient-via), var(--gradient-to))`
+          }}
+        />
         <div className={`absolute inset-[3px] rounded-2xl transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800' : 'bg-white'
         }`} />
         
         {/* Изображение */}
-        <div className="relative h-44 overflow-hidden">
+        <div className="relative h-56 overflow-hidden rounded-t-2xl">
           <SmartImage
             src={category.image}
             alt={category.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
           />
           
@@ -62,11 +70,16 @@ export default function CategoryCard({ category }: CategoryCardProps) {
         <div className={`relative p-5 ${
           isDarkMode ? 'bg-gray-800' : 'bg-white'
         }`}>
-          <h3 className={`text-lg font-bold mb-4 transition-colors duration-300 ${
-            isDarkMode 
-              ? 'text-white group-hover:text-orange-400' 
-              : 'text-gray-900 group-hover:text-orange-600'
-          }`}>
+          <h3 
+            className={`text-lg font-bold mb-4 transition-colors duration-300 ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}
+            style={{
+              color: isDarkMode 
+                ? undefined 
+                : 'var(--text-primary)'
+            }}
+          >
             {category.name}
           </h3>
           
