@@ -210,21 +210,21 @@ const appThemes: Record<AppTheme, { colors: AppThemeColors; classes: AppThemeCla
 /**
  * Получить CSS классы для указанной темы
  */
-export function getAppThemeClasses(theme: AppTheme = 'light'): AppThemeClasses {
+export function getAppThemeClasses(theme: AppTheme = 'dark'): AppThemeClasses {
   return appThemes[theme].classes
 }
 
 /**
  * Получить цвета для указанной темы
  */
-export function getAppThemeColors(theme: AppTheme = 'light'): AppThemeColors {
+export function getAppThemeColors(theme: AppTheme = 'dark'): AppThemeColors {
   return appThemes[theme].colors
 }
 
 /**
  * Получить полную тему
  */
-export function getAppTheme(theme: AppTheme = 'light') {
+export function getAppTheme(theme: AppTheme = 'dark') {
   return appThemes[theme]
 }
 

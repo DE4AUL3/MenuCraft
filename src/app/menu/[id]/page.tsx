@@ -135,13 +135,13 @@ export default function MenuPage() {
                   
                   {/* Category Image */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300">
+                    <div className="w-full h-full sm:w-full sm:h-full rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300">
                       <Image
                         src={imageService.getImageUrl(category.image)}
                         alt={category.name}
-                        width={40}
-                        height={40}
-                        className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg"
+                        width={200}
+                        height={200}
+                        className="w-full h-full sm:w-full sm:h-full object-cover rounded-lg"
                       />
                     </div>
                   </div>

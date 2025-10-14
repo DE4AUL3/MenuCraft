@@ -68,21 +68,7 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Тематические классы для ресторанов */
-.theme-panda {
-  background: var(--panda-bg);
-  color: var(--panda-text);
-}
 
-.theme-han {
-  background: var(--han-bg);
-  color: var(--han-text);
-}
-
-.theme-sweet {
-  background: var(--sweet-bg);
-  color: var(--sweet-text);
-}
 
 /* Vercel (Geist) theme — опционально включается классом .theme-vercel */
 .theme-vercel {
@@ -94,17 +80,11 @@ body {
   /* Фоны и нейтрали */
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
-
-  /* Синхронизация акцентов с темами ресторанов */
-  --panda-accent: #0070f3;
-  --han-accent: #0070f3;
 }
 
 html.dark .theme-vercel {
   --bg-primary: #000000;
   --bg-secondary: #0a0a0a;
-  --panda-accent: #0070f3;
-  --han-accent: #0070f3;
 }
 
 /* Переменные для улучшенной цветовой палитры */
@@ -147,33 +127,6 @@ html.dark .theme-vercel {
   --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-glow: 0 0 0 1px rgb(16 185 129 / 0.15), 0 0 20px rgb(16 185 129 / 0.25);
-  
-  /* Panda Burger - современная темная тема */
-  --panda-bg: #000000;
-  --panda-card: #1a1a1a;
-  --panda-card-hover: #2a2a2a;
-  --panda-text: #ffffff;
-  --panda-text-secondary: #a1a1aa;
-  --panda-border: #27272a;
-  --panda-accent: #10b981;
-  
-  /* Han Tagam - элегантная светлая тема */
-  --han-bg: #fefefe;
-  --han-card: #ffffff;
-  --han-card-hover: #f8fafc;
-  --han-text: #1f2937;
-  --han-text-secondary: #6b7280;
-  --han-border: #e5e7eb;
-  --han-accent: #10b981;
-  
-  /* Sweet - теплая розовая тема */
-  --sweet-bg: #fdf2f8;
-  --sweet-card: #ffffff;
-  --sweet-card-hover: #fce7f3;
-  --sweet-text: #831843;
-  --sweet-text-secondary: #be185d;
-  --sweet-border: #f3e8ff;
-  --sweet-accent: #ec4899;
 }
 
 @layer utilities {

@@ -87,7 +87,6 @@ export const darkTheme: SimpleTheme = {
 }
 
 export const themes = {
-  light: lightTheme,
   dark: darkTheme
 } as const
 

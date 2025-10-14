@@ -12,43 +12,15 @@ interface ThemeSelectorProps {
 
 export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark' | 'panda' | 'han' | 'sweet'>('light')
+  const [currentTheme, setCurrentTheme] = useState<'dark'>('dark')
 
   const themes = [
-    {
-      id: 'light',
-      name: 'Светлая',
-      description: 'Классическая светлая тема',
-      colors: ['#ffffff', '#f8fafc', '#3b82f6', '#10b981'],
-      preview: 'bg-white border-gray-200'
-    },
     {
       id: 'dark',
       name: 'Темная',
       description: 'Современная темная тема',
       colors: ['#0f172a', '#1e293b', '#3b82f6', '#8b5cf6'],
       preview: 'bg-gray-900 border-gray-700'
-    },
-    {
-      id: 'panda',
-      name: 'Panda Express',
-      description: 'Фирменная тема ресторана',
-      colors: ['#0f0f0f', '#1a1a1a', '#3b82f6', '#ffffff'],
-      preview: 'bg-black border-gray-800'
-    },
-    {
-      id: 'han',
-      name: 'Han Tagam',
-      description: 'Элегантная восточная тема',
-      colors: ['#fefefe', '#ffffff', '#10b981', '#1f2937'],
-      preview: 'bg-white border-green-200'
-    },
-    {
-      id: 'sweet',
-      name: 'Sweet',
-      description: 'Нежная розовая тема',
-      colors: ['#fdf2f8', '#ffffff', '#ec4899', '#831843'],
-      preview: 'bg-pink-50 border-pink-200'
     }
   ]
 
@@ -57,34 +29,17 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
     if (savedTheme && themes.find(t => t.id === savedTheme)) {
       setCurrentTheme(savedTheme)
       applyTheme(savedTheme)
+    } else {
+      // По умолчанию всегда темная тема
+      applyTheme('dark')
     }
   }, [])
 
   const applyTheme = (themeId: string) => {
     const root = document.documentElement
     
-    // Удаляем все существующие классы тем
-    root.classList.remove('dark', 'theme-panda', 'theme-han', 'theme-sweet')
-    document.body.classList.remove('theme-panda', 'theme-han', 'theme-sweet')
-    
-    switch (themeId) {
-      case 'dark':
-        root.classList.add('dark')
-        break
-      case 'panda':
-        root.classList.add('dark')
-        document.body.classList.add('theme-panda')
-        break
-      case 'han':
-        document.body.classList.add('theme-han')
-        break
-      case 'sweet':
-        document.body.classList.add('theme-sweet')
-        break
-      default:
-        // light theme - no additional classes needed
-        break
-    }
+    // Всегда применяем темную тему
+    root.classList.add('dark')
     
     localStorage.setItem('theme', themeId)
     setCurrentTheme(themeId as any)
@@ -99,9 +54,7 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
         className="relative"
       >
         <span className="hidden md:inline">Тема</span>
-        {currentTheme !== 'light' && (
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary-500 rounded-full border-2 border-white" />
-        )}
+        <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary-500 rounded-full border-2 border-white" />
       </Button>
 
       <AnimatePresence>

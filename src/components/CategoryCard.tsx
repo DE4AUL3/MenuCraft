@@ -6,7 +6,6 @@ import { useTheme } from '@/hooks/useTheme';
 import SmartImage from '@/components/ui/SmartImage';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface CategoryCardProps {
   category: Category;
@@ -21,67 +20,57 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       href={`/category/${category.id}`}
       className="group block"
     >
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -8, scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className={`relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border-2 ${
+      <div 
+        className={`relative rounded-2xl overflow-hidden shadow-lg border ${
           isDarkMode
-            ? 'bg-gray-800 border-gray-700 hover:border-orange-500/50'
-            : 'bg-white border-gray-200 hover:border-orange-400/50'
+            ? 'bg-gray-800 border-gray-700'
+            : 'bg-white border-gray-200'
         }`}
       >
-        {/* Изображение - увеличенное и без лишних элементов */}
-        <div className="relative h-48 overflow-hidden rounded-t-2xl">
+        {/* Изображение - чистое фото без эффектов */}
+        <div className="h-64 overflow-hidden rounded-t-2xl">
           <SmartImage
             src={category.image}
             alt={category.name}
-            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover object-center"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
           />
         </div>
         
         {/* Контент */}
-        <div className={`relative p-5 ${
+        <div className={`relative p-4 ${
           isDarkMode ? 'bg-gray-800' : 'bg-white'
         }`}>
           <h3 
-            className={`text-lg font-bold mb-4 transition-colors duration-300 ${
+            className={`text-lg font-bold mb-4 ${
               isDarkMode ? 'text-white' : 'text-gray-900'
             }`}
-            style={{
-              color: isDarkMode 
-                ? undefined 
-                : 'var(--text-primary)'
-            }}
           >
             {category.name}
           </h3>
           
           {/* Количество блюд */}
           <div className="flex items-center justify-between">
-            <span className={`text-xs px-3 py-1 rounded-full transition-colors duration-300 ${
+            <span className={`text-xs px-3 py-1 rounded-full ${
               isDarkMode 
-                ? 'bg-gray-700 text-gray-300 group-hover:bg-orange-900/30 group-hover:text-orange-300'
-                : 'bg-gray-100 text-gray-600 group-hover:bg-orange-100 group-hover:text-orange-700'
+                ? 'bg-gray-700 text-gray-300'
+                : 'bg-gray-100 text-gray-600'
             }`}>
               {category.dishes?.length || 0} {t('dishes')}
             </span>
             
-            <motion.div
-              className={`p-1 rounded-full transition-colors duration-300 ${
+            <div
+              className={`p-1 rounded-full ${
                 isDarkMode
-                  ? 'text-gray-400 group-hover:text-orange-400'
-                  : 'text-gray-500 group-hover:text-orange-600'
+                  ? 'text-gray-400'
+                  : 'text-gray-500'
               }`}
-              whileHover={{ x: 2 }}
             >
               <ChevronRight className="w-4 h-4" />
-            </motion.div>
+            </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </Link>
   );
 }
