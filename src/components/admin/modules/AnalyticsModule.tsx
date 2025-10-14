@@ -33,13 +33,13 @@ import {
 interface AnalyticsModuleProps {
   activeSubTab?: string
   onSubTabChange?: (subTab: string) => void
-  theme?: AdminTheme
+  theme?: 'dark'
 }
 
 export default function AnalyticsModule({ 
   activeSubTab = 'sales', 
   onSubTabChange,
-  theme = 'light' 
+  theme = 'dark' 
 }: AnalyticsModuleProps) {
   const [currentSubTab, setCurrentSubTab] = useState(activeSubTab)
   const themeClasses = getThemeClasses(theme)

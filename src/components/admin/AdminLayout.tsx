@@ -95,7 +95,7 @@ const themeStyles = {
 }
 
 export default function AdminLayout({ children, activeTab: externalActiveTab, onTabChange }: AdminLayoutProps) {
-  const [currentTheme, setCurrentTheme] = useState<AdminTheme>('light')
+  const [currentTheme, setCurrentTheme] = useState<AdminTheme>('dark')
   const [activeTab, setActiveTab] = useState(externalActiveTab || 'overview')
 
   // Синхронизируем с внешним activeTab
@@ -105,12 +105,9 @@ export default function AdminLayout({ children, activeTab: externalActiveTab, on
     }
   }, [externalActiveTab, activeTab])
 
-  // Загружаем сохраненную тему при инициализации
+  // Всегда используем темную тему
   useEffect(() => {
-    const savedTheme = localStorage.getItem('adminTheme') as AdminTheme
-    if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
-      setCurrentTheme(savedTheme)
-    }
+    setCurrentTheme('dark')
   }, [])
 
   // Применяем тему к body элементу
@@ -120,41 +117,22 @@ export default function AdminLayout({ children, activeTab: externalActiveTab, on
     // Удаляем предыдущие классы тем
     body.classList.remove('admin-light', 'admin-dark')
     
-    // Добавляем новый класс темы
-    body.classList.add(`admin-${currentTheme}`)
+    // Добавляем только темную тему
+    body.classList.add('admin-dark')
     
-    // Устанавливаем CSS переменные для темы
+    // Устанавливаем CSS переменные для темной темы
     const root = document.documentElement
     
-    switch (currentTheme) {
-      case 'light':
-        root.style.setProperty('--admin-bg-primary', '#ffffff')
-        root.style.setProperty('--admin-bg-secondary', '#f8fafc')
-        root.style.setProperty('--admin-text-primary', '#1f2937')
-        root.style.setProperty('--admin-text-secondary', '#6b7280')
-        root.style.setProperty('--admin-border', '#e5e7eb')
-        root.style.setProperty('--admin-accent', '#3b82f6')
-        break
-      case 'dark':
-        root.style.setProperty('--admin-bg-primary', '#030712')
-        root.style.setProperty('--admin-bg-secondary', '#111827')
-        root.style.setProperty('--admin-text-primary', '#f9fafb')
-        root.style.setProperty('--admin-text-secondary', '#9ca3af')
-        root.style.setProperty('--admin-border', '#1f2937')
-        root.style.setProperty('--admin-accent', '#4b5563')
-        break
-    }
+    root.style.setProperty('--admin-bg-primary', '#030712')
+    root.style.setProperty('--admin-bg-secondary', '#111827')
+    root.style.setProperty('--admin-text-primary', '#f9fafb')
+    root.style.setProperty('--admin-text-secondary', '#9ca3af')
+    root.style.setProperty('--admin-border', '#1f2937')
+    root.style.setProperty('--admin-accent', '#4b5563')
   }, [currentTheme])
 
   const getThemeClasses = () => {
-    switch (currentTheme) {
-      case 'light':
-        return 'bg-gray-50 text-gray-900'
-      case 'dark':
-        return 'bg-gradient-to-br from-gray-950 to-gray-900 text-gray-50'
-      default:
-        return 'bg-gray-50 text-gray-900'
-    }
+    return 'bg-gradient-to-br from-gray-950 to-gray-900 text-gray-50'
   }
 
   const handleTabChange = (tab: string) => {

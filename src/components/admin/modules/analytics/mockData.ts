@@ -64,62 +64,62 @@ export const salesData: SalesData[] = [
   { date: '2025-10-10', sales: 24700, orders: 78, customers: 68 }
 ]
 
-// Популярные блюда
+// Популярные блюда (из реальных данных ресторанов)
 export const popularDishes: DishData[] = [
   {
-    name: 'Panda Classic',
+    name: 'Лагман',
     orders: 126,
-    revenue: 15120,
-    image: '/images/menu/panda-classic.svg',
-    category: 'Бургеры',
+    revenue: 35280, // 280 * 126
+    image: '/images/lagman.jpg',
+    category: 'Супы',
     rating: 4.8
   },
   {
-    name: 'Margherita Royal',
+    name: 'Маргарита',
     orders: 98,
-    revenue: 11760,
+    revenue: 44100, // 450 * 98
     image: '/images/menu/margherita-royal.svg',
     category: 'Пицца',
     rating: 4.7
   },
   {
-    name: 'Pepperoni Supreme',
+    name: 'Манты с говядиной',
     orders: 87,
-    revenue: 13050,
-    image: '/images/menu/pepperoni-supreme.svg',
-    category: 'Пицца',
+    revenue: 15660, // 180 * 87
+    image: '/images/beef-manty.jpg',
+    category: 'Манты',
     rating: 4.9
   },
   {
-    name: 'Crispy Wings',
+    name: 'Стейк из говядины',
     orders: 76,
-    revenue: 9120,
-    image: '/images/menu/crispy-wings.svg',
+    revenue: 64600, // 850 * 76
+    image: '/images/beef-steak.svg',
     category: 'Горячие блюда',
     rating: 4.6
   },
   {
-    name: 'Spicy Panda',
+    name: 'Пепперони',
     orders: 65,
-    revenue: 9750,
-    image: '/images/menu/spicy-panda.svg',
-    category: 'Бургеры',
+    revenue: 33800, // 520 * 65
+    image: '/images/menu/pepperoni-supreme.svg',
+    category: 'Пицца',
     rating: 4.5
   },
   {
-    name: 'Cola Fresh',
+    name: 'Зеленый чай',
     orders: 234,
-    revenue: 7020,
-    image: '/images/menu/cola-fresh.svg',
+    revenue: 18720, // 80 * 234
+    image: '/images/green-tea.jpg',
     category: 'Напитки',
     rating: 4.3
   },
   {
-    name: 'Cheese Deluxe',
+    name: 'Тирамису',
     orders: 54,
-    revenue: 8100,
-    image: '/images/menu/cheese-deluxe.svg',
-    category: 'Бургеры',
+    revenue: 13500, // 250 * 54
+    image: '/images/tiramisu.jpg',
+    category: 'Десерты',
     rating: 4.7
   }
 ]
@@ -206,11 +206,9 @@ export const performanceMetrics: PerformanceData[] = [
 
 // Утилитные функции
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency: 'RUB',
-    minimumFractionDigits: 0
-  }).format(amount)
+  // Конвертируем рубли в туркменские манаты (примерный курс 1 рубль = 0.15 ТМТ)
+  const tmtAmount = Math.round(amount * 0.15)
+  return `${tmtAmount.toLocaleString('ru-RU')} ТМТ`
 }
 
 export const formatDate = (dateString: string): string => {

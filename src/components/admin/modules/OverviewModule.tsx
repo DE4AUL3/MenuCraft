@@ -19,20 +19,81 @@ import { salesData } from './analytics/mockData'
 interface OverviewModuleProps {
   activeSubTab?: string
   onSubTabChange?: (subTab: string) => void
-  theme?: 'light' | 'dark'
+  theme?: 'dark'
+}
+
+// Функция для получения реальных данных из restaurants.json
+const getRealStatsData = async () => {
+  try {
+    const response = await fetch('/data/restaurants.json')
+    const data = await response.json()
+    
+    const totalRestaurants = data.restaurants.length
+    const totalCategories = data.restaurants.reduce((sum: number, r: any) => sum + r.categories.length, 0)
+    const totalDishes = data.restaurants.reduce((sum: number, r: any) => 
+      sum + r.categories.reduce((catSum: number, c: any) => catSum + c.dishes.length, 0), 0)
+    
+    // Подсчитываем среднюю цену и общую стоимость меню
+    let totalPrice = 0
+    let dishCount = 0
+    
+    data.restaurants.forEach((restaurant: any) => {
+      restaurant.categories.forEach((category: any) => {
+        category.dishes.forEach((dish: any) => {
+          totalPrice += dish.price
+          dishCount++
+        })
+      })
+    })
+    
+    const averagePrice = dishCount > 0 ? Math.round(totalPrice / dishCount) : 0
+    const estimatedRevenue = Math.round(totalPrice * 2.5) // Примерная выручка
+    
+    return {
+      totalRestaurants,
+      totalCategories,
+      totalDishes,
+      averagePrice,
+      estimatedRevenue,
+      totalPrice
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error)
+    return {
+      totalRestaurants: 2,
+      totalCategories: 7,
+      totalDishes: 18,
+      averagePrice: 350,
+      estimatedRevenue: 45000,
+      totalPrice: 9500
+    }
+  }
 }
 
 export default function OverviewModule({ 
   activeSubTab = 'basic', 
   onSubTabChange,
-  theme = 'light' 
+  theme = 'dark' 
 }: OverviewModuleProps) {
   const [currentSubTab, setCurrentSubTab] = useState(activeSubTab)
+  const [realStats, setRealStats] = useState({
+    totalRestaurants: 2,
+    totalCategories: 7,
+    totalDishes: 18,
+    averagePrice: 350,
+    estimatedRevenue: 45000,
+    totalPrice: 9500
+  })
   const themeClasses = getThemeClasses(theme)
 
   useEffect(() => {
     setCurrentSubTab(activeSubTab)
   }, [activeSubTab])
+
+  useEffect(() => {
+    // Загружаем реальные данные при монтировании компонента
+    getRealStatsData().then(setRealStats)
+  }, [])
 
   const handleSubTabClick = (subTab: string) => {
     console.log('OverviewModule: Переключение на подвкладку:', subTab)
@@ -47,27 +108,27 @@ export default function OverviewModule({
 
   const basicStats = [
     {
-      title: 'Общие заказы',
-      value: '1,234',
+      title: 'Всего блюд',
+      value: realStats.totalDishes.toString(),
       change: '+12%',
       changeType: 'positive' as const,
       icon: <ShoppingBag className="w-5 h-5" />,
       color: 'from-blue-400 to-blue-600'
     },
     {
-      title: 'Выручка',
-      value: '₽89,500',
+      title: 'Стоимость меню',
+      value: `${Math.round(realStats.totalPrice * 0.15)} ТМТ`, // Конвертируем в манаты
       change: '+8%',
       changeType: 'positive' as const,
       icon: <DollarSign className="w-5 h-5" />,
       color: 'from-green-400 to-green-600'
     },
     {
-      title: 'Клиенты',
-      value: '567',
-      change: '+15%',
+      title: 'Категории',
+      value: realStats.totalCategories.toString(),
+      change: '+2',
       changeType: 'positive' as const,
-      icon: <Users className="w-5 h-5" />,
+      icon: <Package className="w-5 h-5" />,
       color: 'from-purple-400 to-purple-600'
     },
     {
@@ -130,10 +191,10 @@ export default function OverviewModule({
               </h3>
               <div className="space-y-3">
                 {[
-                  { action: 'Новый заказ #1234', time: '2 мин назад', type: 'order' },
-                  { action: 'Добавлено блюдо "Пицца Маргарита"', time: '15 мин назад', type: 'menu' },
-                  { action: 'Обновлен профиль ресторана', time: '1 час назад', type: 'update' },
-                  { action: 'Экспорт отчета по продажам', time: '2 часа назад', type: 'report' }
+                  { action: `Добавлено блюдо "Лагман" (${Math.round(280 * 0.15)} ТМТ)`, time: '2 мин назад', type: 'menu' },
+                  { action: `Обновлена категория "Пицца" - ${realStats.totalCategories} позиций`, time: '15 мин назад', type: 'update' },
+                  { action: `Ресторан "Kemine Bistro" - новое меню`, time: '1 час назад', type: 'restaurant' },
+                  { action: `Экспорт данных по ${realStats.totalDishes} блюдам`, time: '2 часа назад', type: 'report' }
                 ].map((activity, index) => (
                   <div key={index} className={`flex items-center justify-between p-3 rounded-lg ${themeClasses.hover} transition-colors`}>
                     <span className={themeClasses.text}>{activity.action}</span>

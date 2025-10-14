@@ -24,38 +24,24 @@ interface AdminHeaderProps {
   restaurantName?: string
 }
 
-export type AdminTheme = 'light' | 'dark'
+export type AdminTheme = 'dark'
 
-const themes = {
-  light: {
-    name: 'Светлая',
-    icon: <Sun className="w-4 h-4" />,
-    colors: {
-      bg: 'bg-white/95 backdrop-blur-md',
-      border: 'border-gray-200',
-      text: 'text-gray-900',
-      textSecondary: 'text-gray-600',
-      accent: 'from-blue-500 to-purple-600',
-      hover: 'hover:bg-gray-100'
-    }
-  },
-  dark: {
-    name: 'Темная',
-    icon: <Moon className="w-4 h-4" />,
-    colors: {
-      bg: 'bg-gray-950/98 backdrop-blur-md border border-gray-800/50',
-      border: 'border-gray-800',
-      text: 'text-gray-50',
-      textSecondary: 'text-gray-400',
-      accent: 'from-gray-700 to-gray-900',
-      hover: 'hover:bg-gray-900/80'
-    }
+const theme = {
+  name: 'Темная',
+  icon: <Moon className="w-4 h-4" />,
+  colors: {
+    bg: 'bg-gray-950/98 backdrop-blur-md border border-gray-800/50',
+    border: 'border-gray-800',
+    text: 'text-gray-50',
+    textSecondary: 'text-gray-400',
+    accent: 'from-gray-700 to-gray-900',
+    hover: 'hover:bg-gray-900/80'
   }
 }
 
 export default function AdminHeader({ 
   onThemeChange, 
-  currentTheme = 'light', 
+  currentTheme = 'dark', 
   restaurantName = 'Название Ресторана' 
 }: AdminHeaderProps) {
   const router = useRouter()
@@ -63,8 +49,6 @@ export default function AdminHeader({
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [notificationCount] = useState(3)
-
-  const theme = themes[currentTheme]
 
   // Закрываем меню при клике вне их
   useEffect(() => {
@@ -89,7 +73,7 @@ export default function AdminHeader({
     onThemeChange?.(newTheme)
     setIsThemeMenuOpen(false)
     localStorage.setItem('adminTheme', newTheme)
-    toast.success(`Тема изменена на ${themes[newTheme].name.toLowerCase()}`)
+    toast.success(`Тема изменена на ${theme.name.toLowerCase()}`)
   }
 
   const handleLogout = () => {
@@ -161,28 +145,19 @@ export default function AdminHeader({
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     className={`absolute right-0 top-full mt-2 w-48 rounded-lg shadow-xl border overflow-hidden z-50 ${theme.colors.bg} ${theme.colors.border}`}
                   >
-                    {Object.entries(themes).map(([key, themeData]) => (
-                      <button
-                        key={key}
-                        onClick={() => handleThemeChange(key as AdminTheme)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                          currentTheme === key
-                            ? `bg-gradient-to-r ${themeData.colors.accent} text-white`
-                            : theme.colors.hover
-                        }`}
-                      >
-                        {themeData.icon}
-                        <span className={currentTheme === key ? 'text-white' : theme.colors.text}>
-                          {themeData.name}
-                        </span>
-                        {currentTheme === key && (
-                          <motion.div
-                            layoutId="activeTheme"
-                            className="ml-auto w-2 h-2 bg-white rounded-full"
-                          />
-                        )}
-                      </button>
-                    ))}
+                    <button
+                      onClick={() => handleThemeChange('dark')}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors bg-gradient-to-r ${theme.colors.accent} text-white`}
+                    >
+                      {theme.icon}
+                      <span className="text-white">
+                        {theme.name}
+                      </span>
+                      <motion.div
+                        layoutId="activeTheme"
+                        className="ml-auto w-2 h-2 bg-white rounded-full"
+                      />
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -221,9 +196,9 @@ export default function AdminHeader({
                     
                     <div className="max-h-96 overflow-y-auto">
                       {[
-                        { title: 'Новый заказ #1234', message: 'Заказ на сумму 850₽', time: '2 мин назад', type: 'order' },
-                        { title: 'Низкий остаток', message: 'Пицца "Маргарита" заканчивается', time: '15 мин назад', type: 'warning' },
-                        { title: 'Новый отзыв', message: 'Клиент оставил 5 звезд', time: '1 час назад', type: 'review' }
+                        { title: 'Новое блюдо добавлено', message: 'Лагман - 42 ТМТ', time: '2 мин назад', type: 'menu' },
+                        { title: 'Обновление категории', message: 'Категория "Пицца" обновлена', time: '15 мин назад', type: 'update' },
+                        { title: 'Новый ресторан', message: 'Kemine Bistro активирован', time: '1 час назад', type: 'restaurant' }
                       ].map((notification, index) => (
                         <div
                           key={index}

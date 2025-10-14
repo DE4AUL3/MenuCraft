@@ -10,12 +10,12 @@ import CartSettings from './CartSettings';
 
 interface RestaurantModuleProps {
   className?: string;
-  theme?: AdminTheme;
+  theme?: 'dark';
 }
 
 type SubTab = 'general' | 'categories' | 'dishes' | 'cart';
 
-export default function RestaurantModule({ className = '', theme = 'light' }: RestaurantModuleProps) {
+export default function RestaurantModule({ className = '', theme = 'dark' }: RestaurantModuleProps) {
   const [currentSubTab, setCurrentSubTab] = useState<SubTab>('general');
 
   const subTabs = [

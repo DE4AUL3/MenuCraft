@@ -27,20 +27,13 @@ export default function PremiumAdminDashboardV2({
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'restaurant' | 'orders' | 'contacts'>(
     externalActiveTab || 'overview'
   )
-  const [currentTheme, setCurrentTheme] = useState<AdminTheme>('light')
+  const [currentTheme] = useState<'dark'>('dark')
 
   useEffect(() => {
     if (externalActiveTab) {
       setActiveTab(externalActiveTab)
     }
   }, [externalActiveTab])
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('adminTheme') as AdminTheme
-    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-      setCurrentTheme(savedTheme)
-    }
-  }, [])
 
   const renderTabContent = () => {
     switch (activeTab) {
