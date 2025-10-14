@@ -196,9 +196,9 @@ export default function AdminHeader({
                     
                     <div className="max-h-96 overflow-y-auto">
                       {[
-                        { title: 'Новое блюдо добавлено', message: 'Лагман - 42 ТМТ', time: '2 мин назад', type: 'menu' },
-                        { title: 'Обновление категории', message: 'Категория "Пицца" обновлена', time: '15 мин назад', type: 'update' },
-                        { title: 'Новый ресторан', message: 'Kemine Bistro активирован', time: '1 час назад', type: 'restaurant' }
+                        { title: 'Новый заказ #2847', message: 'Лагман + Зеленый чай - 54 ТМТ', time: '2 мин назад', type: 'order' },
+                        { title: 'Заказ готов #2845', message: 'Пицца Маргарита - готова к выдаче', time: '10 мин назад', type: 'ready' },
+                        { title: 'Высокая активность', message: '12 заказов за последний час', time: '30 мин назад', type: 'analytics' }
                       ].map((notification, index) => (
                         <div
                           key={index}

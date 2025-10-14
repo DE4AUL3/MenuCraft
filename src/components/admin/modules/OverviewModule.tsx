@@ -108,33 +108,33 @@ export default function OverviewModule({
 
   const basicStats = [
     {
-      title: 'Всего блюд',
-      value: realStats.totalDishes.toString(),
+      title: 'Заказы сегодня',
+      value: '47',
       change: '+12%',
       changeType: 'positive' as const,
       icon: <ShoppingBag className="w-5 h-5" />,
       color: 'from-blue-400 to-blue-600'
     },
     {
-      title: 'Стоимость меню',
-      value: `${Math.round(realStats.totalPrice * 0.15)} ТМТ`, // Конвертируем в манаты
+      title: 'Выручка за день',
+      value: `${Math.round(2847)} ТМТ`, // Примерная дневная выручка
       change: '+8%',
       changeType: 'positive' as const,
       icon: <DollarSign className="w-5 h-5" />,
       color: 'from-green-400 to-green-600'
     },
     {
-      title: 'Категории',
-      value: realStats.totalCategories.toString(),
+      title: 'Всего блюд',
+      value: realStats.totalDishes.toString(),
       change: '+2',
       changeType: 'positive' as const,
       icon: <Package className="w-5 h-5" />,
       color: 'from-purple-400 to-purple-600'
     },
     {
-      title: 'Рейтинг',
-      value: '4.8',
-      change: '+0.3',
+      title: 'Категории',
+      value: realStats.totalCategories.toString(),
+      change: 'стабильно',
       changeType: 'positive' as const,
       icon: <Star className="w-5 h-5" />,
       color: 'from-yellow-400 to-orange-500'
@@ -191,10 +191,10 @@ export default function OverviewModule({
               </h3>
               <div className="space-y-3">
                 {[
-                  { action: `Добавлено блюдо "Лагман" (${Math.round(280 * 0.15)} ТМТ)`, time: '2 мин назад', type: 'menu' },
-                  { action: `Обновлена категория "Пицца" - ${realStats.totalCategories} позиций`, time: '15 мин назад', type: 'update' },
-                  { action: `Ресторан "Kemine Bistro" - новое меню`, time: '1 час назад', type: 'restaurant' },
-                  { action: `Экспорт данных по ${realStats.totalDishes} блюдам`, time: '2 часа назад', type: 'report' }
+                  { action: `Новый заказ #2847 - Лагман (42 ТМТ)`, time: '2 мин назад', type: 'order' },
+                  { action: `Заказ #2846 - Пицца Маргарита (68 ТМТ)`, time: '15 мин назад', type: 'order' },
+                  { action: `Выручка за час: 524 ТМТ (8 заказов)`, time: '1 час назад', type: 'revenue' },
+                  { action: `Популярное блюдо дня: Манты с говядиной`, time: '2 часа назад', type: 'analytics' }
                 ].map((activity, index) => (
                   <div key={index} className={`flex items-center justify-between p-3 rounded-lg ${themeClasses.hover} transition-colors`}>
                     <span className={themeClasses.text}>{activity.action}</span>
