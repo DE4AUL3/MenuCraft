@@ -6,7 +6,6 @@ import { ShoppingCart, Globe, ArrowLeft, Plus, Minus } from 'lucide-react'
 import Image from 'next/image'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useCart } from '@/hooks/useCart'
-import { dataService } from '@/lib/dataService'
 import { imageService } from '@/lib/imageService'
 import FloatingCallButton from '@/components/FloatingCallButton'
 import type { Category, Dish } from '@/types/common'
@@ -29,15 +28,40 @@ export default function CategoryPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Загружаем категорию
-        const categories = dataService.getCategories()
-        const foundCategory = categories.find(cat => cat.id === categoryId)
-        setCategory(foundCategory || null)
+        // Загружаем категорию и блюда из API
+        const categoryResponse = await fetch('/api/category')
+        const categories = await categoryResponse.json()
+        const foundCategory = categories.find((cat: any) => cat.id === categoryId)
+        
+        const transformedCategory: Category = {
+          id: foundCategory.id,
+          name: foundCategory.nameRu,
+          nameTk: foundCategory.nameTk,
+          image: foundCategory.imageCard,
+          gradient: 'from-slate-500 to-slate-700',
+          description: foundCategory.descriptionRu || '',
+          descriptionTk: foundCategory.descriptionTk || '',
+          isActive: foundCategory.status,
+          sortOrder: foundCategory.order,
+          createdAt: foundCategory.createdAt,
+          updatedAt: foundCategory.updatedAt
+        }
+        setCategory(transformedCategory)
 
         // Загружаем блюда для этой категории
-        const allDishes = dataService.getDishes()
-        const categoryDishes = allDishes.filter(dish => dish.categoryId === categoryId && dish.isActive)
-        setDishes(categoryDishes)
+        const mealsResponse = await fetch(`/api/meal?categoryId=${categoryId}`)
+        const meals = await mealsResponse.json()
+        
+        const transformedDishes: Dish[] = meals.map((meal: any) => ({
+          id: meal.id,
+          name: { ru: meal.nameRu, tk: meal.nameTk },
+          description: { ru: meal.descriptionRu || '', tk: meal.descriptionTk || '' },
+          categoryId: meal.categoryId,
+          price: meal.price,
+          image: meal.image,
+          isActive: true
+        }))
+        setDishes(transformedDishes)
       } catch (error) {
         console.error('Error loading data:', error)
       } finally {

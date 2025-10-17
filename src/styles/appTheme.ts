@@ -4,7 +4,7 @@
  * Основана на правиле 60-30-10 дизайна
  */
 
-export type AppTheme = 'light' | 'dark'
+export type AppTheme = 'dark'
 
 export interface AppThemeColors {
   // 60% - Основные цвета (фоны, поверхности)
@@ -74,15 +74,15 @@ export interface AppThemeClasses {
 // Цвета для светлой темы
 const lightThemeColors: AppThemeColors = {
   primary: {
-    background: '#ffffff',    // 60% - белый фон
-    surface: '#f8f9fa',      // 60% - светло-серый
-    text: '#1a202c'          // 30% - темно-серый текст
+    background: require('../config/colors').COLORS.white,
+    surface: require('../config/colors').COLORS.lightGray,
+    text: require('../config/colors').COLORS.slate900
   },
   secondary: {
-    background: '#f1f3f4',   // 30% - серый фон панелей
-    surface: '#e2e8f0',      // 30% - серый для карточек
-    text: '#4a5568',         // 30% - средне-серый текст
-    border: '#e2e8f0'        // 30% - границы
+    background: require('../config/colors').COLORS.lighterGray,
+    surface: require('../config/colors').COLORS.borderLight,
+    text: require('../config/colors').COLORS.secondary,
+    border: require('../config/colors').COLORS.borderLight
   },
   accent: {
     primary: 'from-blue-500 to-indigo-600',     // 10% - основной акцент
@@ -96,15 +96,15 @@ const lightThemeColors: AppThemeColors = {
 // Цвета для темной темы
 const darkThemeColors: AppThemeColors = {
   primary: {
-    background: '#0f172a',    // 60% - темно-синий фон
-    surface: '#1e293b',      // 60% - синевато-серый
-    text: '#f1f5f9'          // 30% - светло-серый текст
+    background: require('../config/colors').COLORS.slate900,
+    surface: require('../config/colors').COLORS.slate800,
+    text: require('../config/colors').COLORS.slate100
   },
   secondary: {
-    background: '#334155',   // 30% - средне-серый фон панелей
-    surface: '#475569',      // 30% - серый для карточек
-    text: '#cbd5e1',         // 30% - светло-серый текст
-    border: '#475569'        // 30% - границы
+    background: require('../config/colors').COLORS.slate700,
+    surface: require('../config/colors').COLORS.secondary,
+    text: require('../config/colors').COLORS.textSecondary,
+    border: require('../config/colors').COLORS.secondary
   },
   accent: {
     primary: 'from-blue-400 to-indigo-500',     // 10% - основной акцент
@@ -196,11 +196,7 @@ const darkThemeClasses: AppThemeClasses = {
 }
 
 // Хранилище всех тем
-const appThemes: Record<AppTheme, { colors: AppThemeColors; classes: AppThemeClasses }> = {
-  light: {
-    colors: lightThemeColors,
-    classes: lightThemeClasses
-  },
+const appThemes: { dark: { colors: AppThemeColors; classes: AppThemeClasses } } = {
   dark: {
     colors: darkThemeColors,
     classes: darkThemeClasses
@@ -211,21 +207,21 @@ const appThemes: Record<AppTheme, { colors: AppThemeColors; classes: AppThemeCla
  * Получить CSS классы для указанной темы
  */
 export function getAppThemeClasses(theme: AppTheme = 'dark'): AppThemeClasses {
-  return appThemes[theme].classes
+  return appThemes.dark.classes
 }
 
 /**
  * Получить цвета для указанной темы
  */
 export function getAppThemeColors(theme: AppTheme = 'dark'): AppThemeColors {
-  return appThemes[theme].colors
+  return appThemes.dark.colors
 }
 
 /**
  * Получить полную тему
  */
 export function getAppTheme(theme: AppTheme = 'dark') {
-  return appThemes[theme]
+  return appThemes.dark
 }
 
 // Обратная совместимость с админской системой тем

@@ -116,17 +116,19 @@ export default function PremiumRestaurantSelector() {
     visible: { opacity: 1, y: 0 }
   };
 
+  // Импортируем тему
+  const { light: theme } = require('@/styles/simpleTheme').themes;
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: 'var(--bg-primary)',
+      background: theme.colors.background.primary,
       position: 'relative',
       overflow: 'hidden'
     }}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-white/5 to-gray-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-gray-400/5 to-gray-600/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+  <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl animate-pulse" style={{background: theme.colors.background.secondary, opacity: 0.05}}></div>
+  <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl animate-pulse delay-1000" style={{background: theme.colors.background.tertiary, opacity: 0.05}}></div>
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 lg:py-16">
@@ -144,7 +146,7 @@ export default function PremiumRestaurantSelector() {
         >
           <motion.h1 
             className="text-3xl lg:text-5xl font-black mb-4"
-            style={{ color: 'var(--text-primary)' }}
+            style={{ color: theme.colors.text.primary }}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
@@ -154,7 +156,7 @@ export default function PremiumRestaurantSelector() {
           
           <motion.p 
             className="text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed"
-            style={{ color: 'var(--text-secondary)' }}
+            style={{ color: theme.colors.text.secondary }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
@@ -178,15 +180,17 @@ export default function PremiumRestaurantSelector() {
               className="group cursor-pointer"
             >
               <motion.div
-                className="relative overflow-hidden rounded-3xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-2xl hover:bg-white dark:hover:bg-slate-800 transition-all duration-500"
+                className="relative overflow-hidden rounded-3xl backdrop-blur-sm border hover:shadow-2xl transition-all duration-500"
+                style={{
+                  background: selectedId === restaurant.id
+                    ? theme.colors.background.secondary
+                    : theme.colors.background.secondary,
+                  borderColor: theme.colors.border.primary,
+                  boxShadow: selectedId === restaurant.id ? `0 0 0 4px ${theme.colors.accent}` : undefined
+                }}
                 whileHover={{ scale: 1.02, y: -8 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleRestaurantSelect(restaurant.id)}
-                style={{
-                  background: selectedId === restaurant.id
-                    ? (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)')
-                    : ''
-                }}
               >
                   
                   {/* Status Badge */}
@@ -228,22 +232,22 @@ export default function PremiumRestaurantSelector() {
                     <div className="relative p-6 sm:p-8">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        <h3 className="text-xl lg:text-2xl font-bold mb-2 transition-colors" style={{color: theme.colors.text.primary}}>
                           {restaurant.name}
                         </h3>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm lg:text-base line-clamp-2 sm:line-clamp-3 leading-relaxed">
+                        <p className="text-sm lg:text-base line-clamp-2 sm:line-clamp-3 leading-relaxed" style={{color: theme.colors.text.secondary}}>
                           {currentLanguage === 'tk' ? restaurant.descriptionTk : restaurant.description}
                         </p>
                       </div>
-                      <div className="ml-4 p-3 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-                        <ArrowRight className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
+                      <div className="ml-4 p-3 rounded-full transition-all duration-300" style={{background: theme.colors.accent, color: theme.colors.text.primary}}>
+                        <ArrowRight className="w-6 h-6" style={{color: theme.colors.accent}} />
                       </div>
                     </div>
 
                     {/* Enhanced Features */}
                     <div className="flex flex-wrap gap-2 mb-6">
                       {restaurant.features?.slice(0, 3).map((feature, idx) => (
-                        <span key={idx} className="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-full font-medium">
+                        <span key={idx} className="px-3 py-1 text-xs rounded-full font-medium" style={{background: theme.colors.background.tertiary, color: theme.colors.text.secondary}}>
                           {feature}
                         </span>
                       ))}
@@ -251,12 +255,12 @@ export default function PremiumRestaurantSelector() {
 
                     {/* Enhanced Info Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mb-6">
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-2" style={{color: theme.colors.text.secondary}}>
                         <ChefHat className="w-4 h-4 text-emerald-500" />
                         <span className="font-medium">{restaurant.cuisine}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-2" style={{color: theme.colors.text.secondary}}>
                         <Clock className="w-4 h-4 text-emerald-500" />
                         <span className="font-medium">{currentLanguage === 'tk' ? restaurant.deliveryTimeTk : restaurant.deliveryTime}</span>
                       </div>
@@ -264,7 +268,8 @@ export default function PremiumRestaurantSelector() {
 
                     {/* Enhanced CTA Button */}
                     <motion.button
-                      className="w-full py-4 rounded-2xl font-bold text-white text-base sm:text-lg relative overflow-hidden bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
+                      className="w-full py-4 rounded-2xl font-bold text-base sm:text-lg relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
+                      style={{background: theme.colors.accent, color: theme.colors.text.primary}}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >

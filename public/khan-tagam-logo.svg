@@ -1,8 +1,0 @@
-<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="100" cy="100" r="95" stroke="#D4A574" stroke-width="10" fill="white"/>
-  <text x="100" y="75" text-anchor="middle" font-family="cursive" font-size="28" font-weight="bold" fill="#D4A574">Хан</text>
-  <text x="100" y="115" text-anchor="middle" font-family="cursive" font-size="28" font-weight="bold" fill="#D4A574">Тагам</text>
-  <path d="M140 140 Q150 130 160 140 Q150 150 140 140" fill="#D4A574"/>
-  <circle cx="155" cy="135" r="3" fill="white"/>
-  <circle cx="145" cy="138" r="2" fill="white"/>
-</svg>

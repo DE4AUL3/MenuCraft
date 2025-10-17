@@ -34,18 +34,20 @@ export default function SmartImage({
   // Получаем URL изображения через imageService
   const imageUrl = imageService.getImageUrl(src);
   
-  // Если это локальное base64 изображение, используем обычный img
-  if (imageUrl.startsWith('data:')) {
+  // Если это локальное base64 изображение или blob-ссылка, используем обычный img
+  if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
+    // Для blob обязательно width/height (или 100%)
+    const imgStyle = fill
+      ? { width: '100%', height: '100%' } as React.CSSProperties
+      : { width: width || 200, height: height || 200 } as React.CSSProperties;
     return (
       <img
         src={imageUrl}
         alt={alt}
         className={className}
-        style={fill ? { 
-          width: '100%', 
-          height: '100%', 
-          objectFit: 'cover' 
-        } : { width, height }}
+        style={imgStyle}
+        width={width || 200}
+        height={height || 200}
         onError={() => setImageError(true)}
       />
     );

@@ -16,93 +16,33 @@ export interface ColorTheme {
 
 export const defaultThemes: ColorTheme[] = [
   {
-    id: 'orange',
-    name: 'Orange Classic',
-    primary: '#f97316',
-    primaryHover: '#ea580c',
-    primaryLight: '#fed7aa',
-    primaryDark: '#c2410c',
-    secondary: '#fb923c',
-    accent: '#ffedd5',
+    id: 'light',
+    name: 'Светлая',
+    primary: '#ffffff',
+    primaryHover: '#f3f4f6',
+    primaryLight: '#f9fafb',
+    primaryDark: '#e5e7eb',
+    secondary: '#f3f4f6',
+    accent: '#e0e7ff',
     gradient: {
-      from: '#fb923c',
-      via: '#f97316',
-      to: '#ea580c'
+      from: '#e0e7ff',
+      via: '#f3f4f6',
+      to: '#ffffff'
     }
   },
   {
-    id: 'red',
-    name: 'Spicy Red',
-    primary: '#dc2626',
-    primaryHover: '#b91c1c',
-    primaryLight: '#fecaca',
-    primaryDark: '#991b1b',
-    secondary: '#ef4444',
-    accent: '#fee2e2',
+    id: 'dark',
+    name: 'Тёмная',
+    primary: '#18181b',
+    primaryHover: '#27272a',
+    primaryLight: '#27272a',
+    primaryDark: '#09090b',
+    secondary: '#27272a',
+    accent: '#1e293b',
     gradient: {
-      from: '#ef4444',
-      via: '#dc2626',
-      to: '#b91c1c'
-    }
-  },
-  {
-    id: 'green',
-    name: 'Fresh Green',
-    primary: '#16a34a',
-    primaryHover: '#15803d',
-    primaryLight: '#bbf7d0',
-    primaryDark: '#166534',
-    secondary: '#22c55e',
-    accent: '#dcfce7',
-    gradient: {
-      from: '#22c55e',
-      via: '#16a34a',
-      to: '#15803d'
-    }
-  },
-  {
-    id: 'blue',
-    name: 'Ocean Blue',
-    primary: '#2563eb',
-    primaryHover: '#1d4ed8',
-    primaryLight: '#bfdbfe',
-    primaryDark: '#1e40af',
-    secondary: '#3b82f6',
-    accent: '#dbeafe',
-    gradient: {
-      from: '#3b82f6',
-      via: '#2563eb',
-      to: '#1d4ed8'
-    }
-  },
-  {
-    id: 'purple',
-    name: 'Royal Purple',
-    primary: '#9333ea',
-    primaryHover: '#7c3aed',
-    primaryLight: '#e9d5ff',
-    primaryDark: '#6b21a8',
-    secondary: '#a855f7',
-    accent: '#f3e8ff',
-    gradient: {
-      from: '#a855f7',
-      via: '#9333ea',
-      to: '#7c3aed'
-    }
-  },
-  {
-    id: 'pink',
-    name: 'Sweet Pink',
-    primary: '#ec4899',
-    primaryHover: '#db2777',
-    primaryLight: '#fce7f3',
-    primaryDark: '#be185d',
-    secondary: '#f472b6',
-    accent: '#fdf2f8',
-    gradient: {
-      from: '#f472b6',
-      via: '#ec4899',
-      to: '#db2777'
+      from: '#18181b',
+      via: '#27272a',
+      to: '#09090b'
     }
   }
 ];
@@ -145,4 +85,20 @@ export const getSavedColorTheme = (): ColorTheme => {
 export const getCSSVariableColor = (variableName: string): string => {
   if (typeof window === 'undefined') return '';
   return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+};
+
+// Объект цветов для simpleTheme.ts
+export const COLORS = {
+  // Светлая тема
+  background: '#ffffff',
+  surface: '#f3f4f6',
+  border: '#e5e7eb',
+  text: '#18181b',
+  textSecondary: '#27272a',
+  textMuted: '#6b7280',
+  accent: '#22c55e',      // call (зелёный)
+  admin: '#2563eb',       // admin (синий)
+  warning: '#f59e42',     // warning (оранжевый)
+  danger: '#ef4444',      // danger (красный)
+  success: '#22c55e',     // success (зелёный)
 };

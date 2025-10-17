@@ -39,51 +39,18 @@ interface ContactCategory {
   color: string
 }
 
-const mockContacts: Contact[] = [
-  {
-    id: '1',
-    name: 'Иван Петров',
-    phone: '+7 (999) 123-45-67',
-    email: 'ivan@example.com',
-    category: 'customer',
-    notes: 'Постоянный клиент, предпочитает доставку',
-    orders: 15,
-    lastOrder: '2024-01-10',
-    createdAt: '2023-06-15'
-  },
-  {
-    id: '2',
-    name: 'Мария Сидорова',
-    phone: '+7 (888) 234-56-78',
-    email: 'maria@example.com',
-    category: 'customer',
-    notes: 'VIP клиент',
-    orders: 32,
-    lastOrder: '2024-01-12',
-    createdAt: '2023-03-20'
-  },
-  {
-    id: '3',
-    name: 'ООО "Поставки"',
-    phone: '+7 (777) 345-67-89',
-    email: 'supply@company.com',
-    category: 'supplier',
-    notes: 'Поставщик продуктов',
-    orders: 0,
-    createdAt: '2023-01-10'
-  }
-]
+
 
 const categories: ContactCategory[] = [
-  { id: 'customer', name: 'Клиенты', count: 2, color: 'blue' },
-  { id: 'supplier', name: 'Поставщики', count: 1, color: 'green' },
+  { id: 'customer', name: 'Клиенты', count: 0, color: 'blue' },
+  { id: 'supplier', name: 'Поставщики', count: 0, color: 'green' },
   { id: 'delivery', name: 'Доставка', count: 0, color: 'orange' },
   { id: 'staff', name: 'Персонал', count: 0, color: 'purple' }
 ]
 
 export default function ContactsModule() {
-  const [contacts, setContacts] = useState<Contact[]>(mockContacts)
-  const [filteredContacts, setFilteredContacts] = useState<Contact[]>(mockContacts)
+  const [contacts, setContacts] = useState<Contact[]>([])
+  const [filteredContacts, setFilteredContacts] = useState<Contact[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showAddModal, setShowAddModal] = useState(false)
@@ -92,10 +59,28 @@ export default function ContactsModule() {
   const [smsText, setSmsText] = useState('')
   const [copiedNumbers, setCopiedNumbers] = useState(false)
 
+
+  // Загрузка контактов из API
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const res = await fetch('/api/contacts')
+        if (res.ok) {
+          const data = await res.json()
+          setContacts(Array.isArray(data) ? data : [])
+        } else {
+          setContacts([])
+        }
+      } catch (e) {
+        setContacts([])
+      }
+    }
+    fetchContacts()
+  }, [])
+
   // Фильтрация контактов
   useEffect(() => {
     let filtered = contacts
-
     if (searchTerm) {
       filtered = filtered.filter(contact =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -103,11 +88,9 @@ export default function ContactsModule() {
         contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
-
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(contact => contact.category === selectedCategory)
     }
-
     setFilteredContacts(filtered)
   }, [contacts, searchTerm, selectedCategory])
 

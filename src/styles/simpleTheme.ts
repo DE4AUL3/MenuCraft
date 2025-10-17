@@ -30,86 +30,60 @@ export interface SimpleTheme {
   }
 }
 
+
 export const lightTheme: SimpleTheme = {
   mode: 'light',
   colors: {
     background: {
-      primary: '#ffffff',    /* Как в админ панели */
-      secondary: '#f8fafc',  /* Светло-серый белый */
-      tertiary: '#f1f5f9'    /* Более серый белый */
+      primary: require('../config/colors').COLORS.background,
+      secondary: require('../config/colors').COLORS.surface,
+      tertiary: require('../config/colors').COLORS.border
     },
     text: {
-      primary: '#0f172a',    /* Почти черный */
-      secondary: '#475569',  /* Серый */
-      tertiary: '#94a3b8'    /* Светло-серый */
+      primary: '#18181b',
+      secondary: '#27272a',
+      tertiary: '#6b7280'
     },
     border: {
-      primary: '#e2e8f0',    /* Видимая граница */
-      secondary: '#f1f5f9',  /* Слабая граница */
-      tertiary: '#f8fafc'    /* Едва заметная граница */
+      primary: require('../config/colors').COLORS.border,
+      secondary: require('../config/colors').COLORS.surface,
+      tertiary: require('../config/colors').COLORS.background
     },
     accent: {
-      call: '#10b981',       /* Изумрудный для звонка и корзины */
-      admin: '#3b82f6',      /* Синий для админки */
-      warning: '#f59e0b',    /* Оранжевый */
-      danger: '#ef4444',     /* Красный */
-      success: '#10b981'     /* Зеленый успех */
-    }
-  }
-}
-
-export const darkTheme: SimpleTheme = {
-  mode: 'dark',
-  colors: {
-    background: {
-      primary: '#121212',    /* Фоновый цвет */
-      secondary: '#1E1E1E',  /* Фон всех карточек */
-      tertiary: '#2A2A2A'    /* Границы/разделители как третичный фон */
-    },
-    text: {
-      primary: '#F5F5F5',    /* Основной цвет */
-      secondary: '#B3B3B3',  /* Подзаголовки/второстепенный текст */
-      tertiary: '#808080'    /* Еще более слабый текст */
-    },
-    border: {
-      primary: '#2A2A2A',    /* Границы/разделители */
-      secondary: '#1E1E1E',  /* Слабые границы */
-      tertiary: '#121212'    /* Едва заметные границы */
-    },
-    accent: {
-      call: '#10b981',       /* Изумрудный для звонка и корзины */
-      admin: '#3b82f6',      /* Синий для админки */
-      warning: '#f59e0b',    /* Оранжевый */
-      danger: '#ef4444',     /* Красный */
-      success: '#10b981'     /* Зеленый успех */
+      call: require('../config/colors').COLORS.accent,
+      admin: require('../config/colors').COLORS.admin,
+      warning: require('../config/colors').COLORS.warning,
+      danger: require('../config/colors').COLORS.danger,
+      success: require('../config/colors').COLORS.success
     }
   }
 }
 
 export const themes = {
-  dark: darkTheme
+  light: lightTheme
 } as const
 
 // CSS переменные для простого использования
-export const getCSSVariables = (theme: SimpleTheme) => ({
-  '--bg-primary': theme.colors.background.primary,
-  '--bg-secondary': theme.colors.background.secondary,
-  '--bg-tertiary': theme.colors.background.tertiary,
-  
-  '--text-primary': theme.colors.text.primary,
-  '--text-secondary': theme.colors.text.secondary,
-  '--text-tertiary': theme.colors.text.tertiary,
-  
-  '--border-primary': theme.colors.border.primary,
-  '--border-secondary': theme.colors.border.secondary,
-  '--border-tertiary': theme.colors.border.tertiary,
-  
-  '--accent-call': theme.colors.accent.call,
-  '--accent-admin': theme.colors.accent.admin,
-  '--accent-warning': theme.colors.accent.warning,
-  '--accent-danger': theme.colors.accent.danger,
-  '--accent-success': theme.colors.accent.success,
-})
+export const getCSSVariables = (theme?: SimpleTheme) => {
+  const { light: defaultTheme } = require('./simpleTheme').themes;
+  const t = theme && theme.colors ? theme : defaultTheme;
+  return {
+    '--bg-primary': t.colors.background.primary,
+    '--bg-secondary': t.colors.background.secondary,
+    '--bg-tertiary': t.colors.background.tertiary,
+    '--text-primary': t.colors.text.primary,
+    '--text-secondary': t.colors.text.secondary,
+    '--text-tertiary': t.colors.text.tertiary,
+    '--border-primary': t.colors.border.primary,
+    '--border-secondary': t.colors.border.secondary,
+    '--border-tertiary': t.colors.border.tertiary,
+    '--accent-call': t.colors.accent.call,
+    '--accent-admin': t.colors.accent.admin,
+    '--accent-warning': t.colors.accent.warning,
+    '--accent-danger': t.colors.accent.danger,
+    '--accent-success': t.colors.accent.success,
+  };
+}
 
 // Утилитарные классы
 export const getThemeClasses = (theme: SimpleTheme) => ({

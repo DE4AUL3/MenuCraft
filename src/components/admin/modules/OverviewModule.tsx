@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { getThemeClasses } from '../../../styles/adminTheme'
 import SalesChart from './analytics/SalesChart'
-import { salesData } from './analytics/mockData'
+
 
 interface OverviewModuleProps {
   activeSubTab?: string
@@ -22,50 +22,22 @@ interface OverviewModuleProps {
   theme?: 'dark'
 }
 
-// Функция для получения реальных данных из restaurants.json
+// Получение статистики с API
 const getRealStatsData = async () => {
   try {
-    const response = await fetch('/data/restaurants.json')
+    const response = await fetch('/api/analytics?type=overview')
+    if (!response.ok) throw new Error('Ошибка API')
     const data = await response.json()
-    
-    const totalRestaurants = data.restaurants.length
-    const totalCategories = data.restaurants.reduce((sum: number, r: any) => sum + r.categories.length, 0)
-    const totalDishes = data.restaurants.reduce((sum: number, r: any) => 
-      sum + r.categories.reduce((catSum: number, c: any) => catSum + c.dishes.length, 0), 0)
-    
-    // Подсчитываем среднюю цену и общую стоимость меню
-    let totalPrice = 0
-    let dishCount = 0
-    
-    data.restaurants.forEach((restaurant: any) => {
-      restaurant.categories.forEach((category: any) => {
-        category.dishes.forEach((dish: any) => {
-          totalPrice += dish.price
-          dishCount++
-        })
-      })
-    })
-    
-    const averagePrice = dishCount > 0 ? Math.round(totalPrice / dishCount) : 0
-    const estimatedRevenue = Math.round(totalPrice * 2.5) // Примерная выручка
-    
-    return {
-      totalRestaurants,
-      totalCategories,
-      totalDishes,
-      averagePrice,
-      estimatedRevenue,
-      totalPrice
-    }
+    return data
   } catch (error) {
-    console.error('Ошибка загрузки данных:', error)
+    console.error('Ошибка загрузки overview:', error)
     return {
-      totalRestaurants: 2,
-      totalCategories: 7,
-      totalDishes: 18,
-      averagePrice: 350,
-      estimatedRevenue: 45000,
-      totalPrice: 9500
+      totalRestaurants: 0,
+      totalCategories: 0,
+      totalDishes: 0,
+      averagePrice: 0,
+      estimatedRevenue: 0,
+      totalPrice: 0
     }
   }
 }
@@ -77,12 +49,12 @@ export default function OverviewModule({
 }: OverviewModuleProps) {
   const [currentSubTab, setCurrentSubTab] = useState(activeSubTab)
   const [realStats, setRealStats] = useState({
-    totalRestaurants: 2,
-    totalCategories: 7,
-    totalDishes: 18,
-    averagePrice: 350,
-    estimatedRevenue: 45000,
-    totalPrice: 9500
+    totalRestaurants: 0,
+    totalCategories: 0,
+    totalDishes: 0,
+    averagePrice: 0,
+    estimatedRevenue: 0,
+    totalPrice: 0
   })
   const themeClasses = getThemeClasses(theme)
 
@@ -108,17 +80,17 @@ export default function OverviewModule({
 
   const basicStats = [
     {
-      title: 'Заказы сегодня',
-      value: '47',
-      change: '+12%',
+      title: 'Рестораны',
+      value: realStats.totalRestaurants.toString(),
+      change: '',
       changeType: 'positive' as const,
       icon: <ShoppingBag className="w-5 h-5" />,
       color: 'from-blue-400 to-blue-600'
     },
     {
-      title: 'Выручка за день',
-      value: `${Math.round(2847)} ТМТ`, // Примерная дневная выручка
-      change: '+8%',
+      title: 'Выручка',
+      value: `${realStats.estimatedRevenue} ТМТ`,
+      change: '',
       changeType: 'positive' as const,
       icon: <DollarSign className="w-5 h-5" />,
       color: 'from-green-400 to-green-600'
@@ -126,7 +98,7 @@ export default function OverviewModule({
     {
       title: 'Всего блюд',
       value: realStats.totalDishes.toString(),
-      change: '+2',
+      change: '',
       changeType: 'positive' as const,
       icon: <Package className="w-5 h-5" />,
       color: 'from-purple-400 to-purple-600'
@@ -134,7 +106,7 @@ export default function OverviewModule({
     {
       title: 'Категории',
       value: realStats.totalCategories.toString(),
-      change: 'стабильно',
+      change: '',
       changeType: 'positive' as const,
       icon: <Star className="w-5 h-5" />,
       color: 'from-yellow-400 to-orange-500'
@@ -181,8 +153,7 @@ export default function OverviewModule({
               ))}
             </div>
 
-            {/* График продаж перенесен сюда из вкладки "Аналитика" */}
-            <SalesChart data={salesData} theme={theme} />
+
 
             <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
               <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${themeClasses.text}`}>

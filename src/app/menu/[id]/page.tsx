@@ -8,7 +8,6 @@ import { useLanguage } from '@/hooks/useLanguage'
 import { useTheme } from '@/hooks/useTheme'
 import { useCart } from '@/hooks/useCart'
 import { Category } from '@/types/menu'
-import { dataService } from '@/lib/dataService'
 import { imageService } from '@/lib/imageService'
 import FloatingCallButton from '@/components/FloatingCallButton'
 
@@ -26,27 +25,46 @@ export default function MenuPage() {
       setRestaurant(restaurantId === '1' ? 'panda-burger' : 'han-tagam')
     }
 
-    // Загружаем категории из dataService
-    const loadCategories = () => {
-      const categoriesData = dataService.getCategories()
-      setCategories(categoriesData.filter(cat => cat.isActive))
+    // Загружаем категории из API
+    const loadCategories = async () => {
+      try {
+        const response = await fetch('/api/category')
+        if (response.ok) {
+          const data = await response.json()
+          // Трансформируем данные из БД в формат Category
+          const transformedCategories = data.map((cat: any) => ({
+            id: cat.id,
+            name: cat.nameRu,
+            nameTk: cat.nameTk,
+            image: cat.imageCard,
+            gradient: 'from-slate-500 to-slate-700',
+            description: cat.descriptionRu || '',
+            descriptionTk: cat.descriptionTk || '',
+            isActive: cat.status,
+            sortOrder: cat.order
+          }))
+          setCategories(transformedCategories)
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки категорий:', error)
+      }
     }
 
     loadCategories()
   }, [])
 
+  // Импортируем тему
+  const { light: theme } = require('@/styles/simpleTheme').themes;
   return (
-    <div className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding ${
-      currentRestaurant === 'panda-burger' || currentRestaurant === '1' 
-        ? 'bg-[#212121]' 
-        : 'bg-white'
-    }`}>
+    <div
+      className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding`}
+      style={{ background: theme.colors.background.secondary }}
+    >
       {/* Header */}
-      <header className={`sticky top-0 z-40 backdrop-blur-lg border-b ${
-        currentRestaurant === 'panda-burger' || currentRestaurant === '1'
-          ? 'bg-[#282828]/95 border-gray-600/30'
-          : 'bg-white/95 border-gray-200/30'
-      }`}>
+      <header
+        className={`sticky top-0 z-40 backdrop-blur-lg border-b`}
+        style={{ background: theme.colors.background.primary, borderColor: theme.colors.border.primary }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo & Back Button */}
@@ -60,18 +78,18 @@ export default function MenuPage() {
               <div className="flex items-center space-x-3">
                 <div className="relative w-10 h-10 sm:w-12 sm:h-12">
                   <Image
-                    src="/panda-burger-logo.svg"
-                    alt="Panda Burger"
+                    src="/images/han-tagam-logo.png"
+                    alt="Han Tagam"
                     fill
                     className="object-contain"
                   />
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-white">
-                    Panda Burger
+                  <h1 className="text-xl sm:text-2xl font-bold" style={{color: theme.colors.text.primary}}>
+                    Han Tagam
                   </h1>
-                  <p className="text-sm text-slate-300 hidden sm:block">
-                    Лучшие бургеры в городе
+                  <p className="text-sm hidden sm:block" style={{color: theme.colors.text.secondary}}>
+                    Традиционная туркменская кухня
                   </p>
                 </div>
               </div>
@@ -112,44 +130,49 @@ export default function MenuPage() {
         {/* Categories Grid */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            Категории блюд
+            <span style={{color: theme.colors.text.primary}}>Категории блюд</span>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
             {categories.map((category) => (
               <div
                 key={category.id}
                 onClick={() => router.push(`/menu/1/category/${category.id}`)}
-                className="group bg-white/10 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl border border-white/20 hover:border-orange-400/50 overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.03] active:scale-[0.97]"
+                className="group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl border overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.03] active:scale-[0.97]"
+                style={{ background: theme.colors.background.primary, borderColor: theme.colors.border.primary }}
               >
                 {/* Category Image */}
                 <div className={`relative h-32 sm:h-36 bg-gradient-to-br ${category.gradient || 'from-slate-500 to-slate-700'} overflow-hidden`}>
-                  <Image
-                    src={category.image}
-                    alt={category.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
+                  {category.image ? (
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : null}
                   
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                   
                   {/* Category Image */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-full sm:w-full sm:h-full rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300">
-                      <Image
-                        src={imageService.getImageUrl(category.image)}
-                        alt={category.name}
-                        width={200}
-                        height={200}
-                        className="w-full h-full sm:w-full sm:h-full object-cover rounded-lg"
-                      />
+                    <div className="w-full h-full sm:w-full sm:h-full rounded-xl backdrop-blur-md border flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300" style={{background: theme.colors.background.secondary, borderColor: theme.colors.border.primary}}>
+                      {category.image ? (
+                        <Image
+                          src={imageService.getImageUrl(category.image)}
+                          alt={category.name}
+                          width={200}
+                          height={200}
+                          className="w-full h-full sm:w-full sm:h-full object-cover rounded-lg"
+                        />
+                      ) : null}
                     </div>
                   </div>
                 </div>
                 
                 {/* Category Info */}
                 <div className="p-4 text-center bg-white/10 backdrop-blur-md border-t border-white/20">
-                  <h3 className="font-bold text-white text-sm sm:text-base mb-1 group-hover:text-orange-400 transition-colors duration-300">
+                  <h3 className="font-bold text-sm sm:text-base mb-1 transition-colors duration-300" style={{color: theme.colors.text.primary}}>
                     {currentLanguage === 'tk' ? (category.nameTk || category.name) : category.name}
                   </h3>
                 </div>

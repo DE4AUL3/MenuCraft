@@ -17,7 +17,7 @@ export const RESTAURANTS: Record<string, RestaurantConfig> = {
     name: 'Panda Burger',
     domain: 'panda-burger.local',
     theme: 'dark',
-    primaryColor: '#ff6b35',
+    primaryColor: 'orange', // Используем id темы из colors.ts
     logo: '/panda-burger-logo.svg',
     phone: '+993 XX XXX XXX',
     address: 'Ашхабад, ул. Пример, 123',
@@ -28,7 +28,7 @@ export const RESTAURANTS: Record<string, RestaurantConfig> = {
     name: 'Han Tagam',
     domain: 'han-tagam.local',
     theme: 'light',
-    primaryColor: '#3b82f6',
+    primaryColor: 'blue', // Используем id темы из colors.ts
     logo: '/khan-tagam-logo.svg',
     phone: '+993 YY YYY YYY',
     address: 'Ашхабад, ул. Образец, 456',

@@ -20,15 +20,7 @@ import PopularDishesChart from './analytics/PopularDishesChart'
 import CustomersChart from './analytics/CustomersChart'
 import PerformanceChart from './analytics/PerformanceChart'
 import { DateFilter, ExportButton, MetricCard } from './analytics/AnalyticsComponents'
-
-// Импорт данных
-import {
-  salesData,
-  popularDishes,
-  customerData,
-  performanceMetrics,
-  formatCurrency
-} from './analytics/mockData'
+import { formatCurrency } from './analytics/mockData'
 
 interface AnalyticsModuleProps {
   activeSubTab?: string
@@ -42,7 +34,48 @@ export default function AnalyticsModule({
   theme = 'dark' 
 }: AnalyticsModuleProps) {
   const [currentSubTab, setCurrentSubTab] = useState(activeSubTab)
+  const [salesData, setSalesData] = useState<any[]>([])
+  const [popularDishes, setPopularDishes] = useState<any[]>([])
+  const [customerData, setCustomerData] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const themeClasses = getThemeClasses(theme)
+
+  useEffect(() => {
+    // Загружаем данные аналитики из API
+    const loadAnalyticsData = async () => {
+      try {
+        setIsLoading(true)
+        const [salesRes, dishesRes, customersRes] = await Promise.all([
+          fetch('/api/analytics?type=sales&days=30'),
+          fetch('/api/analytics?type=dishes&days=30'),
+          fetch('/api/analytics?type=customers&days=30'),
+        ])
+
+        if (salesRes.ok) {
+          const data = await salesRes.json()
+          setSalesData(Array.isArray(data) ? data : [])
+        }
+        if (dishesRes.ok) {
+          const data = await dishesRes.json()
+          setPopularDishes(Array.isArray(data) ? data : [])
+        }
+        if (customersRes.ok) {
+          const data = await customersRes.json()
+          setCustomerData(Array.isArray(data) ? data : [])
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки аналитики:', error)
+        // Используем пустые массивы как fallback
+        setSalesData([])
+        setPopularDishes([])
+        setCustomerData([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadAnalyticsData()
+  }, [])
 
   useEffect(() => {
     setCurrentSubTab(activeSubTab)
@@ -71,8 +104,23 @@ export default function AnalyticsModule({
   ]
 
   const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className={`${themeClasses.cardBg} rounded-lg p-8 text-center`}>
+          <p className={themeClasses.text}>Загрузка данных...</p>
+        </div>
+      )
+    }
+
     switch (currentSubTab) {
       case 'sales':
+        if (salesData.length === 0) {
+          return (
+            <div className={`${themeClasses.cardBg} rounded-lg p-8 text-center`}>
+              <p className={themeClasses.textSecondary}>Нет данных о продажах</p>
+            </div>
+          )
+        }
         return (
           <div className="space-y-6">
             {/* Метрики продаж */}
@@ -99,7 +147,7 @@ export default function AnalyticsModule({
                 title="Средний чек"
                 value={formatCurrency(
                   salesData.reduce((sum, item) => sum + item.sales, 0) /
-                  salesData.reduce((sum, item) => sum + item.orders, 0)
+                  (salesData.reduce((sum, item) => sum + item.orders, 0) || 1)
                 )}
                 change={4.1}
                 changeType="positive"
@@ -221,8 +269,14 @@ export default function AnalyticsModule({
       case 'performance':
         return (
           <div className="space-y-6">
-            {/* График производительности */}
-            <PerformanceChart data={performanceMetrics} theme={theme} />
+            <div className={`${themeClasses.cardBg} rounded-lg p-6`}>
+              <h3 className={`text-lg font-bold ${themeClasses.text} mb-4`}>
+                Метрики производительности загружаются из API...
+              </h3>
+              <p className={themeClasses.textSecondary}>
+                Данные будут доступны после заполнения базы заказами.
+              </p>
+            </div>
           </div>
         )
 
