@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { dataService } from '@/lib/dataService';
+// import { dataService } from '@/lib/dataService';
 import { imageService } from '@/lib/imageService';
 import ImageUpload from '@/components/ui/ImageUpload';
 import SmartImage from '@/components/ui/SmartImage';
@@ -41,32 +41,63 @@ export default function CategoryManager() {
     loadCategories();
   }, []);
 
-  const loadCategories = () => {
-    const data = dataService.getCategories();
-    setCategories(data);
+  const loadCategories = async () => {
+    try {
+      const response = await fetch('/api/category');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      toast.error('Ошибка загрузки категорий!');
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
       if (editingId) {
-        dataService.updateCategory(editingId, formData);
+        // Редактирование
+        const response = await fetch(`/api/category/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nameRu: formData.name,
+            nameTk: formData.nameTk,
+            descriptionRu: formData.description,
+            descriptionTk: formData.descriptionTk,
+            imageCard: formData.image,
+            imageBackground: formData.dishPageImage,
+            order: formData.sortOrder,
+            status: formData.isActive,
+            restaurantId: 'han-tagam',
+          }),
+        });
+        if (!response.ok) throw new Error('Ошибка обновления');
       } else {
-        dataService.addCategory(formData);
+        // Добавление
+        const response = await fetch('/api/category', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nameRu: formData.name,
+            nameTk: formData.nameTk,
+            descriptionRu: formData.description,
+            descriptionTk: formData.descriptionTk,
+            imageCard: formData.image,
+            imageBackground: formData.dishPageImage,
+            order: formData.sortOrder,
+            status: formData.isActive,
+            restaurantId: 'han-tagam',
+          }),
+        });
+        if (!response.ok) throw new Error('Ошибка добавления');
       }
-      
-      loadCategories();
+      await loadCategories();
       resetForm();
-      toast.success(editingId ? 'Категория обновлена!' : 'Категория добавлена!', {
-        duration: 3000,
-        position: 'top-right',
-      });
+      toast.success(editingId ? 'Категория обновлена!' : 'Категория добавлена!', { icon: '✅' });
     } catch (error) {
-      toast.error('Ошибка: ' + (error as Error).message, {
-        duration: 4000,
-        position: 'top-right',
-      });
+      toast.error('Ошибка сохранения категории!');
     }
   };
 
@@ -86,20 +117,17 @@ export default function CategoryManager() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Вы уверены, что хотите удалить эту категорию?')) {
       try {
-        dataService.deleteCategory(id);
-        loadCategories();
-        toast.success('Категория удалена!', {
-          duration: 3000,
-          position: 'top-right',
+        const response = await fetch(`/api/category/${id}`, {
+          method: 'DELETE'
         });
+        if (!response.ok) throw new Error('Ошибка удаления');
+        await loadCategories();
+        toast.success('Категория удалена!', { duration: 3000, position: 'top-right' });
       } catch (error) {
-        toast.error('Ошибка: ' + (error as Error).message, {
-          duration: 4000,
-          position: 'top-right',
-        });
+        toast.error('Ошибка удаления категории!', { duration: 4000, position: 'top-right' });
       }
     }
   };
