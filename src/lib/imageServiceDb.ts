@@ -43,16 +43,33 @@ class ImageService {
       formData.append('file', file);
       formData.append('category', category);
       if (alt) formData.append('alt', alt);
-
-      // Отправляем запрос на API
-      const response = await fetch('/api/images', {
-        method: 'POST',
-        body: formData
+      
+      console.log('Отправляем запрос с данными:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        category
       });
 
+      // Отправляем запрос на API с правильными заголовками
+      const response = await fetch('/api/images', {
+        method: 'POST',
+        body: formData,
+        // Не устанавливаем заголовок Content-Type, 
+        // браузер автоматически добавит правильный multipart/form-data с boundary
+      });
+
+      console.log('Получен ответ:', response.status, response.statusText);
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Ошибка загрузки');
+        const errorText = await response.text();
+        console.error('Ошибка при загрузке изображения:', errorText);
+        try {
+          const errorJson = JSON.parse(errorText);
+          throw new Error(errorJson.error || 'Ошибка загрузки');
+        } catch (e) {
+          throw new Error('Ошибка загрузки: ' + errorText);
+        }
       }
 
       const result = await response.json();

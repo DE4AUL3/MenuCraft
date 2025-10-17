@@ -1,6 +1,6 @@
 export async function POST(request: Request) {
   try {
-    const body: CreateCategory = await request.json();
+    const body = await request.json();
     const {
       nameRu,
       nameTk,
@@ -9,8 +9,7 @@ export async function POST(request: Request) {
       imageCard,
       imageBackground,
       order,
-      status,
-      restaurantId
+      status
     } = body;
 
     // Валидация обязательных полей
@@ -29,7 +28,7 @@ export async function POST(request: Request) {
         imageBackground: imageBackground || '',
         order,
         status: status ?? true,
-        restaurantId: restaurantId || 'han-tagam',
+        restaurantId: 'han-tagam'
       },
     });
     return NextResponse.json(category, { status: 201 });

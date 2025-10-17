@@ -82,7 +82,7 @@ export default function ImageUpload({
   // Обработчик открытия менеджера изображений
   const handleOpenImageManager = () => {
     // Динамически загружаем модуль менеджера изображений
-    import('@/components/admin/ImageManagerModal').then(({ default: ImageManagerModal }) => {
+    import('./ImageManagerModal').then(({ default: ImageManagerModal }) => {
       // Создаем экземпляр модального окна
       const modalContainer = document.createElement('div');
       document.body.appendChild(modalContainer);

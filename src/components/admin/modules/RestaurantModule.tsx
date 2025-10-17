@@ -1,9 +1,8 @@
 ﻿"use client";
 
 import { useState } from 'react';
-import { Store, TrendingUp, ShoppingBag, FileText } from 'lucide-react';
+import { TrendingUp, ShoppingBag, FileText } from 'lucide-react';
 import { AdminTheme } from '@/components/admin/AdminHeader';
-import RestaurantGeneralSettings from './RestaurantGeneralSettings';
 import CategoryManager from '@/components/CategoryManager';
 import DishManager from './DishManager';
 import CartSettings from './CartSettings';
@@ -13,18 +12,12 @@ interface RestaurantModuleProps {
   theme?: 'dark';
 }
 
-type SubTab = 'general' | 'categories' | 'dishes' | 'cart';
+type SubTab = 'categories' | 'dishes' | 'cart';
 
 export default function RestaurantModule({ className = '', theme = 'dark' }: RestaurantModuleProps) {
-  const [currentSubTab, setCurrentSubTab] = useState<SubTab>('general');
+  const [currentSubTab, setCurrentSubTab] = useState<SubTab>('categories');
 
   const subTabs = [
-    {
-      id: 'general' as SubTab,
-      label: 'Общее',
-      icon: <Store className="w-4 h-4" />,
-      description: 'Основные настройки ресторана'
-    },
     {
       id: 'categories' as SubTab,
       label: 'Категории',
@@ -47,9 +40,6 @@ export default function RestaurantModule({ className = '', theme = 'dark' }: Res
 
   const renderTabContent = () => {
     switch (currentSubTab) {
-      case 'general':
-        return <RestaurantGeneralSettings />;
-      
       case 'categories':
         return <CategoryManager />;
       
@@ -60,7 +50,7 @@ export default function RestaurantModule({ className = '', theme = 'dark' }: Res
         return <CartSettings restaurantId="main_restaurant" />;
       
       default:
-        return null;
+        return <CategoryManager />;
     }
   };
 

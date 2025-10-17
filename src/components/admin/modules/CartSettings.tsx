@@ -27,7 +27,7 @@ const CartSettings: React.FC<CartSettingsProps> = ({ restaurantId }) => {
   const { currentLanguage: language } = useLanguage();
   const [cartSettings, setCartSettings] = useState<CartSettingsType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'general' | 'delivery' | 'schedule'>('general');
+  const [activeTab, setActiveTab] = useState<'delivery'>('delivery');
   const [isEditing, setIsEditing] = useState(false);
   const [editingSettings, setEditingSettings] = useState<CartSettingsType | null>(null);
   const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
@@ -211,12 +211,12 @@ const CartSettings: React.FC<CartSettingsProps> = ({ restaurantId }) => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            {language === 'ru' ? 'Настройки корзины и доставки' : 'Sebet we eltip bermek sazlamalary'}
+            {language === 'ru' ? 'Настройки доставки' : 'Eltip bermek sazlamalary'}
           </h2>
           <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {language === 'ru' 
-              ? 'Управление зонами доставки, минимальными суммами заказа и режимом работы'
-              : 'Eltip bermek zonalaryny, iň az sargyt mukdaryny we iş tertibini dolandyrmak'
+              ? 'Управление зонами доставки и их стоимостью'
+              : 'Eltip bermek zonalaryny we olaryň bahasyny dolandyrmak'
             }
           </p>
         </div>
@@ -250,256 +250,27 @@ const CartSettings: React.FC<CartSettingsProps> = ({ restaurantId }) => {
         </div>
       </div>
 
-      {/* Вкладки */}
+      {/* Заголовок вкладки доставки */}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           {[
-            { id: 'general', icon: Settings, label: { ru: 'Общие', tk: 'Umumy' } },
-            { id: 'delivery', icon: Truck, label: { ru: 'Доставка', tk: 'Eltip bermek' } },
-            { id: 'schedule', icon: Clock, label: { ru: 'Расписание', tk: 'Tertip' } }
+            { id: 'delivery', icon: Truck, label: { ru: 'Доставка', tk: 'Eltip bermek' } }
           ].map(tab => {
-            const isActive = activeTab === tab.id;
             return (
-              <button
+              <div
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
-                  isActive
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
+                className="flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600 dark:text-blue-400"
               >
                 <tab.icon className="w-4 h-4" />
                 <span>{tab.label[language]}</span>
-              </button>
+              </div>
             );
           })}
         </nav>
       </div>
 
       {/* Контент вкладок */}
-      {activeTab === 'general' && (
-        <div className="space-y-6">
-          {/* Основные настройки */}
-          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {language === 'ru' ? 'Основные настройки' : 'Esasy sazlamalar'}
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Минимальная сумма заказа */}
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {language === 'ru' ? 'Минимальная сумма заказа' : 'Iň az sargyt mukdary'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={currentSettings.minOrderAmount}
-                    onChange={(e) => isEditing && setEditingSettings({
-                      ...currentSettings,
-                      minOrderAmount: Number(e.target.value)
-                    })}
-                    disabled={!isEditing}
-                    className={`w-full px-3 py-2 pr-12 border rounded-lg ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-white' 
-                        : 'bg-white border-gray-300 text-gray-900'
-                    } ${!isEditing ? 'opacity-60' : ''}`}
-                  />
-                  <span className={`absolute right-3 top-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {currentSettings.currency}
-                  </span>
-                </div>
-              </div>
-
-              {/* Бесплатная доставка от */}
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {language === 'ru' ? 'Бесплатная доставка от' : 'Mugt eltip bermek'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={currentSettings.freeDeliveryAmount || ''}
-                    onChange={(e) => isEditing && setEditingSettings({
-                      ...currentSettings,
-                      freeDeliveryAmount: e.target.value ? Number(e.target.value) : undefined
-                    })}
-                    disabled={!isEditing}
-                    placeholder={language === 'ru' ? 'Не установлено' : 'Goýulmadyk'}
-                    className={`w-full px-3 py-2 pr-12 border rounded-lg ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-white' 
-                        : 'bg-white border-gray-300 text-gray-900'
-                    } ${!isEditing ? 'opacity-60' : ''}`}
-                  />
-                  <span className={`absolute right-3 top-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {currentSettings.currency}
-                  </span>
-                </div>
-              </div>
-
-              {/* Время обработки заказа */}
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {language === 'ru' ? 'Время обработки (мин)' : 'Işlemek wagty (min)'}
-                </label>
-                <div className="flex space-x-2">
-                  <input
-                    type="number"
-                    value={currentSettings.orderProcessingTime.min}
-                    onChange={(e) => isEditing && setEditingSettings({
-                      ...currentSettings,
-                      orderProcessingTime: {
-                        ...currentSettings.orderProcessingTime,
-                        min: Number(e.target.value)
-                      }
-                    })}
-                    disabled={!isEditing}
-                    placeholder="От"
-                    className={`flex-1 px-3 py-2 border rounded-lg ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-white' 
-                        : 'bg-white border-gray-300 text-gray-900'
-                    } ${!isEditing ? 'opacity-60' : ''}`}
-                  />
-                  <span className={`flex items-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>-</span>
-                  <input
-                    type="number"
-                    value={currentSettings.orderProcessingTime.max}
-                    onChange={(e) => isEditing && setEditingSettings({
-                      ...currentSettings,
-                      orderProcessingTime: {
-                        ...currentSettings.orderProcessingTime,
-                        max: Number(e.target.value)
-                      }
-                    })}
-                    disabled={!isEditing}
-                    placeholder="До"
-                    className={`flex-1 px-3 py-2 border rounded-lg ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-white' 
-                        : 'bg-white border-gray-300 text-gray-900'
-                    } ${!isEditing ? 'opacity-60' : ''}`}
-                  />
-                </div>
-              </div>
-
-              {/* Валюта */}
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {language === 'ru' ? 'Валюта' : 'Walýuta'}
-                </label>
-                <select
-                  value={currentSettings.currency}
-                  onChange={(e) => isEditing && setEditingSettings({
-                    ...currentSettings,
-                    currency: e.target.value
-                  })}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border rounded-lg ${
-                    isDarkMode 
-                      ? 'bg-gray-700 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } ${!isEditing ? 'opacity-60' : ''}`}
-                >
-                  <option value="ТМТ">ТМТ (Туркменский манат)</option>
-                  <option value="USD">USD (Доллар США)</option>
-                  <option value="EUR">EUR (Евро)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Переключатели */}
-            <div className="mt-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {language === 'ru' ? 'Доставка включена' : 'Eltip bermek açyldy'}
-                  </label>
-                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {language === 'ru' 
-                      ? 'Разрешить заказы с доставкой' 
-                      : 'Eltip bermek bilen sargytlara rugsat bermek'
-                    }
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={currentSettings.isDeliveryEnabled}
-                    onChange={(e) => isEditing && setEditingSettings({
-                      ...currentSettings,
-                      isDeliveryEnabled: e.target.checked
-                    })}
-                    disabled={!isEditing}
-                    className="sr-only peer"
-                  />
-                  <div className={`relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 ${!isEditing ? 'opacity-60' : ''}`}></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {language === 'ru' ? 'Самовывоз включен' : 'Özüň almak açyldy'}
-                  </label>
-                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {language === 'ru' 
-                      ? 'Разрешить заказы на самовывоз' 
-                      : 'Özüň almak üçin sargytlara rugsat bermek'
-                    }
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={currentSettings.isTakeawayEnabled}
-                    onChange={(e) => isEditing && setEditingSettings({
-                      ...currentSettings,
-                      isTakeawayEnabled: e.target.checked
-                    })}
-                    disabled={!isEditing}
-                    className="sr-only peer"
-                  />
-                  <div className={`relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 ${!isEditing ? 'opacity-60' : ''}`}></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {language === 'ru' ? 'Автоподтверждение заказов' : 'Sargytlary awtomatik tassyklamak'}
-                  </label>
-                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {language === 'ru' 
-                      ? 'Заказы будут автоматически подтверждаться' 
-                      : 'Sargytlar awtomatik tassyklanar'
-                    }
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={currentSettings.settings.autoConfirmOrders}
-                    onChange={(e) => isEditing && setEditingSettings({
-                      ...currentSettings,
-                      settings: {
-                        ...currentSettings.settings,
-                        autoConfirmOrders: e.target.checked
-                      }
-                    })}
-                    disabled={!isEditing}
-                    className="sr-only peer"
-                  />
-                  <div className={`relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 ${!isEditing ? 'opacity-60' : ''}`}></div>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Основные настройки были здесь, но убраны для упрощения интерфейса */}
 
       {activeTab === 'delivery' && (
         <div className="space-y-6">
@@ -589,99 +360,7 @@ const CartSettings: React.FC<CartSettingsProps> = ({ restaurantId }) => {
         </div>
       )}
 
-      {activeTab === 'schedule' && (
-        <div className="space-y-6">
-          {/* Расписание работы */}
-          <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {language === 'ru' ? 'Режим работы' : 'Iş tertipnamasy'}
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {language === 'ru' ? 'Время открытия' : 'Açylma wagty'}
-                </label>
-                <input
-                  type="time"
-                  value={currentSettings.workingHours.from}
-                  onChange={(e) => isEditing && setEditingSettings({
-                    ...currentSettings,
-                    workingHours: {
-                      ...currentSettings.workingHours,
-                      from: e.target.value
-                    }
-                  })}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border rounded-lg ${
-                    isDarkMode 
-                      ? 'bg-gray-700 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } ${!isEditing ? 'opacity-60' : ''}`}
-                />
-              </div>
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {language === 'ru' ? 'Время закрытия' : 'Ýapylma wagty'}
-                </label>
-                <input
-                  type="time"
-                  value={currentSettings.workingHours.to}
-                  onChange={(e) => isEditing && setEditingSettings({
-                    ...currentSettings,
-                    workingHours: {
-                      ...currentSettings.workingHours,
-                      to: e.target.value
-                    }
-                  })}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border rounded-lg ${
-                    isDarkMode 
-                      ? 'bg-gray-700 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } ${!isEditing ? 'opacity-60' : ''}`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {language === 'ru' ? 'Рабочие дни' : 'Iş günleri'}
-              </label>
-              <div className="grid grid-cols-7 gap-2">
-                {weekDays.map((day) => {
-                  const isSelected = currentSettings.workingDays.includes(day.id);
-                  return (
-                    <button
-                      key={day.id}
-                      onClick={() => {
-                        if (!isEditing) return;
-                        const newWorkingDays = isSelected
-                          ? currentSettings.workingDays.filter(d => d !== day.id)
-                          : [...currentSettings.workingDays, day.id];
-                        setEditingSettings({
-                          ...currentSettings,
-                          workingDays: newWorkingDays
-                        });
-                      }}
-                      disabled={!isEditing}
-                      className={`p-3 text-xs rounded-lg border transition-colors ${
-                        isSelected
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : isDarkMode
-                            ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
-                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      } ${!isEditing ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
-                    >
-                      {day.name[language]}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Настройки расписания были здесь, но убраны для упрощения интерфейса */}
 
       {/* Модальное окно для добавления/редактирования зоны доставки */}
       {isZoneModalOpen && (

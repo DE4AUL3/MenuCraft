@@ -153,12 +153,10 @@ export function ImagePicker({ onSelect, value, category = 'other' }: ImagePicker
       ) : (
         <div className="py-2">
           <ImageUpload
-            imageUrl={value}
             onImageChange={(url) => {
               if (url) handleImageSelect(url);
               setShowUploader(false);
             }}
-            category={'products' as any}
             placeholder="Загрузить новое изображение"
           />
         </div>
