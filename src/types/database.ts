@@ -21,6 +21,7 @@ export interface DatabaseCategory {
   imageBackground: string;
   order: number;
   status: boolean;
+  restaurantId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -71,6 +72,7 @@ export interface CreateCategory {
   imageBackground: string;
   order: number;
   status?: boolean;
+  restaurantId?: string;
 }
 
 export interface CreateMeal {
@@ -102,6 +104,7 @@ export interface UpdateCategory {
   imageBackground?: string;
   order?: number;
   status?: boolean;
+  restaurantId?: string;
 }
 
 export interface UpdateMeal {
@@ -130,6 +133,7 @@ export interface LocalizedCategory {
   status: boolean;
   createdAt: Date;
   updatedAt: Date;
+  restaurantId?: string;
   meals?: LocalizedMeal[];
 }
 

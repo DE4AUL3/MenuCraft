@@ -30,7 +30,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
         {/* Изображение - чистое фото без эффектов */}
         <div className="h-64 overflow-hidden rounded-t-2xl">
           <SmartImage
-            src={category.image}
+            src={category.image || '/images/categories/placeholder.jpg'}
             alt={category.name}
             className="w-full h-full object-cover object-center"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"

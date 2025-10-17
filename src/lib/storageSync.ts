@@ -29,16 +29,39 @@ class StorageSync {
   private handleStorageChange(event: StorageEvent) {
     if (!event.key) return;
 
-    const oldValue = event.oldValue ? JSON.parse(event.oldValue) : null;
-    const newValue = event.newValue ? JSON.parse(event.newValue) : null;
-
-    this.listeners.forEach(callback => {
-      try {
-        callback(event.key!, newValue, oldValue);
-      } catch (error) {
-        console.warn('Ошибка в StorageSync callback:', error);
+    try {
+      // Безопасный парсинг JSON с проверкой на ошибки
+      let oldValue = null;
+      let newValue = null;
+      
+      if (event.oldValue) {
+        try {
+          oldValue = JSON.parse(event.oldValue);
+        } catch (e) {
+          console.warn(`Не удалось распарсить oldValue для ключа ${event.key}:`, e);
+          oldValue = event.oldValue; // Используем строку как есть
+        }
       }
-    });
+      
+      if (event.newValue) {
+        try {
+          newValue = JSON.parse(event.newValue);
+        } catch (e) {
+          console.warn(`Не удалось распарсить newValue для ключа ${event.key}:`, e);
+          newValue = event.newValue; // Используем строку как есть
+        }
+      }
+
+      this.listeners.forEach(callback => {
+        try {
+          callback(event.key!, newValue, oldValue);
+        } catch (error) {
+          console.warn('Ошибка в StorageSync callback:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Ошибка обработки события storage:', error);
+    }
   }
 
   /**
@@ -66,11 +89,18 @@ class StorageSync {
    * Безопасная установка значения с уведомлением других вкладок
    */
   setItem(key: string, value: any) {
-    const oldValue = localStorage.getItem(key);
-    localStorage.setItem(key, JSON.stringify(value));
-    
-    // Уведомляем другие вкладки
-    this.broadcast(key, value);
+    try {
+      const oldValue = localStorage.getItem(key);
+      
+      // Проверяем, можно ли сериализовать значение
+      const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+      localStorage.setItem(key, serialized);
+      
+      // Уведомляем другие вкладки
+      this.broadcast(key, value);
+    } catch (error) {
+      console.error(`Ошибка при сохранении ${key} в localStorage:`, error);
+    }
   }
 
   /**
@@ -79,8 +109,18 @@ class StorageSync {
   getItem<T>(key: string, defaultValue: T): T {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue;
-    } catch {
+      if (!item) return defaultValue;
+      
+      try {
+        // Пытаемся распарсить JSON
+        return JSON.parse(item);
+      } catch (e) {
+        // Если не получилось распарсить, возвращаем строку или дефолтное значение
+        console.warn(`Не удалось распарсить значение для ключа ${key}:`, e);
+        return (item as unknown as T) || defaultValue;
+      }
+    } catch (error) {
+      console.error(`Ошибка при получении ${key} из localStorage:`, error);
       return defaultValue;
     }
   }

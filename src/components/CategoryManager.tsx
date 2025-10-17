@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-// import { dataService } from '@/lib/dataService';
-import { imageService } from '@/lib/imageService';
 import ImageUpload from '@/components/ui/ImageUpload';
 import SmartImage from '@/components/ui/SmartImage';
 import type { Category } from '@/types/common';
@@ -46,9 +44,26 @@ export default function CategoryManager() {
       const response = await fetch('/api/category');
       if (response.ok) {
         const data = await response.json();
-        setCategories(data);
+        // Преобразуем данные из формата БД в формат, используемый компонентом
+        const mappedCategories: Category[] = data.map((item: any) => ({
+          id: item.id,
+          name: item.nameRu,
+          nameTk: item.nameTk,
+          image: item.imageCard,
+          dishPageImage: item.imageBackground,
+          gradient: 'from-blue-600 to-purple-600', // Дефолтный градиент
+          description: item.descriptionRu,
+          descriptionTk: item.descriptionTk,
+          sortOrder: item.order,
+          isActive: item.status
+        }));
+        setCategories(mappedCategories);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ошибка загрузки категорий');
       }
     } catch (error) {
+      console.error('Ошибка при загрузке категорий:', error);
       toast.error('Ошибка загрузки категорий!');
     }
   };
@@ -56,48 +71,52 @@ export default function CategoryManager() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const categoryData = {
+        nameRu: formData.name,
+        nameTk: formData.nameTk,
+        descriptionRu: formData.description,
+        descriptionTk: formData.descriptionTk,
+        imageCard: formData.image,
+        imageBackground: formData.dishPageImage,
+        order: formData.sortOrder,
+        status: formData.isActive,
+        restaurantId: 'han-tagam',
+      };
+
+      let response;
       if (editingId) {
-        // Редактирование
-        const response = await fetch(`/api/category/${editingId}`, {
+        // Редактирование существующей категории
+        response = await fetch(`/api/category/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nameRu: formData.name,
-            nameTk: formData.nameTk,
-            descriptionRu: formData.description,
-            descriptionTk: formData.descriptionTk,
-            imageCard: formData.image,
-            imageBackground: formData.dishPageImage,
-            order: formData.sortOrder,
-            status: formData.isActive,
-            restaurantId: 'han-tagam',
-          }),
+          body: JSON.stringify(categoryData),
         });
-        if (!response.ok) throw new Error('Ошибка обновления');
       } else {
-        // Добавление
-        const response = await fetch('/api/category', {
+        // Создание новой категории
+        response = await fetch('/api/category', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nameRu: formData.name,
-            nameTk: formData.nameTk,
-            descriptionRu: formData.description,
-            descriptionTk: formData.descriptionTk,
-            imageCard: formData.image,
-            imageBackground: formData.dishPageImage,
-            order: formData.sortOrder,
-            status: formData.isActive,
-            restaurantId: 'han-tagam',
-          }),
+          body: JSON.stringify(categoryData),
         });
-        if (!response.ok) throw new Error('Ошибка добавления');
       }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Произошла ошибка при сохранении');
+      }
+
       await loadCategories();
       resetForm();
-      toast.success(editingId ? 'Категория обновлена!' : 'Категория добавлена!', { icon: '✅' });
+      toast.success(
+        editingId ? 'Категория успешно обновлена!' : 'Категория успешно создана!', 
+        { icon: '✅', duration: 3000 }
+      );
     } catch (error) {
-      toast.error('Ошибка сохранения категории!');
+      console.error('Ошибка при сохранении категории:', error);
+      toast.error(
+        error instanceof Error ? error.message : 'Ошибка сохранения категории!', 
+        { duration: 4000 }
+      );
     }
   };
 
@@ -123,11 +142,24 @@ export default function CategoryManager() {
         const response = await fetch(`/api/category/${id}`, {
           method: 'DELETE'
         });
-        if (!response.ok) throw new Error('Ошибка удаления');
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Ошибка удаления категории');
+        }
+        
         await loadCategories();
-        toast.success('Категория удалена!', { duration: 3000, position: 'top-right' });
+        toast.success('Категория успешно удалена!', { 
+          duration: 3000, 
+          position: 'top-right',
+          icon: '🗑️' 
+        });
       } catch (error) {
-        toast.error('Ошибка удаления категории!', { duration: 4000, position: 'top-right' });
+        console.error('Ошибка при удалении категории:', error);
+        toast.error(
+          error instanceof Error ? error.message : 'Ошибка удаления категории!', 
+          { duration: 4000, position: 'top-right' }
+        );
       }
     }
   };

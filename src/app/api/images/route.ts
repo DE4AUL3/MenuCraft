@@ -1,0 +1,245 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { writeFile, mkdir } from 'fs/promises';
+import { join, dirname } from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { existsSync } from 'fs';
+
+const prisma = new PrismaClient();
+
+// Загрузка файла на сервер
+async function saveFile(file: File, category: string): Promise<{ 
+  success: boolean; 
+  filePath?: string; 
+  error?: string;
+}> {
+  try {
+    // Получаем расширение файла
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    
+    const extension = file.name.split('.').pop() || 'jpg';
+    const filename = `${uuidv4()}.${extension}`;
+    
+    // Определяем категорию для сохранения
+    const categoryFolders = {
+      logos: 'logos',
+      categories: 'categories',
+      products: 'menu',
+      other: 'other'
+    };
+    
+    const folderKey = category as keyof typeof categoryFolders;
+    const folder = categoryFolders[folderKey] || 'other';
+    
+    // Создаем путь к файлу
+    const relativePath = `/images/${folder}/${filename}`;
+    const absolutePath = join(process.cwd(), 'public', relativePath);
+    
+    // Проверяем существование директории
+    const dir = dirname(absolutePath);
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true });
+    }
+    
+    // Записываем файл
+    await writeFile(absolutePath, buffer);
+    
+    return {
+      success: true,
+      filePath: relativePath
+    };
+  } catch (error) {
+    console.error('Ошибка при сохранении файла:', error);
+    return {
+      success: false,
+      error: 'Не удалось сохранить файл'
+    };
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const data = await request.formData();
+    const file = data.get('file') as unknown as File;
+    
+    if (!file) {
+      return NextResponse.json(
+        { error: 'Файл не предоставлен' }, 
+        { status: 400 }
+      );
+    }
+    
+    // Проверка типа файла
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        { error: 'Неподдерживаемый формат файла' }, 
+        { status: 400 }
+      );
+    }
+    
+    // Проверка размера файла (5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: 'Размер файла превышает 5MB' }, 
+        { status: 400 }
+      );
+    }
+    
+    // Получаем данные из запроса
+    const category = (data.get('category') as string) || 'other';
+    const alt = (data.get('alt') as string) || '';
+    
+    // Сохраняем файл
+    const saveResult = await saveFile(file, category);
+    
+    if (!saveResult.success) {
+      return NextResponse.json(
+        { error: saveResult.error }, 
+        { status: 500 }
+      );
+    }
+    
+    // Сохраняем информацию в БД
+    const image = await prisma.image.create({
+      data: {
+        filename: file.name,
+        path: saveResult.filePath!,
+        size: file.size,
+        mimeType: file.type,
+        category,
+        alt,
+        originalFilename: file.name,
+        type: file.type
+      }
+    });
+    
+    return NextResponse.json({
+      success: true,
+      image: {
+        id: image.id,
+        filename: file.name,
+        url: saveResult.filePath,
+        size: file.size,
+        category,
+        alt,
+        createdAt: image.createdAt
+      }
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Ошибка при загрузке изображения:', error);
+    return NextResponse.json(
+      { error: 'Ошибка при обработке запроса' }, 
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const category = searchParams.get('category');
+    
+    // Если запрашивается конкретное изображение
+    if (id) {
+      const image = await prisma.image.findUnique({
+        where: { id }
+      });
+      
+      if (!image) {
+        return NextResponse.json(
+          { error: 'Изображение не найдено' }, 
+          { status: 404 }
+        );
+      }
+      
+      return NextResponse.json({ image: {
+        id: image.id,
+        filename: image.filename,
+        url: image.path,
+        size: image.size,
+        category: image.category,
+        alt: image.alt,
+        createdAt: image.createdAt,
+        originalFilename: image.originalFilename,
+        type: image.type
+      }});
+    }
+    
+    // Формируем условие для поиска
+    const whereClause = category ? { category } : {};
+    
+    // Получаем список изображений
+    const images = await prisma.image.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    // Преобразуем данные
+    const result = images.map((img: any) => ({
+      id: img.id,
+      filename: img.filename,
+      url: img.path,
+      size: img.size,
+      category: img.category,
+      alt: img.alt,
+      createdAt: img.createdAt
+    }));
+    
+    return NextResponse.json({ images: result });
+  } catch (error) {
+    console.error('Ошибка при получении изображений:', error);
+    return NextResponse.json(
+      { error: 'Не удалось получить изображения' }, 
+      { status: 500 }
+    );
+  }
+}
+
+// Обработчик DELETE-запросов
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'ID изображения не указан' }, 
+        { status: 400 }
+      );
+    }
+    
+    // Ищем изображение в БД
+    const image = await prisma.image.findUnique({
+      where: { id }
+    });
+    
+    if (!image) {
+      return NextResponse.json(
+        { error: 'Изображение не найдено' }, 
+        { status: 404 }
+      );
+    }
+    
+    // Удаляем из БД
+    await prisma.image.delete({
+      where: { id }
+    });
+    
+    // Примечание: физическое удаление файла можно добавить при необходимости
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Изображение успешно удалено'
+    });
+  } catch (error) {
+    console.error('Ошибка при удалении изображения:', error);
+    return NextResponse.json(
+      { error: 'Не удалось удалить изображение' }, 
+      { status: 500 }
+    );
+  }
+}

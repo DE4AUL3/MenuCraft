@@ -79,7 +79,7 @@ export class DatabaseService {
   async getCategoriesLocalized(language: Language): Promise<LocalizedCategory[]> {
     const categories = await this.getCategories();
     
-    return categories.map(category => ({
+    return categories.map((category: any) => ({
       id: category.id,
       name: getLocalizedName(category, language),
       description: getLocalizedDescription(category, language),
@@ -88,7 +88,8 @@ export class DatabaseService {
       order: category.order,
       status: category.status,
       createdAt: category.createdAt,
-      updatedAt: category.updatedAt
+      updatedAt: category.updatedAt,
+      restaurantId: category.restaurantId || 'han-tagam'
     }));
   }
 

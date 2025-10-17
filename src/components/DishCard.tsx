@@ -29,11 +29,12 @@ export default function DishCard({ dish }: DishCardProps) {
       <div className="relative h-48 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10" />
         <Image
-          src={dish.image}
+          src={dish.image || '/images/menu/placeholder.jpg'}
           alt={dish.name}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-700"
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
+          unoptimized={dish.image?.startsWith('/') || dish.image?.includes('localhost')}
         />
         
         {/* Кнопка лайка */}

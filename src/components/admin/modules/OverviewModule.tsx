@@ -1,240 +1,145 @@
-'use client'
+/* Recreated OverviewModule.tsx */
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  BarChart3,
-  Users,
-  ShoppingBag,
-  DollarSign,
-  Star,
-  Package,
-  FileText,
-  Activity
-} from 'lucide-react'
-import { getThemeClasses } from '../../../styles/adminTheme'
-import SalesChart from './analytics/SalesChart'
-
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, ShoppingBag, DollarSign, Package, Star } from 'lucide-react';
+import getThemeClasses from "../../../../config/colors";
+import SalesChart from "../SalesChart";
 
 interface OverviewModuleProps {
-  activeSubTab?: string
-  onSubTabChange?: (subTab: string) => void
-  theme?: 'dark'
+  onSubTabChange?: (tabId: string) => void;
+  theme: string;
 }
 
-// Получение статистики с API
-const getRealStatsData = async () => {
-  try {
-    const response = await fetch('/api/analytics?type=overview')
-    if (!response.ok) throw new Error('Ошибка API')
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Ошибка загрузки overview:', error)
-    return {
-      totalRestaurants: 0,
-      totalCategories: 0,
-      totalDishes: 0,
-      averagePrice: 0,
-      estimatedRevenue: 0,
-      totalPrice: 0
-    }
-  }
+interface Stat {
+  title: string;
+  value: string;
+  change: string;
+  changeType: 'positive' | 'negative';
+  icon: React.ReactNode;
+  color: string;
 }
 
-export default function OverviewModule({ 
-  activeSubTab = 'basic', 
-  onSubTabChange,
-  theme = 'dark' 
-}: OverviewModuleProps) {
-  const [currentSubTab, setCurrentSubTab] = useState(activeSubTab)
-  const [realStats, setRealStats] = useState({
-    totalRestaurants: 0,
-    totalCategories: 0,
-    totalDishes: 0,
-    averagePrice: 0,
-    estimatedRevenue: 0,
-    totalPrice: 0
-  })
-  const themeClasses = getThemeClasses(theme)
+interface ActivityItem {
+  action: string;
+  timestamp: string | number | Date;
+}
 
+const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }) => {
+  const themeClasses = getThemeClasses(theme);
+  const [currentSubTab, setCurrentSubTab] = useState('basic');
+  const [basicStats, setBasicStats] = useState<Stat[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+
+  // Fetch basic stats from API
   useEffect(() => {
-    setCurrentSubTab(activeSubTab)
-  }, [activeSubTab])
+    fetch('/api/analytics?type=overview')
+      .then(res => res.json())
+      .then(realStats => {
+        // Проверка на наличие всех нужных полей
+        const stats: Stat[] = [
+          { title: 'рестораны', value: (realStats?.totalRestaurants ?? 0).toString(), change: '', changeType: 'positive', icon: <ShoppingBag className="w-5 h-5" />, color: 'from-blue-400 to-blue-600' },
+          { title: 'выручка', value: `${realStats?.estimatedRevenue ?? 0} ТТ`, change: '', changeType: 'positive', icon: <DollarSign className="w-5 h-5" />, color: 'from-green-400 to-green-600' },
+          { title: 'блюд', value: (realStats?.totalDishes ?? 0).toString(), change: '', changeType: 'positive', icon: <Package className="w-5 h-5" />, color: 'from-purple-400 to-purple-600' },
+          { title: 'категории', value: (realStats?.totalCategories ?? 0).toString(), change: '', changeType: 'positive', icon: <Star className="w-5 h-5" />, color: 'from-yellow-400 to-orange-500' }
+        ];
+        setBasicStats(stats);
+      })
+      .catch(err => console.error(err));
+  }, []);
 
+  // Fetch recent activity from API
   useEffect(() => {
-    // Загружаем реальные данные при монтировании компонента
-    getRealStatsData().then(setRealStats)
-  }, [])
-
-  const handleSubTabClick = (subTab: string) => {
-    console.log('OverviewModule: Переключение на подвкладку:', subTab)
-    setCurrentSubTab(subTab)
-    onSubTabChange?.(subTab)
-  }
-
-  const subTabs = [
-    { id: 'basic', label: 'Базовый', icon: <BarChart3 className="w-4 h-4" /> },
-    { id: 'reports', label: 'Отчеты', icon: <FileText className="w-4 h-4" /> }
-  ]
-
-  const basicStats = [
-    {
-      title: 'Рестораны',
-      value: realStats.totalRestaurants.toString(),
-      change: '',
-      changeType: 'positive' as const,
-      icon: <ShoppingBag className="w-5 h-5" />,
-      color: 'from-blue-400 to-blue-600'
-    },
-    {
-      title: 'Выручка',
-      value: `${realStats.estimatedRevenue} ТМТ`,
-      change: '',
-      changeType: 'positive' as const,
-      icon: <DollarSign className="w-5 h-5" />,
-      color: 'from-green-400 to-green-600'
-    },
-    {
-      title: 'Всего блюд',
-      value: realStats.totalDishes.toString(),
-      change: '',
-      changeType: 'positive' as const,
-      icon: <Package className="w-5 h-5" />,
-      color: 'from-purple-400 to-purple-600'
-    },
-    {
-      title: 'Категории',
-      value: realStats.totalCategories.toString(),
-      change: '',
-      changeType: 'positive' as const,
-      icon: <Star className="w-5 h-5" />,
-      color: 'from-yellow-400 to-orange-500'
-    }
-  ]
-
-  const renderContent = () => {
-    
-    switch (currentSubTab) {
-      case 'basic':
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {basicStats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`p-6 rounded-xl relative overflow-hidden transition-all duration-300 hover:scale-105 ${themeClasses.cardBg} shadow-lg`}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-10`} />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} text-white shadow-lg`}>
-                        {stat.icon}
-                      </div>
-                      <div className={`text-sm font-medium px-3 py-1 rounded-full shadow-md ${
-                        stat.changeType === 'positive' 
-                          ? 'bg-green-100 text-green-700 border border-green-200'
-                          : 'bg-red-100 text-red-700 border border-red-200'
-                      }`}>
-                        {stat.change}
-                      </div>
-                    </div>
-                    <h3 className={`text-2xl font-bold mb-1 ${themeClasses.text}`}>
-                      {stat.value}
-                    </h3>
-                    <p className={`text-sm ${themeClasses.textSecondary}`}>
-                      {stat.title}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-
-
-            <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
-              <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${themeClasses.text}`}>
-                <Activity className="w-5 h-5 text-blue-500" />
-                Последняя активность
-              </h3>
-              <div className="space-y-3">
-                {[
-                  { action: `Новый заказ #2847 - Лагман (42 ТМТ)`, time: '2 мин назад', type: 'order' },
-                  { action: `Заказ #2846 - Пицца Маргарита (68 ТМТ)`, time: '15 мин назад', type: 'order' },
-                  { action: `Выручка за час: 524 ТМТ (8 заказов)`, time: '1 час назад', type: 'revenue' },
-                  { action: `Популярное блюдо дня: Манты с говядиной`, time: '2 часа назад', type: 'analytics' }
-                ].map((activity, index) => (
-                  <div key={index} className={`flex items-center justify-between p-3 rounded-lg ${themeClasses.hover} transition-colors`}>
-                    <span className={themeClasses.text}>{activity.action}</span>
-                    <span className={`text-sm ${themeClasses.textSecondary}`}>{activity.time}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-
-      
-
-      case 'reports':
-        return (
-          <div className="space-y-6">
-            <div className={`p-8 text-center ${themeClasses.cardBg} rounded-xl shadow-lg`}>
-              <FileText className={`w-16 h-16 mx-auto mb-4 ${themeClasses.text} opacity-50`} />
-              <h2 className={`text-2xl font-bold mb-2 ${themeClasses.text}`}>
-                Модуль отчетов
-              </h2>
-              <p className={`mb-6 ${themeClasses.textSecondary}`}>
-                Генерация и экспорт различных отчетов
-              </p>
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${themeClasses.accent} text-white shadow-lg`}>
-                <Package className="w-4 h-4" />
-                Скоро будет доступно
-              </div>
-            </div>
-          </div>
-        )
-
-      default:
-        return null
-    }
-  }
+    fetch('/api/order')
+      .then(res => res.json())
+      .then(data => {
+        // Expected data: array of { action, timestamp }
+        setRecentActivity(data);
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   return (
     <div className="space-y-6">
-      {/* Подвкладки */}
       <div className="flex flex-wrap gap-3">
-        {subTabs.map((tab) => (
+        {[{ id: 'basic', label: 'Базовый', icon: <Activity className="w-5 h-5" /> }].map(tab => (
           <button
             key={tab.id}
-            onClick={() => handleSubTabClick(tab.id)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${
-              currentSubTab === tab.id
-                ? `bg-gradient-to-r ${themeClasses.accent} text-white shadow-xl`
-                : `${themeClasses.cardBg} ${themeClasses.text} ${themeClasses.hover} shadow-md`
-            }`}
+            onClick={() => { setCurrentSubTab(tab.id); onSubTabChange?.(tab.id); }}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${currentSubTab === tab.id ? `bg-gradient-to-r ${themeClasses.accent} text-white shadow-xl` : `${themeClasses.cardBg} ${themeClasses.text} ${themeClasses.hover} shadow-md`}`}
           >
-            {tab.icon}
-            {tab.label}
+            {tab.icon}{tab.label}
           </button>
         ))}
       </div>
-
-      {/* Контент подвкладки */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSubTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          {renderContent()}
+        <motion.div key={currentSubTab} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
+          {currentSubTab === 'basic' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {basicStats.map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className={`p-6 rounded-xl relative overflow-hidden transition-all duration-300 hover:scale-105 ${themeClasses.cardBg} shadow-lg`}
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-10`} />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} text-white shadow-lg`}>{stat.icon}</div>
+                        <div className={`text-sm font-medium px-3 py-1 rounded-full shadow-md ${stat.changeType === 'positive' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>{stat.change}</div>
+                      </div>
+                      <h3 className={`text-2xl font-bold mb-1 ${themeClasses.text}`}>{stat.value}</h3>
+                      <p className={`text-sm ${themeClasses.textSecondary}`}>{stat.title}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
+                <SalesChart data={[]} theme={theme} />
+              </div>
+              <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
+                <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${themeClasses.text}`}>
+                  <Activity className="w-5 h-5 text-blue-500" /> Последняя активность
+                </h3>
+                <div className="space-y-3">
+                  {recentActivity.length ? recentActivity.map((a, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${themeClasses.hover} transition-colors`}>
+                      <span className={themeClasses.text}>{a.action}</span>
+                      <span className="text-sm">{formatTimeAgo(a.timestamp)}</span>
+                    </div>
+                  )) : (
+                    <p className={themeClasses.text}>Нет активности</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
-  )
+  );
+};
+
+// Helper function to format time ago
+function formatTimeAgo(timestamp: string | number | Date): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  let interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) return interval + " лет назад";
+  interval = Math.floor(seconds / 2592000);
+  if (interval >= 1) return interval + " месяцев назад";
+  interval = Math.floor(seconds / 86400);
+  if (interval >= 1) return interval + " дней назад";
+  interval = Math.floor(seconds / 3600);
+  if (interval >= 1) return interval + " часов назад";
+  interval = Math.floor(seconds / 60);
+  if (interval >= 1) return interval + " минут назад";
+  return "секунду назад";
 }
+
+export default OverviewModule;

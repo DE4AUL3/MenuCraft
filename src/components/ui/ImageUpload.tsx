@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { Upload, X, Image as ImageIcon, AlertCircle, CheckCircle } from 'lucide-react';
-import { imageService, ImageUploadResult } from '@/lib/imageService';
+import { imageService, ImageUploadResult } from '@/lib/imageServiceDb';
 import SmartImage from './SmartImage';
 
 interface ImageUploadProps {
@@ -95,9 +95,17 @@ export default function ImageUpload({
   }, []);
 
   // Удаление изображения
-  const handleRemoveImage = () => {
-    if (currentImage) {
-      imageService.deleteImage(currentImage);
+  const handleRemoveImage = async () => {
+    if (currentImage && currentImage.startsWith('/')) {
+      try {
+        const id = currentImage.split('/').pop()?.split('.')[0];
+        if (id) {
+          // При необходимости можно вызвать API для удаления файла с сервера
+          // await fetch(`/api/images?id=${id}`, { method: 'DELETE' });
+        }
+      } catch (error) {
+        console.error('Ошибка при удалении изображения:', error);
+      }
     }
     onImageChange(null);
     setPreviewUrl(null);

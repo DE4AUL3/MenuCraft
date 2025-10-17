@@ -10,6 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Модель для хранения информации об изображениях
+model Image {
+  id              String   @id @default(cuid())
+  filename        String
+  path            String
+  size            Int
+  mimeType        String
+  category        String   @default("other")
+  alt             String?
+  originalFilename String?  @map("original_filename")
+  type            String?  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("images")
+}
+
 // Модель для клиентов
 model Client {
   id           String @id @default(cuid())
@@ -34,7 +51,7 @@ model Category {
   imageBackground   String  @map("image_background")
   order             Int
   status            Boolean @default(true)
-  restaurantId      String  @map("restaurant_id")
+  restaurantId      String  @default("han-tagam") @map("restaurant_id")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 

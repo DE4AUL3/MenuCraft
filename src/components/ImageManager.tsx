@@ -3,9 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, ImageIcon, Tag, Filter, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { imageService } from '@/lib/imageService';
-import { storageSync } from '@/lib/storageSync';
-import type { ImageInfo } from '@/lib/imageService';
+import { imageService } from '@/lib/imageServiceDb';
+import type { ImageInfo } from '@/lib/imageServiceDb';
 
 type ImageCategory = 'all' | 'logos' | 'categories' | 'products' | 'other';
 
@@ -17,21 +16,16 @@ export default function ImageManager() {
 
   useEffect(() => {
     loadImages();
-    
-    // Подписываемся на изменения localStorage для синхронизации между вкладками
-    const unsubscribe = storageSync.subscribe((key) => {
-      if (key.startsWith('image_')) {
-        console.log('🔄 Обновление изображений из другой вкладки');
-        loadImages();
-      }
-    });
-
-    return unsubscribe;
   }, []);
 
-  const loadImages = () => {
-    const allImages = imageService.getAllImages();
-    setImages(allImages);
+  const loadImages = async () => {
+    try {
+      const allImages = await imageService.getAllImages();
+      setImages(allImages);
+    } catch (error) {
+      console.error('Ошибка загрузки изображений:', error);
+      toast.error('Не удалось загрузить изображения');
+    }
   };
 
   const handleFileUpload = async (files: FileList, category: 'logos' | 'categories' | 'products' | 'other' = 'other') => {
@@ -83,7 +77,7 @@ export default function ImageManager() {
           Управление изображениями
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Всего изображений: {images.length} • Размер: {imageService.formatFileSize(imageService.getTotalImagesSize())}
+          Всего изображений: {images.length}
         </p>
       </div>
 

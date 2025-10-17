@@ -78,19 +78,27 @@ export default function PremiumRestaurantSelector() {
     if (typeof window !== 'undefined' && 'matchMedia' in window) {
       setIsTouch(window.matchMedia('(pointer: coarse)').matches);
     }
-    // Загружаем избранные рестораны из localStorage
-    try {
-      const raw = localStorage.getItem('featuredRestaurants');
-      if (raw) {
-        const parsed = JSON.parse(raw) as Restaurant[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setRestaurants(parsed);
+    
+    // Загружаем рестораны из API
+    async function fetchRestaurants() {
+      try {
+        const response = await fetch('/api/restaurant');
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setRestaurants(data);
+          }
+        } else {
+          // Если API недоступно, используем дефолтные данные
+          setRestaurants(defaultRestaurants);
         }
-      } else {
-        // Инициализируем дефолтным списком
-        localStorage.setItem('featuredRestaurants', JSON.stringify(defaultRestaurants));
+      } catch (error) {
+        console.error('Ошибка при загрузке ресторанов:', error);
+        setRestaurants(defaultRestaurants);
       }
-    } catch {}
+    }
+    
+    fetchRestaurants();
   }, []);
 
   const handleRestaurantSelect = (restaurantId: string) => {
