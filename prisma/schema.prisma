@@ -12,109 +12,113 @@ datasource db {
 
 // Модель для хранения информации об изображениях
 model Image {
-  id              String   @id @default(cuid())
-  filename        String
-  path            String
-  size            Int
-  mimeType        String
-  category        String   @default("other")
-  alt             String?
+  id               String   @id @default(cuid())
+  filename         String
+  path             String
+  size             Int
+  mimeType         String
+  category         String   @default("other")
+  alt              String?
   originalFilename String?  @map("original_filename")
-  type            String?  
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  type             String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   @@map("images")
 }
 
 // Модель для клиентов
 model Client {
-  id           String @id @default(cuid())
-  phoneNumber  String @unique @map("phone_number")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  
+  id          String   @id @default(cuid())
+  phoneNumber String   @unique @map("phone_number")
+  name        String? // Имя клиента
+  email       String? // Email клиента
+  notes       String? // Заметки о клиенте
+  category    String   @default("customer") // Категория клиента: customer, supplier, delivery, staff
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
   // Связь с заказами
-  orders       Order[]
-  
+  orders Order[]
+
   @@map("clients")
 }
 
 // Модель для категорий с локализацией (ru/tk)
 model Category {
-  id                String  @id @default(cuid())
-  nameRu            String  @map("name_ru")
-  nameTk            String  @map("name_tk")
-  descriptionRu     String? @map("description_ru")
-  descriptionTk     String? @map("description_tk")
-  imageCard         String  @map("image_card")
-  imageBackground   String  @map("image_background")
-  order             Int
-  status            Boolean @default(true)
-  restaurantId      String  @default("han-tagam") @map("restaurant_id")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(cuid())
+  nameRu          String   @map("name_ru")
+  nameTk          String   @map("name_tk")
+  descriptionRu   String?  @map("description_ru")
+  descriptionTk   String?  @map("description_tk")
+  imageCard       String   @map("image_card")
+  imageBackground String   @map("image_background")
+  order           Int
+  status          Boolean  @default(true)
+  restaurantId    String   @default("han-tagam") @map("restaurant_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   // Связь с блюдами
-  meals             Meal[]
+  meals Meal[]
 
   @@map("categories")
 }
 
 // Модель для блюд с локализацией (ru/tk)
 model Meal {
-  id                String   @id @default(cuid())
-  nameRu            String   @map("name_ru")
-  nameTk            String   @map("name_tk")
-  categoryId        String   @map("category_id")
-  price             Float
-  descriptionRu     String?  @map("description_ru")
-  descriptionTk     String?  @map("description_tk")
-  image             String
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-  
+  id            String   @id @default(cuid())
+  nameRu        String   @map("name_ru")
+  nameTk        String   @map("name_tk")
+  categoryId    String   @map("category_id")
+  price         Float
+  descriptionRu String?  @map("description_ru")
+  descriptionTk String?  @map("description_tk")
+  image         String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
   // Связь с категорией
-  category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
   // Связь с элементами заказа
-  orderItems        OrderItem[]
-  
+  orderItems OrderItem[]
+
   @@map("meals")
 }
 
 // Модель для заказов
 model Order {
-  id              String      @id @default(cuid())
-  phoneNumber     String      @map("phone_number")
-  clientId        String?     @map("client_id")
-  totalAmount     Float       @default(0) @map("total_amount")
-  status          OrderStatus @default(PENDING)
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
-  
+  id          String      @id @default(cuid())
+  phoneNumber String      @map("phone_number")
+  clientId    String?     @map("client_id")
+  totalAmount Float       @default(0) @map("total_amount")
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
   // Связь с клиентом
-  client          Client?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  
+  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
   // Связь с элементами заказа (products в заказе)
-  orderItems      OrderItem[]
-  
+  orderItems OrderItem[]
+
   @@map("orders")
 }
 
 // Модель для элементов заказа (products в заказе)
 model OrderItem {
-  id          String   @id @default(cuid())
-  orderId     String   @map("order_id")
-  mealId      String   @map("meal_id")
-  amount      Int      // количество продукта в заказе
-  price       Float    // цена на момент заказа
-  createdAt   DateTime @default(now()) @map("created_at")
-  
+  id        String   @id @default(cuid())
+  orderId   String   @map("order_id")
+  mealId    String   @map("meal_id")
+  amount    Int // количество продукта в заказе
+  price     Float // цена на момент заказа
+  createdAt DateTime @default(now()) @map("created_at")
+
   // Связи
-  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  meal        Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
-  
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
   @@map("order_items")
 }
 

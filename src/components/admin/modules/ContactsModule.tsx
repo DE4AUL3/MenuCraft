@@ -8,71 +8,58 @@ import {
   MessageSquare,
   Plus,
   Search,
-  Download,
-  Upload,
   Trash2,
   Edit,
   Filter,
   Send,
-  Mail,
   Copy,
-  Check,
-  AlertCircle
+  Check
 } from 'lucide-react'
+import CopyPhoneButton from '@/components/CopyPhoneButton'
 
 interface Contact {
   id: string
   name: string
   phone: string
-  email?: string
-  category: 'customer' | 'supplier' | 'delivery' | 'staff'
-  notes?: string
-  orders: number
-  lastOrder?: string
+  totalOrders: number
+  totalAmount: number
+  lastOrderDate: string | null
+  firstOrderDate: string | null
   createdAt: string
+  isActive: boolean
 }
-
-interface ContactCategory {
-  id: string
-  name: string
-  count: number
-  color: string
-}
-
-
-
-const categories: ContactCategory[] = [
-  { id: 'customer', name: 'Клиенты', count: 0, color: 'blue' },
-  { id: 'supplier', name: 'Поставщики', count: 0, color: 'green' },
-  { id: 'delivery', name: 'Доставка', count: 0, color: 'orange' },
-  { id: 'staff', name: 'Персонал', count: 0, color: 'purple' }
-]
 
 export default function ContactsModule() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [filteredContacts, setFilteredContacts] = useState<Contact[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedContacts, setSelectedContacts] = useState<string[]>([])
+  const [copiedNumbers, setCopiedNumbers] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
   const [showSMSModal, setShowSMSModal] = useState(false)
   const [smsText, setSmsText] = useState('')
-  const [copiedNumbers, setCopiedNumbers] = useState(false)
-
 
   // Загрузка контактов из API
   useEffect(() => {
     const fetchContacts = async () => {
+      setLoading(true)
+      setError(null)
       try {
         const res = await fetch('/api/contacts')
         if (res.ok) {
           const data = await res.json()
           setContacts(Array.isArray(data) ? data : [])
         } else {
+          setError('Не удалось загрузить контакты')
           setContacts([])
         }
       } catch (e) {
+        setError('Ошибка при загрузке контактов')
         setContacts([])
+      } finally {
+        setLoading(false)
       }
     }
     fetchContacts()
@@ -84,15 +71,12 @@ export default function ContactsModule() {
     if (searchTerm) {
       filtered = filtered.filter(contact =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.phone.includes(searchTerm) ||
-        contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        contact.phone.includes(searchTerm)
       )
     }
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(contact => contact.category === selectedCategory)
-    }
+    
     setFilteredContacts(filtered)
-  }, [contacts, searchTerm, selectedCategory])
+  }, [contacts, searchTerm])
 
   const handleSelectContact = (contactId: string) => {
     setSelectedContacts(prev =>
@@ -121,22 +105,33 @@ export default function ContactsModule() {
     setTimeout(() => setCopiedNumbers(false), 2000)
   }
 
-  const getCategoryColor = (category: string) => {
-    const cat = categories.find(c => c.id === category)
-    return cat?.color || 'gray'
+  const handleDeleteContact = async (id: string) => {
+    try {
+      const response = await fetch(`/api/contacts/${id}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        // Удаляем контакт из списка
+        setContacts(contacts.filter(contact => contact.id !== id))
+        setShowDeleteConfirm(null)
+      } else {
+        setError('Ошибка при удалении контакта')
+      }
+    } catch (error) {
+      setError('Ошибка при удалении контакта')
+    }
   }
 
-  const getCategoryBadgeStyle = (category: string) => {
-    const colorMap = {
-      blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      green: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      orange: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
-      purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
-      gray: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-    }
-    
-    const color = getCategoryColor(category)
-    return colorMap[color as keyof typeof colorMap] || colorMap.gray
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-'
+    return new Date(dateString).toLocaleString('ru', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   return (
@@ -145,46 +140,13 @@ export default function ContactsModule() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Управление контактами
+            Контакты клиентов
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            База контактов и SMS рассылка
+            {contacts.length} {contacts.length === 1 ? 'контакт' : 
+              contacts.length >= 2 && contacts.length <= 4 ? 'контакта' : 'контактов'}
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Добавить контакт
-          </button>
-        </div>
-      </div>
-
-      {/* Статистика по категориям */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {categories.map((category) => (
-          <motion.div
-            key={category.id}
-            whileHover={{ scale: 1.02 }}
-            className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {category.name}
-                </h3>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {category.count}
-                </p>
-              </div>
-              <div className={`w-12 h-12 rounded-lg bg-${category.color}-100 dark:bg-${category.color}-900/20 flex items-center justify-center`}>
-                <Users className={`w-6 h-6 text-${category.color}-600 dark:text-${category.color}-400`} />
-              </div>
-            </div>
-          </motion.div>
-        ))}
       </div>
 
       {/* Фильтры и поиск */}
@@ -195,26 +157,12 @@ export default function ContactsModule() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Поиск контактов..."
+              placeholder="Поиск по номеру телефона..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-2 w-full sm:w-60 md:w-80 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-
-          {/* Фильтр по категории */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">Все категории</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Действия с выбранными */}
@@ -222,17 +170,10 @@ export default function ContactsModule() {
           <div className="flex gap-2">
             <button
               onClick={exportSelectedNumbers}
-              className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              {copiedNumbers ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copiedNumbers ? 'Скопировано!' : 'Копировать номера'}
-            </button>
-            <button
-              onClick={() => setShowSMSModal(true)}
               className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              <MessageSquare className="w-4 h-4" />
-              SMS рассылка ({selectedContacts.length})
+              {copiedNumbers ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copiedNumbers ? 'Скопировано!' : `Копировать номера (${selectedContacts.length})`}
             </button>
           </div>
         )}
@@ -240,115 +181,122 @@ export default function ContactsModule() {
 
       {/* Таблица контактов */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-4 py-3 text-left">
-                  <input
-                    type="checkbox"
-                    checked={selectedContacts.length === filteredContacts.length}
-                    onChange={handleSelectAll}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Контакт
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Телефон
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Категория
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Заказы
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Последний заказ
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Действия
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredContacts.map((contact) => (
-                <tr key={contact.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="px-4 py-4">
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin w-12 h-12 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+            <p className="text-gray-600 dark:text-gray-400">Загрузка контактов...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500">{error}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-4 py-3 text-left">
                     <input
                       type="checkbox"
-                      checked={selectedContacts.includes(contact.id)}
-                      onChange={() => handleSelectContact(contact.id)}
+                      checked={selectedContacts.length === filteredContacts.length && filteredContacts.length > 0}
+                      onChange={handleSelectAll}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                  </td>
-                  <td className="px-4 py-4">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {contact.name}
-                      </div>
-                      {contact.email && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {contact.email}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
-                    {contact.phone}
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCategoryBadgeStyle(contact.category)}`}>
-                      {categories.find(c => c.id === contact.category)?.name}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
-                    {contact.orders}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {contact.lastOrder || '-'}
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                        title="Редактировать"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                        title="Удалить"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Номер телефона
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Заказы
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Сумма заказов
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Последний заказ
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Первый заказ
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Действия
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredContacts.map((contact) => (
+                  <tr key={contact.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedContacts.includes(contact.id)}
+                        onChange={() => handleSelectContact(contact.id)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {contact.phone}
+                        </span>
+                        <CopyPhoneButton phone={contact.phone} variant="text" size="sm" />
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                      {contact.totalOrders}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                      {contact.totalAmount.toFixed(2)} ₽
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                      {formatDate(contact.lastOrderDate)}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                      {formatDate(contact.firstOrderDate)}
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex items-center gap-2 justify-end">
+                        <button
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          onClick={() => window.open(`tel:${contact.phone}`)}
+                          title="Позвонить"
+                        >
+                          <Phone className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                          onClick={() => setShowDeleteConfirm(contact.id)}
+                          title="Удалить"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        {filteredContacts.length === 0 && (
+        {!loading && !error && filteredContacts.length === 0 && (
           <div className="text-center py-12">
             <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Контакты не найдены
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              {searchTerm || selectedCategory !== 'all' 
-                ? 'Попробуйте изменить фильтры поиска'
-                : 'Начните добавлять контакты в вашу базу'
+              {searchTerm 
+                ? 'Попробуйте изменить запрос поиска'
+                : 'Список контактов пуст'
               }
             </p>
           </div>
         )}
       </div>
 
-      {/* Модальное окно SMS рассылки */}
-      {showSMSModal && (
+      {/* Модальное окно подтверждения удаления */}
+      {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
@@ -357,10 +305,10 @@ export default function ContactsModule() {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                SMS рассылка
+                Подтверждение удаления
               </h3>
               <button
-                onClick={() => setShowSMSModal(false)}
+                onClick={() => setShowDeleteConfirm(null)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 ×
@@ -368,48 +316,22 @@ export default function ContactsModule() {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Получатели ({selectedContacts.length})
-                </label>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {contacts
-                    .filter(c => selectedContacts.includes(c.id))
-                    .map(c => c.name)
-                    .join(', ')
-                  }
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Текст сообщения
-                </label>
-                <textarea
-                  value={smsText}
-                  onChange={(e) => setSmsText(e.target.value)}
-                  placeholder="Введите текст SMS сообщения..."
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {smsText.length}/160 символов
-                </div>
-              </div>
+              <p className="text-gray-600 dark:text-gray-400">
+                Вы действительно хотите удалить этот контакт? Это действие нельзя отменить.
+              </p>
 
               <div className="flex gap-3 pt-4">
                 <button
-                  onClick={() => setShowSMSModal(false)}
+                  onClick={() => setShowDeleteConfirm(null)}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Отмена
                 </button>
                 <button
-                  disabled={!smsText.trim()}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => showDeleteConfirm && handleDeleteContact(showDeleteConfirm)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
-                  <Send className="w-4 h-4" />
-                  Отправить
+                  Удалить
                 </button>
               </div>
             </div>

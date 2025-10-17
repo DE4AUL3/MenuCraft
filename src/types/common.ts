@@ -66,11 +66,14 @@ export interface Dish {
 }
 
 export interface OrderItem {
+  id?: string;
   dishId: string;
+  mealId?: string; // Алиас для dishId для совместимости с БД
   dishName: string;
   dishNameTk: string;
   price: number;
   quantity: number;
+  amount?: number; // Алиас для quantity для совместимости с БД
   total: number;
 }
 
@@ -83,7 +86,7 @@ export interface Order {
   subtotal: number;
   deliveryFee: number;
   totalAmount: number;
-  status: 'new' | 'confirmed' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
+  status: 'pending' | 'new' | 'confirmed' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'completed' | 'cancelled';
   notes?: string;
   createdAt: string;
   updatedAt: string;

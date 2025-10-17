@@ -77,11 +77,37 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [dishesData, categoriesData] = await Promise.all([
-        dataService.getAllDishes(),
-        dataService.getAllCategories()
-      ])
-      setDishes(dishesData)
+      
+      // Загружаем категории из базы данных через API
+      const categoriesResponse = await fetch('/api/db-categories')
+      const categoriesData = await categoriesResponse.json()
+      
+      // Загружаем блюда из базы данных через API
+      const dishesResponse = await fetch('/api/meal')
+      const dishesData = await dishesResponse.json()
+      
+      // Преобразуем данные из API в формат компонента
+      const formattedDishes = dishesData.map((dish: any) => ({
+        id: dish.id,
+        name: {
+          ru: dish.nameRu,
+          tk: dish.nameTk
+        },
+        description: {
+          ru: dish.descriptionRu || '',
+          tk: dish.descriptionTk || ''
+        },
+        price: dish.price,
+        image: dish.image,
+        categoryId: dish.categoryId,
+        isActive: true,
+        isAvailable: true
+      }))
+      
+      console.log('Загружены категории:', categoriesData)
+      console.log('Загружены блюда:', formattedDishes)
+      
+      setDishes(formattedDishes)
       setCategories(categoriesData)
     } catch (error) {
       console.error('Ошибка загрузки данных:', error)
@@ -143,15 +169,72 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
         })
         return
       }
+      
+      // Подготавливаем данные для API
+      const dishData = {
+        nameRu: formData.name.ru,
+        nameTk: formData.name.tk,
+        descriptionRu: formData.description?.ru || '',
+        descriptionTk: formData.description?.tk || '',
+        price: formData.price || 0,
+        categoryId: formData.categoryId,
+        image: formData.image || ''
+      }
 
       if (editingDish) {
-        // Редактирование
-        const updatedDish = await dataService.updateDish(editingDish.id, formData)
-        setDishes(prev => prev.map(d => d.id === editingDish.id ? updatedDish : d))
+        // Редактирование через API
+        const response = await fetch(`/api/meal/${editingDish.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dishData)
+        })
+        
+        if (!response.ok) {
+          throw new Error('Ошибка при обновлении блюда')
+        }
+        
+        const updatedDish = await response.json()
+        
+        // Обновляем состояние с преобразованным объектом
+        setDishes(prev => prev.map(d => d.id === editingDish.id ? {
+          ...d,
+          name: { ru: updatedDish.nameRu, tk: updatedDish.nameTk },
+          description: { ru: updatedDish.descriptionRu || '', tk: updatedDish.descriptionTk || '' },
+          price: updatedDish.price,
+          image: updatedDish.image,
+          categoryId: updatedDish.categoryId
+        } : d))
       } else {
-        // Создание
-        const newDish = await dataService.createDish(formData as Omit<Dish, 'id' | 'createdAt' | 'updatedAt'>)
-        setDishes(prev => [...prev, newDish])
+        // Создание через API
+        const response = await fetch('/api/meal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dishData)
+        })
+        
+        if (!response.ok) {
+          throw new Error('Ошибка при создании блюда')
+        }
+        
+        const newDish = await response.json()
+        
+        // Добавляем в состояние с преобразованным объектом
+        setDishes(prev => [...prev, {
+          id: newDish.id,
+          name: { ru: newDish.nameRu, tk: newDish.nameTk },
+          description: { ru: newDish.descriptionRu || '', tk: newDish.descriptionTk || '' },
+          price: newDish.price,
+          image: newDish.image,
+          categoryId: newDish.categoryId,
+          isActive: true,
+          isAvailable: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }])
       }
 
       closeModal()
@@ -159,9 +242,12 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
         duration: 3000,
         position: 'top-right',
       })
+      
+      // Перезагружаем данные для обновления списка
+      loadData()
     } catch (error) {
       console.error('Ошибка сохранения блюда:', error)
-      toast.error('Ошибка сохранения блюда', {
+      toast.error(`Ошибка сохранения блюда: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`, {
         duration: 4000,
         position: 'top-right',
       })
@@ -172,7 +258,15 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
     if (!confirm('Вы уверены, что хотите удалить это блюдо?')) return
 
     try {
-      await dataService.deleteDish(dishId)
+      // Удаление через API
+      const response = await fetch(`/api/meal/${dishId}`, {
+        method: 'DELETE',
+      })
+      
+      if (!response.ok) {
+        throw new Error('Ошибка при удалении блюда')
+      }
+      
       setDishes(prev => prev.filter(d => d.id !== dishId))
       toast.success('Блюдо удалено!', {
         duration: 3000,
@@ -180,7 +274,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
       })
     } catch (error) {
       console.error('Ошибка удаления блюда:', error)
-      toast.error('Ошибка удаления блюда', {
+      toast.error(`Ошибка удаления блюда: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`, {
         duration: 4000,
         position: 'top-right',
       })

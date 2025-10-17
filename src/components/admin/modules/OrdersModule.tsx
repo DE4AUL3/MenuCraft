@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { Search, Filter, Copy } from 'lucide-react';
 import { dataService } from '@/lib/dataService';
 import { Order } from '@/types/common';
 import { useLanguage } from '@/hooks/useLanguage';
+import OrderCard from '../OrderCard';
+import toast from 'react-hot-toast';
 
 interface OrdersModuleProps {
   className?: string;
@@ -19,6 +22,7 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'amount'>('newest');
   const [loading, setLoading] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   // Загрузка заказов
   useEffect(() => {
@@ -35,17 +39,26 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
       dataService.removeEventListener('order_created', handleOrderUpdate);
       dataService.removeEventListener('order_updated', handleOrderUpdate);
     };
-  }, []);
+  }, [activeTab]);
 
-  const loadOrders = () => {
+  const loadOrders = async () => {
     try {
-      // Создаем демо заказы если их нет
-      dataService.createDemoOrders();
+      setLoading(true);
       
+      // В будущем здесь будет запрос к API, но пока используем демо данные
+      dataService.createDemoOrders();
       const ordersData = dataService.getOrders();
       setOrders(ordersData);
     } catch (error) {
       console.error('Ошибка загрузки заказов:', error);
+      toast.error(
+        currentLanguage === 'ru' 
+          ? 'Не удалось загрузить заказы' 
+          : 'Sargytlary ýükläp bolmady',
+        { duration: 3000 }
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,17 +69,17 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
     // Фильтр по статусу
     if (activeTab === 'active') {
       filtered = filtered.filter(order => 
-        ['new', 'confirmed', 'preparing', 'delivering'].includes(order.status)
+        ['new', 'pending', 'confirmed', 'preparing', 'delivering', 'ready'].includes(order.status as string)
       );
     } else if (activeTab === 'history') {
       filtered = filtered.filter(order => 
-        ['completed', 'cancelled'].includes(order.status)
+        ['completed', 'delivered', 'cancelled'].includes(order.status as string)
       );
     }
 
     // Фильтр по конкретному статусу
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(order => order.status === statusFilter);
+      filtered = filtered.filter(order => order.status === statusFilter as Order['status']);
     }
 
     // Поиск
@@ -100,16 +113,31 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
   const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
     try {
       setLoading(true);
+      
+      // В будущем здесь будет запрос к API
       dataService.updateOrderStatus(orderId, newStatus);
-      loadOrders();
+      await loadOrders();
       
       // Обновляем выбранный заказ если он открыт
       if (selectedOrder && selectedOrder.id === orderId) {
         const updatedOrder = dataService.getOrderById(orderId);
         setSelectedOrder(updatedOrder);
       }
+      
+      toast.success(
+        currentLanguage === 'ru' 
+          ? 'Статус заказа обновлен' 
+          : 'Sargydyň ýagdaýy täzelendi',
+        { duration: 2000 }
+      );
     } catch (error) {
       console.error('Ошибка обновления статуса:', error);
+      toast.error(
+        currentLanguage === 'ru' 
+          ? 'Не удалось обновить статус заказа' 
+          : 'Sargyt ýagdaýyny täzeläp bolmady',
+        { duration: 3000 }
+      );
     } finally {
       setLoading(false);
     }
@@ -118,7 +146,6 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
   // Статистика для вкладки аналитики
   const analytics = useMemo(() => {
     const today = new Date();
-    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
     const thisWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
@@ -134,7 +161,9 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
       new Date(order.createdAt) >= thisMonth
     );
 
-    const completedOrders = orders.filter(order => order.status === 'completed');
+    const completedOrders = orders.filter(order => 
+      order.status === 'delivered' || order.status === 'completed'
+    );
 
     return {
       todayCount: todayOrders.length,
@@ -154,25 +183,48 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
   const getStatusBadgeClass = (status: Order['status']) => {
     const baseClass = 'px-2 py-1 rounded-full text-xs font-medium';
     switch (status) {
-      case 'new': return `${baseClass} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`;
-      case 'confirmed': return `${baseClass} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200`;
-      case 'preparing': return `${baseClass} bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200`;
-      case 'delivering': return `${baseClass} bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200`;
-      case 'completed': return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
-      case 'cancelled': return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200`;
-      default: return baseClass;
+      case 'new':
+      case 'pending':
+        return `${baseClass} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`;
+      case 'confirmed':
+        return `${baseClass} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200`;
+      case 'preparing':
+        return `${baseClass} bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200`;
+      case 'ready':
+        return `${baseClass} bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200`;
+      case 'delivering':
+        return `${baseClass} bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200`;
+      case 'delivered':
+      case 'completed':
+        return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
+      case 'cancelled':
+        return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200`;
+      default:
+        return baseClass;
     }
   };
 
   const getStatusText = (status: Order['status']) => {
     switch (status) {
-      case 'new': return currentLanguage === 'ru' ? 'Новый' : 'Täze';
-      case 'confirmed': return currentLanguage === 'ru' ? 'Подтвержден' : 'Tassyklandy';
-      case 'preparing': return currentLanguage === 'ru' ? 'Готовится' : 'Taýýarlanýar';
-      case 'delivering': return currentLanguage === 'ru' ? 'Доставляется' : 'Eltip berilýär';
-      case 'completed': return currentLanguage === 'ru' ? 'Завершен' : 'Tamamlandy';
-      case 'cancelled': return currentLanguage === 'ru' ? 'Отменен' : 'Ýatyryldy';
-      default: return status;
+      case 'new':
+      case 'pending':
+        return currentLanguage === 'ru' ? 'Новый' : 'Täze';
+      case 'confirmed':
+        return currentLanguage === 'ru' ? 'Подтвержден' : 'Tassyklandy';
+      case 'preparing':
+        return currentLanguage === 'ru' ? 'Готовится' : 'Taýýarlanýar';
+      case 'ready':
+        return currentLanguage === 'ru' ? 'Готов' : 'Taýýar';
+      case 'delivering':
+        return currentLanguage === 'ru' ? 'Доставляется' : 'Eltip berilýär';
+      case 'delivered':
+        return currentLanguage === 'ru' ? 'Доставлен' : 'Eltip berildi';
+      case 'completed':
+        return currentLanguage === 'ru' ? 'Завершен' : 'Tamamlandy';
+      case 'cancelled':
+        return currentLanguage === 'ru' ? 'Отменен' : 'Ýatyryldy';
+      default:
+        return status;
     }
   };
 
@@ -188,7 +240,12 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
   };
 
   const formatCurrency = (amount: number) => {
-    return `${amount.toFixed(2)} TMT`;
+    return `${amount.toFixed(2)} ТМ`;
+  };
+  
+  const openOrderDetails = (order: Order) => {
+    setSelectedOrder(order);
+    setIsDetailModalOpen(true);
   };
 
   return (
@@ -336,44 +393,44 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
           {/* Фильтры и поиск */}
           <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             {/* Поиск */}
-            <div className="flex-1">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder={currentLanguage === 'ru' ? 'Поиск по имени, телефону или ID заказа...' : 'At, telefon ýa-da sargyt ID boýunça gözleg...'}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder={currentLanguage === 'ru' ? 'Поиск по имени, телефону или ID заказа...' : 'At, telefon ýa-da sargyt ID boýunça gözleg...'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+              <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
             </div>
 
             {/* Фильтр по статусу */}
-            <div className="w-full sm:w-48">
+            <div className="w-full sm:w-48 relative">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
               >
                 <option value="all">{currentLanguage === 'ru' ? 'Все статусы' : 'Ähli ýagdaýlar'}</option>
                 {activeTab === 'active' && (
                   <>
                     <option value="new">{currentLanguage === 'ru' ? 'Новые' : 'Täze'}</option>
+                    <option value="pending">{currentLanguage === 'ru' ? 'Ожидающие' : 'Garaşýan'}</option>
                     <option value="confirmed">{currentLanguage === 'ru' ? 'Подтвержденные' : 'Tassyklanan'}</option>
                     <option value="preparing">{currentLanguage === 'ru' ? 'Готовятся' : 'Taýýarlanan'}</option>
+                    <option value="ready">{currentLanguage === 'ru' ? 'Готовые' : 'Taýýar'}</option>
                     <option value="delivering">{currentLanguage === 'ru' ? 'Доставляются' : 'Eltilýän'}</option>
                   </>
                 )}
                 {activeTab === 'history' && (
                   <>
                     <option value="completed">{currentLanguage === 'ru' ? 'Завершенные' : 'Tamamlanan'}</option>
+                    <option value="delivered">{currentLanguage === 'ru' ? 'Доставленные' : 'Eltilen'}</option>
                     <option value="cancelled">{currentLanguage === 'ru' ? 'Отмененные' : 'Ýatyrlan'}</option>
                   </>
                 )}
               </select>
+              <Filter className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
             </div>
 
             {/* Сортировка */}
@@ -391,139 +448,48 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
           </div>
 
           {/* Список заказов */}
-          <div className="space-y-3">
-            {filteredOrders.length === 0 ? (
-              <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {currentLanguage === 'ru' ? 'Заказы не найдены' : 'Sargyt tapylmady'}
-                </p>
-              </div>
-            ) : (
-              filteredOrders.map((order) => (
-                <div 
-                  key={order.id} 
-                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  <div className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      {/* Основная информация */}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">
-                            #{order.id.slice(-8)}
-                          </h3>
-                          <span className={getStatusBadgeClass(order.status)}>
-                            {getStatusText(order.status)}
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                          <p><span className="font-medium">{currentLanguage === 'ru' ? 'Клиент:' : 'Müşderi:'}</span> {order.customerName}</p>
-                          <p><span className="font-medium">{currentLanguage === 'ru' ? 'Телефон:' : 'Telefon:'}</span> {order.customerPhone}</p>
-                          {order.customerAddress && (
-                            <p><span className="font-medium">{currentLanguage === 'ru' ? 'Адрес:' : 'Salgy:'}</span> {order.customerAddress}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Сумма и время */}
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-gray-900 dark:text-white">
-                          {formatCurrency(order.totalAmount)}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {formatDate(order.createdAt)}
-                        </p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
-                          {order.items.length} {currentLanguage === 'ru' ? 'позиций' : 'pozisiýa'}
-                        </p>
-                      </div>
-
-                      {/* Кнопки действий для активных заказов */}
-                      {activeTab === 'active' && (
-                        <div className="flex flex-col gap-2">
-                          {order.status === 'new' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateOrderStatus(order.id, 'confirmed');
-                              }}
-                              disabled={loading}
-                              className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md transition-colors disabled:opacity-50"
-                            >
-                              {currentLanguage === 'ru' ? 'Подтвердить' : 'Tassykla'}
-                            </button>
-                          )}
-                          {order.status === 'confirmed' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateOrderStatus(order.id, 'preparing');
-                              }}
-                              disabled={loading}
-                              className="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-md transition-colors disabled:opacity-50"
-                            >
-                              {currentLanguage === 'ru' ? 'Готовить' : 'Taýýarla'}
-                            </button>
-                          )}
-                          {order.status === 'preparing' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateOrderStatus(order.id, 'delivering');
-                              }}
-                              disabled={loading}
-                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors disabled:opacity-50"
-                            >
-                              {currentLanguage === 'ru' ? 'Доставить' : 'Eltip ber'}
-                            </button>
-                          )}
-                          {order.status === 'delivering' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateOrderStatus(order.id, 'completed');
-                              }}
-                              disabled={loading}
-                              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-md transition-colors disabled:opacity-50"
-                            >
-                              {currentLanguage === 'ru' ? 'Завершить' : 'Tamamla'}
-                            </button>
-                          )}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateOrderStatus(order.id, 'cancelled');
-                            }}
-                            disabled={loading}
-                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors disabled:opacity-50"
-                          >
-                            {currentLanguage === 'ru' ? 'Отменить' : 'Ýatyr'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          {loading && (
+            <div className="flex justify-center items-center py-10">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+          
+          {!loading && filteredOrders.length === 0 ? (
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <p className="text-gray-600 dark:text-gray-400">
+                {currentLanguage === 'ru' ? 'Заказы не найдены' : 'Sargyt tapylmady'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredOrders.map(order => (
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  onClick={() => openOrderDetails(order)}
+                  onStatusChange={updateOrderStatus}
+                  activeTab={activeTab}
+                  loading={loading}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Модальное окно с деталями заказа */}
-      {selectedOrder && (
+      {selectedOrder && isDetailModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {currentLanguage === 'ru' ? 'Детали заказа' : 'Sargyt jikme-jiklikleri'} #{selectedOrder.id.slice(-8)}
+                {currentLanguage === 'ru' ? 'Детали заказа' : 'Sargyt jikme-jiklikleri'} #{selectedOrder.id.slice(-6)}
               </h2>
               <button
-                onClick={() => setSelectedOrder(null)}
+                onClick={() => setIsDetailModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -539,13 +505,36 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
                   {currentLanguage === 'ru' ? 'Информация о клиенте' : 'Müşderi maglumat'}
                 </h3>
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
-                  <p><span className="font-medium">{currentLanguage === 'ru' ? 'Имя:' : 'Ady:'}</span> {selectedOrder.customerName}</p>
-                  <p><span className="font-medium">{currentLanguage === 'ru' ? 'Телефон:' : 'Telefon:'}</span> {selectedOrder.customerPhone}</p>
+                  <p className="flex justify-between">
+                    <span className="font-medium">{currentLanguage === 'ru' ? 'Имя:' : 'Ady:'}</span>
+                    <span>{selectedOrder.customerName}</span>
+                  </p>
+                  <p className="flex justify-between">
+                    <span className="font-medium">{currentLanguage === 'ru' ? 'Телефон:' : 'Telefon:'}</span>
+                    <span className="flex items-center">
+                      {selectedOrder.customerPhone}
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(selectedOrder.customerPhone);
+                          toast.success(currentLanguage === 'ru' ? 'Скопировано!' : 'Göçürildi!');
+                        }}
+                        className="ml-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                      >
+                        <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      </button>
+                    </span>
+                  </p>
                   {selectedOrder.customerAddress && (
-                    <p><span className="font-medium">{currentLanguage === 'ru' ? 'Адрес:' : 'Salgy:'}</span> {selectedOrder.customerAddress}</p>
+                    <p className="flex justify-between">
+                      <span className="font-medium">{currentLanguage === 'ru' ? 'Адрес:' : 'Salgy:'}</span>
+                      <span>{selectedOrder.customerAddress}</span>
+                    </p>
                   )}
                   {selectedOrder.notes && (
-                    <p><span className="font-medium">{currentLanguage === 'ru' ? 'Комментарий:' : 'Bellik:'}</span> {selectedOrder.notes}</p>
+                    <p className="flex justify-between">
+                      <span className="font-medium">{currentLanguage === 'ru' ? 'Комментарий:' : 'Bellik:'}</span>
+                      <span>{selectedOrder.notes}</span>
+                    </p>
                   )}
                 </div>
               </div>
@@ -602,19 +591,77 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
                   {currentLanguage === 'ru' ? 'Информация о заказе' : 'Sargyt maglumat'}
                 </h3>
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
-                  <p>
-                    <span className="font-medium">{currentLanguage === 'ru' ? 'Статус:' : 'Ýagdaý:'}</span>{' '}
+                  <p className="flex justify-between">
+                    <span className="font-medium">{currentLanguage === 'ru' ? 'Статус:' : 'Ýagdaý:'}</span>
                     <span className={getStatusBadgeClass(selectedOrder.status)}>
                       {getStatusText(selectedOrder.status)}
                     </span>
                   </p>
-                  <p><span className="font-medium">{currentLanguage === 'ru' ? 'Создан:' : 'Döredilen:'}</span> {formatDate(selectedOrder.createdAt)}</p>
-                  <p><span className="font-medium">{currentLanguage === 'ru' ? 'Обновлен:' : 'Täzelenen:'}</span> {formatDate(selectedOrder.updatedAt)}</p>
+                  <p className="flex justify-between">
+                    <span className="font-medium">{currentLanguage === 'ru' ? 'Создан:' : 'Döredilen:'}</span>
+                    <span>{formatDate(selectedOrder.createdAt)}</span>
+                  </p>
+                  <p className="flex justify-between">
+                    <span className="font-medium">{currentLanguage === 'ru' ? 'Обновлен:' : 'Täzelenen:'}</span>
+                    <span>{formatDate(selectedOrder.updatedAt)}</span>
+                  </p>
                   {selectedOrder.completedAt && (
-                    <p><span className="font-medium">{currentLanguage === 'ru' ? 'Завершен:' : 'Tamamlanan:'}</span> {formatDate(selectedOrder.completedAt)}</p>
+                    <p className="flex justify-between">
+                      <span className="font-medium">{currentLanguage === 'ru' ? 'Завершен:' : 'Tamamlanan:'}</span>
+                      <span>{formatDate(selectedOrder.completedAt)}</span>
+                    </p>
                   )}
                 </div>
               </div>
+
+              {/* Кнопки управления статусом для активных заказов */}
+              {activeTab === 'active' && (
+                <div className="pt-4 flex gap-4 flex-wrap">
+                  {selectedOrder.status === 'new' || selectedOrder.status === 'pending' ? (
+                    <button
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'confirmed')}
+                      className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                    >
+                      {currentLanguage === 'ru' ? 'Подтвердить' : 'Tassykla'}
+                    </button>
+                  ) : null}
+                  
+                  {selectedOrder.status === 'confirmed' && (
+                    <button
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'preparing')}
+                      className="flex-1 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg"
+                    >
+                      {currentLanguage === 'ru' ? 'Готовится' : 'Taýýarlanýar'}
+                    </button>
+                  )}
+                  
+                  {selectedOrder.status === 'preparing' && (
+                    <button
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'ready')}
+                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                    >
+                      {currentLanguage === 'ru' ? 'Готово' : 'Taýýar'}
+                    </button>
+                  )}
+                  
+                  {selectedOrder.status === 'ready' && (
+                    <button
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'delivered')}
+                      className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                    >
+                      {currentLanguage === 'ru' ? 'Доставлено' : 'Eltip berildi'}
+                    </button>
+                  )}
+                  
+                  {/* Кнопка отмены заказа всегда доступна для активных заказов */}
+                  <button
+                    onClick={() => updateOrderStatus(selectedOrder.id, 'cancelled')}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                  >
+                    {currentLanguage === 'ru' ? 'Отменить заказ' : 'Sargydy ýatyrmak'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -31,7 +31,53 @@ export default function OrderForm({ isOpen, onClose, onSuccess }: OrderFormProps
     setIsSubmitting(true)
 
     try {
-      const orderId = db.createOrder(
+      // Сохраняем телефон клиента в базе
+      const contactResponse = await fetch('/api/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          phoneNumber: formData.phone,
+          name: formData.name || undefined,
+          email: formData.email || undefined
+        })
+      });
+      
+      if (!contactResponse.ok) {
+        throw new Error('Ошибка при сохранении контакта');
+      }
+      
+      const contactData = await contactResponse.json();
+
+      // Создаем заказ в БД через API
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clientId: contactData.id,
+          phoneNumber: formData.phone,
+          items: state.items.map(item => ({
+            mealId: item.id,
+            price: item.price,
+            amount: item.quantity
+          })),
+          address: formData.address,
+          notes: formData.notes,
+          totalAmount: state.totalAmount + state.deliveryFee
+        })
+      });
+
+      if (!orderResponse.ok) {
+        throw new Error('Ошибка при создании заказа');
+      }
+      
+      const orderData = await orderResponse.json();
+
+      // Для совместимости со старым кодом сохраняем заказ и в локальной базе
+      const localOrderId = db.createOrder(
         formData.phone,
         state.items.map(item => ({
           id: item.id,
@@ -55,7 +101,9 @@ export default function OrderForm({ isOpen, onClose, onSuccess }: OrderFormProps
         address: '',
         notes: ''
       })
-      onSuccess(orderId)
+      
+      // Используем ID заказа из БД, если доступен
+      onSuccess(orderData.id || localOrderId)
     } catch (error) {
       console.error('Ошибка при создании заказа:', error)
       alert('Произошла ошибка при оформлении заказа. Попробуйте еще раз.')
