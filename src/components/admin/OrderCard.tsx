@@ -82,6 +82,14 @@ const OrderCard: React.FC<OrderCardProps> = ({
     return `${amount.toFixed(2)} ТМ`;
   };
 
+  const getDishTitle = (item: any, lang: 'ru' | 'tk' = 'ru') => {
+    // Возможные поля: dishName, dishNameTk, raw.meal.nameRu, raw.meal.nameTk, nameRu
+    if (lang === 'ru') {
+      return item.dishName || item.raw?.meal?.nameRu || item.raw?.meal?.name || item.nameRu || item.title || '';
+    }
+    return item.dishNameTk || item.raw?.meal?.nameTk || item.raw?.meal?.name || item.nameTk || '';
+  };
+
   // Находим следующий статус для заказа
   const getNextStatus = (currentStatus: Order['status']): Order['status'] | null => {
     switch (currentStatus) {
@@ -212,9 +220,9 @@ const OrderCard: React.FC<OrderCardProps> = ({
                   <span className="font-medium text-gray-800 dark:text-gray-200">
                     {item.quantity}×
                   </span>
-                  <span className="ml-2 text-gray-700 dark:text-gray-300 line-clamp-1">
-                    {currentLanguage === 'ru' ? item.dishName : item.dishNameTk}
-                  </span>
+                    <span className="ml-2 text-gray-700 dark:text-gray-300 line-clamp-1">
+                      {currentLanguage === 'ru' ? getDishTitle(item, 'ru') : getDishTitle(item, 'tk')}
+                    </span>
                 </div>
                 <span className="text-gray-700 dark:text-gray-300">
                   {formatCurrency(item.total)}

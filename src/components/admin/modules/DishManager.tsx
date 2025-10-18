@@ -192,7 +192,19 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
         })
         
         if (!response.ok) {
-          throw new Error('Ошибка при обновлении блюда')
+          let msg = 'Ошибка при обновлении блюда'
+          try {
+            const text = await response.text()
+            try {
+              const j = JSON.parse(text)
+              msg = j.error || msg
+              console.error('Meal update error (json):', j)
+            } catch {
+              console.error('Meal update error (text):', text)
+              msg = text || msg
+            }
+          } catch {}
+          throw new Error(msg)
         }
         
         const updatedDish = await response.json()
@@ -217,7 +229,19 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
         })
         
         if (!response.ok) {
-          throw new Error('Ошибка при создании блюда')
+          let msg = 'Ошибка при создании блюда'
+          try {
+            const text = await response.text()
+            try {
+              const j = JSON.parse(text)
+              msg = j.error || msg
+              console.error('Meal create error (json):', j)
+            } catch {
+              console.error('Meal create error (text):', text)
+              msg = text || msg
+            }
+          } catch {}
+          throw new Error(msg)
         }
         
         const newDish = await response.json()
@@ -264,7 +288,19 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
       })
       
       if (!response.ok) {
-        throw new Error('Ошибка при удалении блюда')
+        let msg = 'Ошибка при удалении блюда'
+        try {
+          const text = await response.text()
+          try {
+            const j = JSON.parse(text)
+            msg = j.error || msg
+            console.error('Meal delete error (json):', j)
+          } catch {
+            console.error('Meal delete error (text):', text)
+            msg = text || msg
+          }
+        } catch {}
+        throw new Error(msg)
       }
       
       setDishes(prev => prev.filter(d => d.id !== dishId))

@@ -20,38 +20,10 @@ interface Restaurant {
   image: string;
   gradient: string;
   features: string[];
+  isOpen: boolean;
+  deliveryTime: string;
+  deliveryTimeTk: string;
 }
-
-const restaurants: Restaurant[] = [
-  {
-    id: 'panda-burger',
-    name: 'Panda Burger',
-    logo: '/panda-burger-logo.svg',
-    description: 'Сочные бургеры и американская кухня',
-    descriptionTk: 'Damsly burgerler we amerikan aşhanasy', 
-    cuisine: 'Американская кухня',
-    rating: 4.8,
-    phone: '+993 (12) 123-45-67',
-    address: 'г. Ашхабад',
-    image: '/panda_logo.jpg',
-    gradient: 'from-orange-500 to-red-600',
-    features: ['Быстрая доставка', 'WiFi', 'QR заказ']
-  },
-  {
-    id: 'han-tagam',
-    name: 'Han Tagam',
-    logo: '/khan-tagam-logo.svg', 
-    description: 'Традиционная туркменская кухня',
-    descriptionTk: 'Adaty türkmen aşhanasy',
-    cuisine: 'Туркменская кухня',
-    rating: 4.9,
-    phone: '+993 (65) 987-65-43',
-    address: 'г. Ашхабад',
-    image: '/han_tagam.jpg',
-    gradient: 'from-blue-500 to-indigo-600',
-    features: ['Национальная кухня', 'WiFi', 'QR заказ']
-  }
-];
 
 export default function RestaurantSelector() {
   const router = useRouter();
@@ -59,6 +31,7 @@ export default function RestaurantSelector() {
   const [selectedRestaurant, setSelectedRestaurant] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -70,6 +43,22 @@ export default function RestaurantSelector() {
       setRestaurant(domainRestaurant.id);
       router.push(`/menu/${domainRestaurant.id}`);
     }
+
+    // Загружаем рестораны из API
+    async function fetchRestaurants() {
+      try {
+        const response = await fetch('/api/restaurant');
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setRestaurants(data);
+          }
+        }
+      } catch (e) {
+        console.error('Ошибка загрузки ресторанов', e);
+      }
+    }
+    fetchRestaurants();
   }, [router, setRestaurant]);
 
   const handleRestaurantSelect = (restaurantId: string) => {
@@ -78,7 +67,6 @@ export default function RestaurantSelector() {
     setSelectedRestaurant(restaurantId);
     setIsLoading(true);
     setRestaurant(restaurantId);
-    
     // Плавный переход
     setTimeout(() => {
       router.push(`/menu/${restaurantId}`);
@@ -86,33 +74,22 @@ export default function RestaurantSelector() {
   };
 
   if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-slate-300 border-t-blue-600 rounded-full"></div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <div className="pt-12 pb-8 text-center">
-        <div className="max-w-4xl mx-auto px-6">
-          {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg mb-6 border border-white/20">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-slate-600">Онлайн заказ активен</span>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      {/* Hero */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-rose-50">
+        <div className="absolute inset-0 opacity-40" />
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 backdrop-blur text-slate-600 text-sm mb-6 border border-slate-100">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <span>Онлайн заказ активен</span>
           </div>
-          
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-            QR Меню
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-600 mb-2">
-            Выберите ресторан
-          </p>
-          <p className="text-lg text-slate-500">
-            Сделайте заказ в один клик
-          </p>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-slate-900">QR Меню</h1>
+          <p className="text-xl md:text-2xl text-slate-600 mb-2">Выберите ресторан</p>
+          <p className="text-lg text-slate-500">Сделайте заказ в один клик</p>
         </div>
       </div>
 

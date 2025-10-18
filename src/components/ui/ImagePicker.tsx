@@ -145,7 +145,7 @@ export function ImagePicker({ onSelect, value, category = 'other' }: ImagePicker
               <Upload className="mx-auto w-12 h-12 text-gray-400" />
               <h3 className="mt-4 text-sm font-medium text-gray-900">Нет изображений</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Загрузите изображения через вкладку "Загрузить"
+                Загрузите изображения через вкладку &quot;Загрузить&quot;
               </p>
             </div>
           )}

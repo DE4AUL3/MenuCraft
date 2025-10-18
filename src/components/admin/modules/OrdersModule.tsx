@@ -24,43 +24,75 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
   const [loading, setLoading] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-  // Загрузка заказов
+  // Загрузка заказов из БД через API
   useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/order');
+        if (res.ok) {
+          const data = await res.json();
+          // Преобразуем данные из API к типу Order
+          const mappedOrders = Array.isArray(data) ? data.map((order: any) => {
+            // Поддерживаем несколько форматов ответа: order.orderItems (Prisma) или order.items (форматированная точка /api/orders)
+            const sourceItems = Array.isArray(order.orderItems) ? order.orderItems : (Array.isArray(order.items) ? order.items : []);
+
+            const items = sourceItems.map((item: any) => {
+              const meal = item.meal || item.mealData || item.mealInfo || null;
+              return {
+                dishId: item.mealId || item.dishId || item.meal?.id || '',
+                dishName: item.dishName || meal?.nameRu || item.nameRu || item.title || '',
+                dishNameTk: item.dishNameTk || meal?.nameTk || item.nameTk || '',
+                price: item.price ?? item.unitPrice ?? 0,
+                quantity: item.amount ?? item.quantity ?? item.qty ?? 0,
+                total: (item.price ?? item.unitPrice ?? 0) * (item.amount ?? item.quantity ?? item.qty ?? 0),
+                raw: item
+              };
+            });
+
+            const subtotal = items.reduce((sum: number, it: any) => sum + (it.total || 0), 0);
+
+            return {
+              id: order.id,
+              customerName: order.client?.name || order.phoneNumber || '',
+              customerPhone: order.phoneNumber || order.client?.phoneNumber || '',
+              customerAddress: order.client?.address || '',
+              items,
+              subtotal,
+              deliveryFee: order.deliveryFee ?? 0,
+              totalAmount: order.totalAmount ?? subtotal,
+              status: (order.status || 'pending').toString().toLowerCase(),
+              notes: order.notes || '',
+              createdAt: order.createdAt,
+              updatedAt: order.updatedAt,
+              completedAt: order.completedAt || ''
+            };
+          }) : [];
+          setOrders(mappedOrders);
+        } else {
+          toast.error(
+            currentLanguage === 'ru'
+              ? 'Не удалось загрузить заказы'
+              : 'Sargytlary ýükläp bolmady',
+            { duration: 3000 }
+          );
+          setOrders([]);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки заказов:', error);
+        toast.error(
+          currentLanguage === 'ru'
+            ? 'Не удалось загрузить заказы'
+            : 'Sargytlary ýükläp bolmady',
+          { duration: 3000 }
+        );
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadOrders();
-    
-    const handleOrderUpdate = () => {
-      loadOrders();
-    };
-
-    dataService.addEventListener('order_created', handleOrderUpdate);
-    dataService.addEventListener('order_updated', handleOrderUpdate);
-
-    return () => {
-      dataService.removeEventListener('order_created', handleOrderUpdate);
-      dataService.removeEventListener('order_updated', handleOrderUpdate);
-    };
   }, [activeTab]);
-
-  const loadOrders = async () => {
-    try {
-      setLoading(true);
-      
-      // В будущем здесь будет запрос к API, но пока используем демо данные
-      dataService.createDemoOrders();
-      const ordersData = dataService.getOrders();
-      setOrders(ordersData);
-    } catch (error) {
-      console.error('Ошибка загрузки заказов:', error);
-      toast.error(
-        currentLanguage === 'ru' 
-          ? 'Не удалось загрузить заказы' 
-          : 'Sargytlary ýükläp bolmady',
-        { duration: 3000 }
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Фильтрация и сортировка заказов
   const filteredOrders = useMemo(() => {
@@ -113,28 +145,37 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
   const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
     try {
       setLoading(true);
-      
-      // В будущем здесь будет запрос к API
-      dataService.updateOrderStatus(orderId, newStatus);
-      await loadOrders();
-      
-      // Обновляем выбранный заказ если он открыт
-      if (selectedOrder && selectedOrder.id === orderId) {
-        const updatedOrder = dataService.getOrderById(orderId);
-        setSelectedOrder(updatedOrder);
+      const res = await fetch(`/api/order`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, status: newStatus })
+      });
+      if (res.ok) {
+        // Обновляем список заказов
+        const updatedOrder = await res.json();
+        setOrders(prev => prev.map(o => o.id === orderId ? updatedOrder : o));
+        if (selectedOrder && selectedOrder.id === orderId) {
+          setSelectedOrder(updatedOrder);
+        }
+        toast.success(
+          currentLanguage === 'ru'
+            ? 'Статус заказа обновлен'
+            : 'Sargydyň ýagdaýy täzelendi',
+          { duration: 2000 }
+        );
+      } else {
+        toast.error(
+          currentLanguage === 'ru'
+            ? 'Не удалось обновить статус заказа'
+            : 'Sargyt ýagdaýyny täzeläp bolmady',
+          { duration: 3000 }
+        );
       }
-      
-      toast.success(
-        currentLanguage === 'ru' 
-          ? 'Статус заказа обновлен' 
-          : 'Sargydyň ýagdaýy täzelendi',
-        { duration: 2000 }
-      );
     } catch (error) {
       console.error('Ошибка обновления статуса:', error);
       toast.error(
-        currentLanguage === 'ru' 
-          ? 'Не удалось обновить статус заказа' 
+        currentLanguage === 'ru'
+          ? 'Не удалось обновить статус заказа'
           : 'Sargyt ýagdaýyny täzeläp bolmady',
         { duration: 3000 }
       );

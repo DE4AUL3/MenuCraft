@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "vercel-build": "next build",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest --colors"
   },
   "engines": {
     "node": ">=18.18.0"
@@ -25,6 +26,7 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.22",
     "lottie-react": "^2.4.1",
+    "lru-cache": "^11.2.2",
     "lucide-react": "^0.544.0",
     "next": "15.5.3",
     "pg": "^8.16.3",
@@ -43,13 +45,26 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
     "@eslint/eslintrc": "^3",
+    "@jest/globals": "^30.2.0",
+    "@swc/core": "^1.13.5",
+    "@swc/jest": "^0.2.39",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.19.21",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/testing-library__jest-dom": "^5.14.9",
+    "babel-jest": "^30.2.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "node-mocks-http": "^1.17.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

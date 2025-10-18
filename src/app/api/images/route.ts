@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/databaseService';
 import { writeFile, mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { existsSync } from 'fs';
 
-const prisma = new PrismaClient();
 
 // Загрузка файла на сервер
 async function saveFile(file: File, category: string): Promise<{ 

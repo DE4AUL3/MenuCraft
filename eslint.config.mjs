@@ -33,6 +33,12 @@ const eslintConfig = [
       "@next/next/no-img-element": "warn",
       "react-hooks/exhaustive-deps": "warn"
     }
+  },
+  {
+    files: ["jest.setup.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off"
+    }
   }
 ];
 

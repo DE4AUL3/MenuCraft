@@ -31,6 +31,7 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }
   const [currentSubTab, setCurrentSubTab] = useState('basic');
   const [basicStats, setBasicStats] = useState<Stat[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [salesData, setSalesData] = useState<{ date: string; value: number }[]>([]);
 
   // Fetch basic stats from API
   useEffect(() => {
@@ -49,15 +50,57 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }
       .catch(err => console.error(err));
   }, []);
 
-  // Fetch recent activity from API
+  // Real-time updates: poll sales analytics and recent activity every 10s
   useEffect(() => {
-    fetch('/api/order')
-      .then(res => res.json())
-      .then(data => {
-        // Expected data: array of { action, timestamp }
-        setRecentActivity(data);
-      })
-      .catch(err => console.error(err));
+    let mounted = true;
+
+    const fetchSales = async () => {
+      try {
+        const res = await fetch('/api/analytics?type=sales&days=30');
+        if (!res.ok) return;
+        const data = await res.json();
+        // data: [{ date, sales, orders, customers }]
+        if (!mounted) return;
+        const chartData = Array.isArray(data) ? data.map((d: any) => ({ date: d.date, value: Math.round(d.sales) })) : [];
+        setSalesData(chartData);
+      } catch (err) {
+        console.error('Ошибка загрузки sales analytics', err);
+      }
+    };
+
+    const fetchRecent = async () => {
+      try {
+        // используем /api/orders, который возвращает форматированные данные с createdAt
+        const res = await fetch('/api/orders');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        // Ожидаем массив заказов, создаём activity items (последние 10)
+        const activities = (Array.isArray(data) ? data : [])
+          .slice(0, 10)
+          .map((o: any) => ({
+            action: `${o.customerPhone || o.customerName || 'Клиент'} — ${o.items?.length ?? 0} позиций — ${o.totalAmount ?? 0} TMT`,
+            timestamp: o.createdAt || new Date().toISOString()
+          }));
+        setRecentActivity(activities);
+      } catch (err) {
+        console.error('Ошибка загрузки recent orders', err);
+      }
+    };
+
+    // Initial fetch
+    fetchSales();
+    fetchRecent();
+
+    const interval = setInterval(() => {
+      fetchSales();
+      fetchRecent();
+    }, 10000); // 10s
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -99,7 +142,7 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }
                 ))}
               </div>
               <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
-                <SalesChart data={[]} theme={theme} />
+                <SalesChart data={salesData} theme={theme} />
               </div>
               <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
                 <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${themeClasses.text}`}>

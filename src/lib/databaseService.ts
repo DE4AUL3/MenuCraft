@@ -27,7 +27,8 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    log: ['query', 'error', 'warn'],
+    // В продакшене пишем только ошибки, в dev расширенный лог
+    log: process.env.NODE_ENV === 'production' ? ['error'] : ['query', 'error', 'warn'],
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
@@ -61,8 +62,21 @@ export class DatabaseService {
   // === КАТЕГОРИИ ===
   
   async createCategory(data: CreateCategory): Promise<DatabaseCategory> {
+    if (!data.restaurantId) {
+      throw new Error('restaurantId is required to create a category');
+    }
     return await prisma.category.create({
-      data
+      data: {
+        nameRu: data.nameRu,
+        nameTk: data.nameTk,
+        descriptionRu: data.descriptionRu,
+        descriptionTk: data.descriptionTk,
+        imageCard: data.imageCard,
+        imageBackground: data.imageBackground,
+        order: data.order,
+        status: data.status ?? true,
+        restaurantId: data.restaurantId,
+      }
     });
   }
 
@@ -89,7 +103,7 @@ export class DatabaseService {
       status: category.status,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
-      restaurantId: category.restaurantId || 'han-tagam'
+      restaurantId: category.restaurantId
     }));
   }
 

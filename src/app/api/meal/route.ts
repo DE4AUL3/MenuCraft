@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/databaseService';
 
 export async function GET(request: Request) {
   try {
@@ -33,6 +31,17 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { nameRu, nameTk, categoryId, price, descriptionRu, descriptionTk, image } = body;
 
+    // Простая валидация входных данных
+    if (!nameRu || !nameTk || !categoryId || price === undefined) {
+      return NextResponse.json({ error: 'Обязательные поля: nameRu, nameTk, categoryId, price' }, { status: 400 });
+    }
+
+    // Проверяем, что категория существует
+    const category = await prisma.category.findUnique({ where: { id: categoryId } });
+    if (!category) {
+      return NextResponse.json({ error: 'Категория не найдена' }, { status: 400 });
+    }
+
     const meal = await prisma.meal.create({
       data: {
         nameRu,
@@ -48,6 +57,7 @@ export async function POST(request: Request) {
     return NextResponse.json(meal, { status: 201 });
   } catch (error) {
     console.error('Ошибка создания блюда:', error);
-    return NextResponse.json({ error: 'Ошибка создания блюда' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Ошибка создания блюда';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

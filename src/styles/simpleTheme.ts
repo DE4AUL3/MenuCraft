@@ -31,13 +31,15 @@ export interface SimpleTheme {
 }
 
 
+import { COLORS } from '@/config/colors';
+
 export const lightTheme: SimpleTheme = {
   mode: 'light',
   colors: {
     background: {
-      primary: require('../config/colors').COLORS.background,
-      secondary: require('../config/colors').COLORS.surface,
-      tertiary: require('../config/colors').COLORS.border
+      primary: COLORS.background,
+      secondary: COLORS.surface,
+      tertiary: COLORS.border
     },
     text: {
       primary: '#18181b',
@@ -45,27 +47,29 @@ export const lightTheme: SimpleTheme = {
       tertiary: '#6b7280'
     },
     border: {
-      primary: require('../config/colors').COLORS.border,
-      secondary: require('../config/colors').COLORS.surface,
-      tertiary: require('../config/colors').COLORS.background
+      primary: COLORS.border,
+      secondary: COLORS.surface,
+      tertiary: COLORS.background
     },
     accent: {
-      call: require('../config/colors').COLORS.accent,
-      admin: require('../config/colors').COLORS.admin,
-      warning: require('../config/colors').COLORS.warning,
-      danger: require('../config/colors').COLORS.danger,
-      success: require('../config/colors').COLORS.success
+      call: COLORS.accent,
+      admin: COLORS.admin,
+      warning: COLORS.warning,
+      danger: COLORS.danger,
+      success: COLORS.success
     }
   }
 }
 
 export const themes = {
-  light: lightTheme
+  light: lightTheme,
+  dark: lightTheme // временно используем ту же схему, чтобы не ломать потребителей
 } as const
 
 // CSS переменные для простого использования
 export const getCSSVariables = (theme?: SimpleTheme) => {
-  const { light: defaultTheme } = require('./simpleTheme').themes;
+  // Прямая ссылка на локальный объект themes, без require()
+  const defaultTheme = themes.light;
   const t = theme && theme.colors ? theme : defaultTheme;
   return {
     '--bg-primary': t.colors.background.primary,

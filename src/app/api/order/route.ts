@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/databaseService';
 
 export async function GET(request: Request) {
   try {
@@ -11,14 +9,14 @@ export async function GET(request: Request) {
     if (clientId) {
       const orders = await prisma.order.findMany({
         where: { clientId },
-        include: { orderItems: true },
+        include: { orderItems: { include: { meal: true } } },
         orderBy: { createdAt: 'desc' },
       });
       return NextResponse.json(orders);
     }
 
     const orders = await prisma.order.findMany({
-      include: { orderItems: true },
+      include: { orderItems: { include: { meal: true } } },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(orders);
@@ -50,7 +48,7 @@ export async function POST(request: Request) {
           })),
         },
       },
-      include: { orderItems: true },
+      include: { orderItems: { include: { meal: true } } },
     });
 
     return NextResponse.json(order, { status: 201 });

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import SmartImage from '@/components/ui/SmartImage';
 import { imageService } from '@/lib/imageServiceDb';
 import { XCircle } from 'lucide-react';
@@ -99,16 +100,15 @@ export default function ImageUpload({
         document.body.removeChild(modalContainer);
       };
       
-      // Рендерим модальное окно в контейнере
-      const { render } = require('react-dom');
-      render(
+      // Рендерим модальное окно в контейнере (React 18 createRoot)
+      const root = createRoot(modalContainer);
+      root.render(
         <ImageManagerModal
           title={imageManagerTitle}
           onSelect={handleSelectImage}
           onClose={handleClose}
           category={category}
-        />,
-        modalContainer
+        />
       );
     });
   };

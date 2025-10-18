@@ -41,7 +41,7 @@ export default function ContactsModule() {
   const [showSMSModal, setShowSMSModal] = useState(false)
   const [smsText, setSmsText] = useState('')
 
-  // Загрузка контактов из API
+  // Загрузка контактов из БД через API
   useEffect(() => {
     const fetchContacts = async () => {
       setLoading(true)
@@ -50,6 +50,7 @@ export default function ContactsModule() {
         const res = await fetch('/api/contacts')
         if (res.ok) {
           const data = await res.json()
+          // API возвращает уже нужную структуру
           setContacts(Array.isArray(data) ? data : [])
         } else {
           setError('Не удалось загрузить контакты')
@@ -246,7 +247,7 @@ export default function ContactsModule() {
                       {contact.totalOrders}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
-                      {contact.totalAmount.toFixed(2)} ₽
+                      {contact.totalAmount.toFixed(2)} TMT
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
                       {formatDate(contact.lastOrderDate)}

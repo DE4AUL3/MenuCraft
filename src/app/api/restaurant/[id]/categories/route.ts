@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/databaseService';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const restaurantId = params.id;
+    const { id: restaurantId } = await params;
 
-    // Получаем все категории (потом можно фильтровать по restaurantId)
+    // Получаем категории конкретного ресторана
     const categories = await prisma.category.findMany({
       where: {
-        status: true
+        status: true,
+        restaurantId
       },
       orderBy: {
         order: 'asc'
@@ -21,7 +20,7 @@ export async function GET(
     });
     
     // Преобразуем данные в формат, ожидаемый фронтендом
-    const formattedCategories = categories.map((cat: any) => ({
+    const formattedCategories = categories.map((cat) => ({
       id: cat.id,
       name: cat.nameRu,
       nameTk: cat.nameTk,

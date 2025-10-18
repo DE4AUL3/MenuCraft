@@ -125,7 +125,7 @@ export default function AdminLayout({ children, activeSection = 'dashboard' }: A
         </div>
 
         {/* Content */}
-        <main className="p-6">
+        <main className="pt-16 p-6">
           {children}
         </main>
       </div>

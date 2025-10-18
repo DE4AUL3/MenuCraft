@@ -1,0 +1,19 @@
+{
+  "testEnvironment": "jsdom",
+  "transform": {
+    "^.+\\.(ts|tsx|js|jsx)$": [
+      "@swc/jest"
+    ]
+  },
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+  "testPathIgnorePatterns": [
+    "<rootDir>/node_modules/",
+    "<rootDir>/.next/",
+    "<rootDir>/test-functions.js",
+    "<rootDir>/test-database.js"
+  ],
+  "testMatch": ["**/__tests__/**/*.test.(ts|tsx|js)"]
+}

@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient, OrderStatus } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/databaseService';
+import type { OrderStatus } from '@prisma/client';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
 
-    // Построение условия поиска
-    const whereCondition: any = {};
+  // Построение условия поиска
+  const whereCondition: { status?: OrderStatus | { in: OrderStatus[] } } = {};
     
     if (status) {
       if (status === 'active') {
@@ -21,7 +20,12 @@ export async function GET(request: Request) {
           in: ['DELIVERED', 'CANCELLED'],
         };
       } else if (status !== 'all') {
-        whereCondition.status = status;
+        // Приводим строковой параметр к UpperCase и валидируем против допустимых значений OrderStatus
+        const upper = status.toUpperCase();
+        const allowed: OrderStatus[] = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED', 'CANCELLED'];
+        if (allowed.includes(upper as OrderStatus)) {
+          whereCondition.status = upper as OrderStatus;
+        }
       }
     }
 
@@ -44,15 +48,15 @@ export async function GET(request: Request) {
     // Преобразуем данные в формат, ожидаемый на фронтенде
     const formattedOrders = orders.map(order => {
       // Преобразуем статус из ENUM в нижний регистр для соответствия интерфейсу
-      let status = order.status.toLowerCase() as any;
-      
+      let status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+      const s = order.status.toLowerCase();
       // Соответствие между статусами Prisma и фронтенда
-      if (status === 'pending') status = 'pending';
-      else if (status === 'confirmed') status = 'confirmed';
-      else if (status === 'preparing') status = 'preparing';
-      else if (status === 'ready') status = 'ready';
-      else if (status === 'delivered') status = 'delivered';
-      else if (status === 'cancelled') status = 'cancelled';
+      if (s === 'pending') status = 'pending';
+      else if (s === 'confirmed') status = 'confirmed';
+      else if (s === 'preparing') status = 'preparing';
+      else if (s === 'ready') status = 'ready';
+      else if (s === 'delivered') status = 'delivered';
+      else status = 'cancelled';
       
       return {
         id: order.id,

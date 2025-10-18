@@ -1,10 +1,11 @@
-'use client';
+ 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ImageUpload from '@/components/ui/ImageUpload';
 import SmartImage from '@/components/ui/SmartImage';
+import { motion } from 'framer-motion';
 import type { Category } from '@/types/common';
 
 interface CategoryFormData {
@@ -23,6 +24,7 @@ export default function CategoryManager() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
     nameTk: '',
@@ -38,6 +40,47 @@ export default function CategoryManager() {
   useEffect(() => {
     loadCategories();
   }, []);
+
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  // Focus trap + Esc handling when modal is open
+  useEffect(() => {
+    if (!isFormOpen) return;
+
+    const node = modalRef.current;
+    const focusableSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusable = node ? Array.from(node.querySelectorAll<HTMLElement>(focusableSelector)) : [];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        resetForm();
+        return;
+      }
+      if (e.key === 'Tab') {
+        if (!first || !last) return;
+        if (e.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    // focus first input
+    setTimeout(() => first?.focus(), 0);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isFormOpen]);
 
   const loadCategories = async () => {
     try {
@@ -71,6 +114,7 @@ export default function CategoryManager() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsSaving(true);
       const categoryData = {
         nameRu: formData.name,
         nameTk: formData.nameTk,
@@ -82,6 +126,8 @@ export default function CategoryManager() {
         status: formData.isActive,
         restaurantId: 'han-tagam',
       };
+
+      console.log('Submitting category data:', categoryData); // Log the category data being submitted
 
       let response;
       if (editingId) {
@@ -100,9 +146,23 @@ export default function CategoryManager() {
         });
       }
 
+      console.log('Server response:', response);
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Произошла ошибка при сохранении');
+        let errorMessage = 'Произошла ошибка при сохранении';
+        try {
+          const errorText = await response.text();
+          try {
+            const errorJson = JSON.parse(errorText);
+            console.error('Error details (json):', errorJson);
+            errorMessage = errorJson.error || errorMessage;
+          } catch {
+            console.error('Error details (text):', errorText);
+            errorMessage = errorText || errorMessage;
+          }
+        } catch (e) {
+          console.error('Не удалось прочитать тело ответа об ошибке', e);
+        }
+        throw new Error(errorMessage);
       }
 
       await loadCategories();
@@ -117,6 +177,8 @@ export default function CategoryManager() {
         error instanceof Error ? error.message : 'Ошибка сохранения категории!', 
         { duration: 4000 }
       );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -282,15 +344,36 @@ export default function CategoryManager() {
 
       {/* Form Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-[#282828] rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          role="presentation"
+          onMouseDown={(e) => {
+            // close on backdrop click
+            if (e.target === e.currentTarget) {
+              resetForm();
+            }
+          }}
+        >
+          <motion.div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="category-modal-title"
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+            transition={{ duration: 0.16 }}
+            className="bg-white dark:bg-[#282828] rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h3 id="category-modal-title" className="text-xl font-bold text-gray-900 dark:text-white">
                   {editingId ? 'Редактировать категорию' : 'Добавить категорию'}
                 </h3>
                 <button
                   onClick={resetForm}
+                  aria-label="Закрыть"
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   <X className="w-6 h-6" />
@@ -361,7 +444,7 @@ export default function CategoryManager() {
                   </label>
                   <ImageUpload
                     currentImage={formData.image}
-                    onImageChange={(imageUrl) => setFormData({ ...formData, image: imageUrl || '' })}
+                    onImageChange={(imageUrl: string | null) => setFormData({ ...formData, image: imageUrl || '' })}
                     placeholder="Добавить изображение категории"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -418,9 +501,14 @@ export default function CategoryManager() {
                 <div className="flex gap-4 pt-4">
                   <button
                     type="submit"
-                    className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={isSaving}
+                    className={`flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg transition-colors ${isSaving ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
                   >
-                    <Save className="w-4 h-4 mr-2" />
+                    {isSaving ? (
+                      <svg className="animate-spin w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="4" opacity="0.25" /><path d="M22 12a10 10 0 0 1-10 10" stroke="white" strokeWidth="4" strokeLinecap="round" /></svg>
+                    ) : (
+                      <Save className="w-4 h-4 mr-2" />
+                    )}
                     {editingId ? 'Сохранить изменения' : 'Создать категорию'}
                   </button>
                   <button
@@ -433,7 +521,7 @@ export default function CategoryManager() {
                 </div>
               </form>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

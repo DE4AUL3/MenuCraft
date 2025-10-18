@@ -10,6 +10,7 @@ import { useCart } from '@/hooks/useCart'
 import { Category } from '@/types/menu'
 import { imageService } from '@/lib/imageService'
 import FloatingCallButton from '@/components/FloatingCallButton'
+import { themes } from '@/styles/simpleTheme'
 
 export default function MenuPage() {
   const router = useRouter()
@@ -54,7 +55,7 @@ export default function MenuPage() {
   }, [])
 
   // Импортируем тему
-  const { light: theme } = require('@/styles/simpleTheme').themes;
+  const { light: theme } = themes;
   return (
     <div
       className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding`}
@@ -88,9 +89,6 @@ export default function MenuPage() {
                   <h1 className="text-xl sm:text-2xl font-bold" style={{color: theme.colors.text.primary}}>
                     Han Tagam
                   </h1>
-                  <p className="text-sm hidden sm:block" style={{color: theme.colors.text.secondary}}>
-                    Традиционная туркменская кухня
-                  </p>
                 </div>
               </div>
             </div>
@@ -129,9 +127,6 @@ export default function MenuPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Categories Grid */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            <span style={{color: theme.colors.text.primary}}>Категории блюд</span>
-          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
             {categories.map((category) => (
               <div
@@ -156,14 +151,14 @@ export default function MenuPage() {
                   
                   {/* Category Image */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-full sm:w-full sm:h-full rounded-xl backdrop-blur-md border flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300" style={{background: theme.colors.background.secondary, borderColor: theme.colors.border.primary}}>
+                    <div className="w-full h-full sm:w-full sm:h-full backdrop-blur-md border flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300" style={{background: theme.colors.background.secondary, borderColor: theme.colors.border.primary}}>
                       {category.image ? (
                         <Image
                           src={imageService.getImageUrl(category.image)}
                           alt={category.name}
                           width={200}
                           height={200}
-                          className="w-full h-full sm:w-full sm:h-full object-cover rounded-lg"
+                          className="w-full h-full sm:w-full sm:h-full object-cover"
                         />
                       ) : null}
                     </div>

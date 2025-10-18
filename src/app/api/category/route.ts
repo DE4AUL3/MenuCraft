@@ -1,6 +1,10 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/databaseService';
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log('Incoming request body:', body);
     const {
       nameRu,
       nameTk,
@@ -9,15 +13,16 @@ export async function POST(request: Request) {
       imageCard,
       imageBackground,
       order,
-      status
+      status,
+      restaurantId
     } = body;
 
     // Валидация обязательных полей
-    if (!nameRu || !nameTk || order === undefined) {
-      return NextResponse.json({ error: 'Заполните все обязательные поля: название, перевод, порядок' }, { status: 400 });
+    if (!nameRu || !nameTk || order === undefined || !restaurantId) {
+      return NextResponse.json({ error: 'Заполните обязательные поля: nameRu, nameTk, order, restaurantId' }, { status: 400 });
     }
 
-    // Создаем категорию с обязательными полями
+    // Создаём категорию и одновременно гарантируем ресторан через connectOrCreate
     const category = await prisma.category.create({
       data: {
         nameRu,
@@ -28,20 +33,21 @@ export async function POST(request: Request) {
         imageBackground: imageBackground || '',
         order,
         status: status ?? true,
-        restaurantId: 'han-tagam'
+        restaurant: {
+          connectOrCreate: {
+            where: { id: restaurantId },
+            create: { id: restaurantId, slug: restaurantId, name: restaurantId },
+          },
+        },
       },
     });
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
     console.error('Ошибка создания категории:', error);
-    return NextResponse.json({ error: 'Ошибка создания категории' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Ошибка создания категории';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { CreateCategory, DatabaseCategory } from '@/types/database';
-
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {

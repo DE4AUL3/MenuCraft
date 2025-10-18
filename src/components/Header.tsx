@@ -31,7 +31,7 @@ export default function Header({ restaurantName }: HeaderProps) {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+  <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled 
           ? currentRestaurant === 'panda-burger' || currentRestaurant === '1'
             ? 'bg-[#282828]/95 backdrop-blur-xl shadow-lg border-b border-gray-600/50' 

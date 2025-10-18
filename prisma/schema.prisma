@@ -55,12 +55,15 @@ model Category {
   imageBackground String   @map("image_background")
   order           Int
   status          Boolean  @default(true)
-  restaurantId    String   @default("han-tagam") @map("restaurant_id")
+  restaurantId    String   @map("restaurant_id")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   // Связь с блюдами
   meals Meal[]
+
+  // Связь с рестораном
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@map("categories")
 }
@@ -130,4 +133,29 @@ enum OrderStatus {
   READY
   DELIVERED
   CANCELLED
+}
+
+// Модель ресторана (связана с категориями)
+model Restaurant {
+  id           String   @id
+  slug         String   @unique
+  name         String
+  description  String?
+  descriptionTk String?
+  logo         String?
+  image        String?
+  phone        String?
+  address      String?
+  rating       Float    @default(0)
+  gradient     String   @default("from-emerald-500 via-teal-500 to-emerald-700")
+  isOpen       Boolean  @default(true)
+  deliveryTime String?  @map("delivery_time")
+  features     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Связи
+  categories   Category[]
+
+  @@map("restaurants")
 }

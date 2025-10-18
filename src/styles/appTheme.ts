@@ -71,18 +71,35 @@ export interface AppThemeClasses {
   }
 }
 
+// Цвета конфигурации
+import { COLORS } from '@/config/colors';
+
 // Цвета для светлой темы
+const COLORS_TYPED = COLORS as {
+  background: string;
+  surface: string;
+  border: string;
+  text: string;
+  textSecondary: string;
+  textMuted: string;
+  accent: string;
+  admin: string;
+  warning: string;
+  danger: string;
+  success: string;
+};
+
 const lightThemeColors: AppThemeColors = {
   primary: {
-    background: require('../config/colors').COLORS.white,
-    surface: require('../config/colors').COLORS.lightGray,
-    text: require('../config/colors').COLORS.slate900
+    background: COLORS_TYPED.background,
+    surface: COLORS_TYPED.surface,
+    text: COLORS_TYPED.text
   },
   secondary: {
-    background: require('../config/colors').COLORS.lighterGray,
-    surface: require('../config/colors').COLORS.borderLight,
-    text: require('../config/colors').COLORS.secondary,
-    border: require('../config/colors').COLORS.borderLight
+    background: COLORS_TYPED.surface,
+    surface: COLORS_TYPED.border,
+    text: COLORS_TYPED.textSecondary,
+    border: COLORS_TYPED.border
   },
   accent: {
     primary: 'from-blue-500 to-indigo-600',     // 10% - основной акцент
@@ -96,15 +113,15 @@ const lightThemeColors: AppThemeColors = {
 // Цвета для темной темы
 const darkThemeColors: AppThemeColors = {
   primary: {
-    background: require('../config/colors').COLORS.slate900,
-    surface: require('../config/colors').COLORS.slate800,
-    text: require('../config/colors').COLORS.slate100
+    background: '#0f172a',
+    surface: '#1f2937',
+    text: '#f1f5f9'
   },
   secondary: {
-    background: require('../config/colors').COLORS.slate700,
-    surface: require('../config/colors').COLORS.secondary,
-    text: require('../config/colors').COLORS.textSecondary,
-    border: require('../config/colors').COLORS.secondary
+    background: '#334155',
+    surface: COLORS_TYPED.textSecondary,
+    text: COLORS_TYPED.textMuted,
+    border: COLORS_TYPED.textSecondary
   },
   accent: {
     primary: 'from-blue-400 to-indigo-500',     // 10% - основной акцент

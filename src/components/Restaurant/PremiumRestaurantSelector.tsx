@@ -8,6 +8,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/hooks/useLanguage';
 import { getText } from '@/i18n/translations';
 import AnimatedContainer from '@/components/ui/AnimatedContainer';
+import { themes } from '@/styles/simpleTheme';
 import Image from 'next/image';
 
 interface Restaurant {
@@ -125,7 +126,7 @@ export default function PremiumRestaurantSelector() {
   };
 
   // Импортируем тему
-  const { light: theme } = require('@/styles/simpleTheme').themes;
+  const { light: theme } = themes;
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -247,8 +248,8 @@ export default function PremiumRestaurantSelector() {
                           {currentLanguage === 'tk' ? restaurant.descriptionTk : restaurant.description}
                         </p>
                       </div>
-                      <div className="ml-4 p-3 rounded-full transition-all duration-300" style={{background: theme.colors.accent, color: theme.colors.text.primary}}>
-                        <ArrowRight className="w-6 h-6" style={{color: theme.colors.accent}} />
+                      <div className="ml-4 p-3 rounded-full transition-all duration-300" style={{background: theme.colors.accent.call, color: theme.colors.text.primary}}>
+                        <ArrowRight className="w-6 h-6" style={{color: theme.colors.accent.call}} />
                       </div>
                     </div>
 
@@ -277,7 +278,7 @@ export default function PremiumRestaurantSelector() {
                     {/* Enhanced CTA Button */}
                     <motion.button
                       className="w-full py-4 rounded-2xl font-bold text-base sm:text-lg relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
-                      style={{background: theme.colors.accent, color: theme.colors.text.primary}}
+                      style={{background: theme.colors.accent.call, color: theme.colors.text.primary}}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
