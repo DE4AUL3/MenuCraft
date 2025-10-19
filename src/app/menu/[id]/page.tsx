@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { ShoppingCart, Globe, ArrowLeft } from 'lucide-react'
+import { ShoppingCart, Globe } from 'lucide-react'
 import Image from 'next/image'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useTheme } from '@/hooks/useTheme'
@@ -68,8 +69,18 @@ export default function MenuPage() {
   } else {
     restaurantDisplayName = currentRestaurant === 'panda-burger' ? 'Panda Burger' : 'Han Tagam';
   }
+  const pageVariants: any = {
+    hidden: { opacity: 0, y: 12 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.2, 0.8, 0.2, 1] } },
+    exit: { opacity: 0, y: -6, transition: { duration: 0.18, ease: [0.4, 0, 0.2, 1] } }
+  }
+
   return (
-    <div
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="enter"
+      exit="exit"
       className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding`}
       style={{ background: theme.colors.background.secondary }}
     >
@@ -82,12 +93,7 @@ export default function MenuPage() {
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo & Back Button */}
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.back()}
-                className="p-2 text-slate-300 hover:text-white transition-colors duration-200"
-              >
-                <ArrowLeft className="w-6 h-6" />
-              </button>
+              {/* Кнопка назад убрана */}
               <div className="flex items-center space-x-3">
                 <div className="relative w-10 h-10 sm:w-12 sm:h-12">
                   <Image
@@ -110,18 +116,19 @@ export default function MenuPage() {
               {/* Language Toggle */}
               <button
                 onClick={toggleLanguage}
-                className="flex items-center space-x-2 p-2 text-slate-300 hover:text-white transition-colors duration-200"
+                className="flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200"
               >
-                <Globe className="w-5 h-5" />
-                <span className="text-sm font-medium hidden sm:inline">
-                  {currentLanguage === 'ru' ? 'TK' : 'RU'}
+                <Globe className="w-5 h-5 text-slate-900" />
+                <span className="text-sm font-medium" style={{color: theme.colors.text.primary}}>
+                  {currentLanguage === 'ru' ? 'TM' : 'RU'}
                 </span>
               </button>
 
               {/* Cart */}
               <button
                 onClick={() => router.push('/cart')}
-                className="relative p-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl transition-colors duration-200"
+                className="relative p-2 text-white rounded-xl transition-colors duration-200"
+                style={{ background: theme.colors.accent.call }}
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartState.items.length > 0 && (
@@ -143,8 +150,45 @@ export default function MenuPage() {
             {categories.map((category) => (
               <div
                 key={category.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => router.push(`/menu/${currentRestaurant}/category/${category.id}`)}
-                className="group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl border overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.03] active:scale-[0.97]"
+                onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/menu/${currentRestaurant}/category/${category.id}`) }}
+                onPointerEnter={() => {
+                  try {
+                    // prefetch route
+                    (router as any).prefetch && (router as any).prefetch(`/menu/${currentRestaurant}/category/${category.id}`)
+                    // warm up meals API once and cache in window and sessionStorage
+                    if (typeof window !== 'undefined') {
+                      (window as any).__mealCache = (window as any).__mealCache || {}
+                      if (!(window as any).__mealCache[category.id]) {
+                        fetch(`/api/meal?categoryId=${category.id}`)
+                          .then(r => r.ok ? r.json() : null)
+                          .then(data => {
+                            if (data) {
+                              (window as any).__mealCache[category.id] = data
+                              try { sessionStorage.setItem('mealCache:' + category.id, JSON.stringify(data)) } catch (e) {}
+                            }
+                          }).catch(() => {})
+                      }
+                    }
+                  } catch (e) {}
+                }}
+                onFocus={() => {
+                  try {
+                    (router as any).prefetch && (router as any).prefetch(`/menu/${currentRestaurant}/category/${category.id}`)
+                    if (typeof window !== 'undefined') {
+                      (window as any).__mealCache = (window as any).__mealCache || {}
+                      if (!(window as any).__mealCache[category.id]) {
+                        const cached = sessionStorage.getItem('mealCache:' + category.id)
+                        if (cached) {
+                          try { (window as any).__mealCache[category.id] = JSON.parse(cached) } catch (e) {}
+                        }
+                      }
+                    }
+                  } catch (e) {}
+                }}
+                className="group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl border overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.03] active:scale-[0.97]"
                 style={{ background: theme.colors.background.primary, borderColor: theme.colors.border.primary }}
               >
                 {/* Category Image */}
@@ -191,6 +235,6 @@ export default function MenuPage() {
 
       {/* Floating Phone Button */}
       <FloatingCallButton />
-    </div>
+    </motion.div>
   )
 }

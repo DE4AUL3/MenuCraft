@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useRouter, useParams } from 'next/navigation'
 import { ShoppingCart, Globe, ArrowLeft, Plus, Minus } from 'lucide-react'
 import Image from 'next/image'
@@ -8,6 +9,7 @@ import { useLanguage } from '@/hooks/useLanguage'
 import { useCart } from '@/hooks/useCart'
 import { imageService } from '@/lib/imageService'
 import FloatingCallButton from '@/components/FloatingCallButton'
+import { themes } from '@/styles/simpleTheme'
 import type { Category, Dish } from '@/types/common'
 
 export default function CategoryPage() {
@@ -15,6 +17,7 @@ export default function CategoryPage() {
   const params = useParams()
   const { currentLanguage, toggleLanguage } = useLanguage()
   const { state: cartState, dispatch } = useCart()
+  const { light: theme } = themes
   
   const [isLoading, setIsLoading] = useState(true)
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
@@ -28,7 +31,7 @@ export default function CategoryPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Загружаем категорию и блюда из API
+        // Загружаем категорию
         const categoryResponse = await fetch('/api/category')
         const categories = await categoryResponse.json()
         const foundCategory = categories.find((cat: any) => cat.id === categoryId)
@@ -48,18 +51,34 @@ export default function CategoryPage() {
         }
         setCategory(transformedCategory)
 
-        // Загружаем блюда для этой категории
-        const mealsResponse = await fetch(`/api/meal?categoryId=${categoryId}`)
-        const meals = await mealsResponse.json()
-        
-        const transformedDishes: Dish[] = meals.map((meal: any) => ({
+        // Попытка использовать предзагруженные данные из window/session cache для мгновенного отображения
+        let meals: any[] | null = null
+        try {
+          if (typeof window !== 'undefined' && (window as any).__mealCache && (window as any).__mealCache[categoryId]) {
+            meals = (window as any).__mealCache[categoryId]
+          } else if (typeof window !== 'undefined') {
+            const cached = sessionStorage.getItem('mealCache:' + categoryId)
+            if (cached) meals = JSON.parse(cached)
+          }
+        } catch (e) {
+          meals = null
+        }
+
+        if (!meals) {
+          const mealsResponse = await fetch(`/api/meal?categoryId=${categoryId}`)
+          meals = await mealsResponse.json()
+        }
+
+        const transformedDishes: Dish[] = (meals || []).map((meal: any) => ({
           id: meal.id,
           name: { ru: meal.nameRu, tk: meal.nameTk },
           description: { ru: meal.descriptionRu || '', tk: meal.descriptionTk || '' },
           categoryId: meal.categoryId,
           price: meal.price,
           image: meal.image,
-          isActive: true
+          isActive: true,
+          createdAt: meal.createdAt || null,
+          updatedAt: meal.updatedAt || null
         }))
         setDishes(transformedDishes)
       } catch (error) {
@@ -159,14 +178,27 @@ export default function CategoryPage() {
     return imageService.getImageUrl(category.image)
   }
 
+  const pageVariants: any = {
+    hidden: { opacity: 0, y: 10 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.28 } },
+    exit: { opacity: 0, y: -6, transition: { duration: 0.18 } }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <motion.div variants={pageVariants} initial="hidden" animate="enter" exit="exit" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Title only - back navigation removed on category listing */}
+            {/* Back Button + Title */}
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => router.push(`/menu/${restaurantId}`)}
+                className="p-2 text-slate-300 hover:text-white transition-colors duration-200"
+                aria-label="Назад к категориям"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </button>
               <div>
                 <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   {currentLanguage === 'tk' ? category.nameTk : category.name}
@@ -181,13 +213,17 @@ export default function CategoryPage() {
             <div className="flex items-center space-x-2">
               <button
                 onClick={toggleLanguage}
-                className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all duration-300"
+                className="flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200"
               >
-                <Globe className="w-5 h-5" />
+                <Globe className="w-5 h-5 text-slate-900" />
+                <span className="text-sm font-medium" style={{color: theme.colors.text.primary}}>
+                  {currentLanguage === 'ru' ? 'TM' : 'RU'}
+                </span>
               </button>
               <button
                 onClick={() => router.push('/cart')}
-                className="relative p-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                className="relative p-3 text-white rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                style={{ background: theme.colors.accent.call }}
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartState.items.length > 0 && (
@@ -338,6 +374,6 @@ export default function CategoryPage() {
       </main>
 
       <FloatingCallButton />
-    </div>
+    </motion.div>
   )
 }
