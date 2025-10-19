@@ -46,16 +46,7 @@ export default function CategoryPage() {
       <Header restaurantName="Kemine Bistro" />
       
       <main className="container mx-auto px-4 pt-8 pb-16">
-        {/* Навигация */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors bg-white dark:bg-gray-800 px-4 py-2 rounded-xl shadow-md hover:shadow-lg border border-gray-200 dark:border-gray-700"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t('back')}
-          </button>
-        </div>
+        {/* Навигация убрана: кнопка 'Назад' скрыта на странице категории, но остаётся на странице блюд */}
 
         {/* Заголовок категории */}
         <div className="text-center mb-12">

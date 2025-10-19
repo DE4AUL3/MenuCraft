@@ -44,7 +44,8 @@ const defaultRestaurants: Restaurant[] = [
     image: '/panda_logo.jpg',
   gradient: 'from-emerald-500 via-teal-500 to-emerald-700',
     features: ['Быстрая доставка', 'WiFi', 'QR заказ', 'Премиум качество'],
-    isOpen: true,
+  isOpen: true,
+  openingHours: '08:00 - 22:00',
     deliveryTime: '20-30 мин',
     deliveryTimeTk: '20-30 min'
   },
@@ -61,7 +62,8 @@ const defaultRestaurants: Restaurant[] = [
   image: '/han_tagam2..jpg',
   gradient: 'from-emerald-500 via-teal-500 to-emerald-700',
     features: ['Национальная кухня', 'WiFi', 'QR заказ', 'Авторские блюда'],
-    isOpen: false,
+  isOpen: true,
+  openingHours: '08:00 - 22:00',
     deliveryTime: '35-45 мин',
     deliveryTimeTk: '35-45 min'
   }
