@@ -6,6 +6,12 @@
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
+
+  /* Han Tagam defaults to avoid flash before JS initializes theme */
+  --han-bg: #ffffff;
+  --han-surface: #ffffff;
+  --han-border: #f1f5f9;
+  --han-text: #0f1724;
   
   /* Текст */
   --text-primary: #0f172a;

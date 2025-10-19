@@ -31,21 +31,21 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: 'Han Tagam — QR-меню',
-    description: 'Han Tagam — элегантное светлое QR-меню для кафе и ресторанов',
-    url: 'http://localhost:3000',
-    siteName: 'Han Tagam',
-    images: [
-      {
-        url: '/han_tagam.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Han Tagam',
-      },
-    ],
-    locale: 'ru_RU',
-    type: 'website',
-  },
+      title: 'Han Tagam — QR-меню',
+      description: 'Han Tagam — элегантное светлое QR-меню для кафе и ресторанов',
+      url: 'http://localhost:3000',
+      siteName: 'Han Tagam',
+      images: [
+        {
+          url: '/han_tagam2..jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Han Tagam',
+        },
+      ],
+      locale: 'ru_RU',
+      type: 'website',
+    },
   twitter: {
     card: 'summary_large_image',
     title: 'MenuCraft — QR-меню для ресторанов',
@@ -89,7 +89,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="h-full">
-      <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--han-bg, #fffaf5)', color: 'var(--han-text, #0f1724)'}}>
+  <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--han-bg, var(--bg-primary))', color: 'var(--han-text, var(--text-primary))'}}>
         <CartProvider>
           <ErrorBoundary>
             <ColorThemeInitializer />

@@ -8,7 +8,7 @@ const STATIC_ASSETS = [
   '/manifest.json',
   '/favicon.ico',
   '/panda_logo.jpg',
-  '/han_tagam.jpg',
+  '/han_tagam2..jpg',
   '/Sweet.jpg',
   '/khan-tagam-logo.svg',
   '/panda-burger-logo.svg'

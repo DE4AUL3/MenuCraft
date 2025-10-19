@@ -58,7 +58,7 @@ const defaultRestaurants: Restaurant[] = [
     rating: 4.9,
     phone: '+993 (65) 987-65-43',
     address: 'г. Ашхабад, ул. Туркменбаши, 28',
-    image: '/han_tagam.jpg',
+  image: '/han_tagam2..jpg',
   gradient: 'from-emerald-500 via-teal-500 to-emerald-700',
     features: ['Национальная кухня', 'WiFi', 'QR заказ', 'Авторские блюда'],
     isOpen: false,
@@ -79,34 +79,26 @@ export default function PremiumRestaurantSelector() {
     if (typeof window !== 'undefined' && 'matchMedia' in window) {
       setIsTouch(window.matchMedia('(pointer: coarse)').matches);
     }
-    
-    // Загружаем рестораны из API
-    async function fetchRestaurants() {
-      try {
-        const response = await fetch('/api/restaurant');
-        if (response.ok) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setRestaurants(data);
-          }
-        } else {
-          // Если API недоступно, используем дефолтные данные
-          setRestaurants(defaultRestaurants);
+    // Статический список — используем готовые карточки
+    setRestaurants(defaultRestaurants);
+
+    // Prefetch internal routes to speed up navigation
+    try {
+      defaultRestaurants.forEach(r => {
+        const path = `/menu/${r.id}`;
+        if (path.startsWith('/') && typeof (router as any).prefetch === 'function') {
+          ;(router as any).prefetch(path)
         }
-      } catch (error) {
-        console.error('Ошибка при загрузке ресторанов:', error);
-        setRestaurants(defaultRestaurants);
-      }
+      })
+    } catch (e) {
+      // ignore
     }
-    
-    fetchRestaurants();
   }, []);
 
   const handleRestaurantSelect = (restaurantId: string) => {
     setSelectedId(restaurantId);
-    setTimeout(() => {
-      router.push(`/menu/${restaurantId}`);
-    }, 300);
+    // Immediate navigation (no artificial delay)
+    router.push(`/menu/${restaurantId}`);
   };
 
   const containerVariants = {
@@ -130,7 +122,7 @@ export default function PremiumRestaurantSelector() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: theme.colors.background.primary,
+      background: theme.colors.background.secondary,
       position: 'relative',
       overflow: 'hidden'
     }}>
@@ -154,7 +146,7 @@ export default function PremiumRestaurantSelector() {
           className="text-center mb-16"
         >
           <motion.h1 
-            className="text-3xl lg:text-5xl font-black mb-4"
+            className="text-2xl lg:text-4xl font-black mb-4"
             style={{ color: theme.colors.text.primary }}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -164,7 +156,7 @@ export default function PremiumRestaurantSelector() {
           </motion.h1>
           
           <motion.p 
-            className="text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed"
+            className="text-base lg:text-lg max-w-2xl mx-auto leading-relaxed"
             style={{ color: theme.colors.text.secondary }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -192,8 +184,8 @@ export default function PremiumRestaurantSelector() {
                 className="relative overflow-hidden rounded-3xl backdrop-blur-sm border hover:shadow-2xl transition-all duration-500"
                 style={{
                   background: selectedId === restaurant.id
-                    ? theme.colors.background.secondary
-                    : theme.colors.background.secondary,
+                    ? theme.colors.background.primary
+                    : theme.colors.background.primary,
                   borderColor: theme.colors.border.primary,
                   boxShadow: selectedId === restaurant.id ? `0 0 0 4px ${theme.colors.accent}` : undefined
                 }}
@@ -230,11 +222,7 @@ export default function PremiumRestaurantSelector() {
                       priority={index < 2}
                     />
                     
-                    {/* Enhanced overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                    
-                    {/* Shine effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    {/* Image overlays removed to show photos without dark or shiny effect */}
                   </div>
 
                   {/* Content */}
@@ -244,36 +232,15 @@ export default function PremiumRestaurantSelector() {
                         <h3 className="text-xl lg:text-2xl font-bold mb-2 transition-colors" style={{color: theme.colors.text.primary}}>
                           {restaurant.name}
                         </h3>
-                        <p className="text-sm lg:text-base line-clamp-2 sm:line-clamp-3 leading-relaxed" style={{color: theme.colors.text.secondary}}>
+                        <p className="text-sm lg:text-base line-clamp-1 sm:line-clamp-2 leading-relaxed" style={{color: theme.colors.text.secondary}}>
                           {currentLanguage === 'tk' ? restaurant.descriptionTk : restaurant.description}
                         </p>
                       </div>
                       <div className="ml-4 p-3 rounded-full transition-all duration-300" style={{background: theme.colors.accent.call, color: theme.colors.text.primary}}>
-                        <ArrowRight className="w-6 h-6" style={{color: theme.colors.accent.call}} />
+                        <ArrowRight className="w-6 h-6 text-[inherit]" />
                       </div>
                     </div>
-
-                    {/* Enhanced Features */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {restaurant.features?.slice(0, 3).map((feature, idx) => (
-                        <span key={idx} className="px-3 py-1 text-xs rounded-full font-medium" style={{background: theme.colors.background.tertiary, color: theme.colors.text.secondary}}>
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Enhanced Info Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mb-6">
-                      <div className="flex items-center gap-2" style={{color: theme.colors.text.secondary}}>
-                        <ChefHat className="w-4 h-4 text-emerald-500" />
-                        <span className="font-medium">{restaurant.cuisine}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2" style={{color: theme.colors.text.secondary}}>
-                        <Clock className="w-4 h-4 text-emerald-500" />
-                        <span className="font-medium">{currentLanguage === 'tk' ? restaurant.deliveryTimeTk : restaurant.deliveryTime}</span>
-                      </div>
-                    </div>
+                    {/* Features and info removed for a cleaner card */}
 
                     {/* Enhanced CTA Button */}
                     <motion.button
@@ -287,7 +254,7 @@ export default function PremiumRestaurantSelector() {
                       
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         {getText('viewMenu', currentLanguage)}
-                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform text-[inherit]" />
                       </span>
                     </motion.button>
                   </div>
