@@ -1,0 +1,16 @@
+[build]
+  # Use the same build command you use locally
+  command = "npm run build"
+  # For the Next.js Runtime, Netlify handles the output; publish the project root or .next
+  publish = ".next"
+
+  # Optional: pass environment variables during build (you can also set these in Netlify UI)
+  [build.environment]
+    NODE_ENV = "production"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[dev]
+  command = "npm run dev"
+  port = 3000
