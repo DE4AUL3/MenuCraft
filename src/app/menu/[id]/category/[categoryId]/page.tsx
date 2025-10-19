@@ -204,7 +204,7 @@ export default function CategoryPage() {
                   {currentLanguage === 'tk' ? category.nameTk : category.name}
                 </h1>
                 <p className="text-sm text-slate-600">
-                  {dishes.length} блюд{dishes.length !== 1 && dishes.length < 5 ? 'а' : ''}
+                  {(dishes?.length ?? 0)} блюд{(dishes?.length ?? 0) !== 1 && (dishes?.length ?? 0) < 5 ? 'а' : ''}
                 </p>
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function CategoryPage() {
       </header>
 
       {/* Category Banner */}
-      <div className="relative h-48 sm:h-56 lg:h-64 overflow-hidden">
+  <div className="relative h-48 sm:h-56 lg:h-64 overflow-hidden rounded-b-3xl">
         <Image
           src={getCategoryHeaderImage()}
           alt={currentLanguage === 'tk' ? category.nameTk : category.name}
@@ -250,26 +250,7 @@ export default function CategoryPage() {
         <div className="absolute inset-0 bg-black/40"></div>
         
         {/* Content */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-4 max-w-4xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-3 drop-shadow-lg">
-              {currentLanguage === 'tk' ? category.nameTk : category.name}
-            </h1>
-            
-            {category.description && (
-              <p className="text-lg sm:text-xl text-white/90 font-medium drop-shadow mb-4">
-                {currentLanguage === 'tk' ? category.descriptionTk : category.description}
-              </p>
-            )}
-            
-            {/* Items Count Badge */}
-            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-2">
-              <span className="text-white font-semibold">
-                {dishes.length} {dishes.length === 1 ? 'блюдо' : dishes.length < 5 ? 'блюда' : 'блюд'}
-              </span>
-            </div>
-          </div>
-        </div>
+        <div className="absolute inset-0 flex items-center justify-center"></div>
       </div>
 
       {/* Menu Items */}
