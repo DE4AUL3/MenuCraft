@@ -4,7 +4,7 @@
  * Основана на правиле 60-30-10 дизайна
  */
 
-export type AppTheme = 'dark'
+export type AppTheme = 'dark' | 'han-tagam'
 
 export interface AppThemeColors {
   // 60% - Основные цвета (фоны, поверхности)
@@ -212,33 +212,91 @@ const darkThemeClasses: AppThemeClasses = {
   }
 }
 
+// Тема Han Tagam (светлая, элегантная)
+const hanTagamColors: AppThemeColors = {
+  primary: {
+    background: '#fffaf5', // мягкий кремовый фон
+    surface: '#ffffff',
+    text: '#0f1724'
+  },
+  secondary: {
+    background: '#fffefc',
+    surface: '#f7f6f3',
+    text: '#334155',
+    border: '#eef2f3'
+  },
+  accent: {
+    primary: 'from-emerald-500 to-emerald-700',
+    secondary: 'from-amber-400 to-amber-600',
+    success: 'from-emerald-500 to-green-600',
+    warning: 'from-amber-500 to-orange-500',
+    error: 'from-red-500 to-rose-600'
+  }
+}
+
+const hanTagamClasses: AppThemeClasses = {
+  background: 'bg-[var(--han-bg,#fffaf5)]',
+  surface: 'bg-white',
+  card: 'bg-white border border-[var(--han-border,#eef2f3)]',
+
+  bg: 'bg-[var(--han-bg,#fffaf5)]',
+  bgSecondary: 'bg-[var(--han-surface,#f7f6f3)]',
+  cardBg: 'bg-white border border-[var(--han-border,#eef2f3)]',
+
+  text: 'text-[#0f1724]',
+  textSecondary: 'text-gray-600',
+  textMuted: 'text-gray-500',
+
+  hover: 'hover:bg-gray-50',
+  accent: 'bg-gradient-to-r from-emerald-500 to-emerald-700',
+  accentSecondary: 'bg-gradient-to-r from-amber-400 to-amber-600',
+
+  success: 'text-emerald-600 bg-emerald-50',
+  warning: 'text-amber-600 bg-amber-50',
+  error: 'text-red-600 bg-red-50',
+
+  border: 'border-[var(--han-border,#eef2f3)]',
+  borderLight: 'border-gray-100',
+
+  gradients: {
+    main: 'bg-gradient-to-br from-emerald-50 via-amber-50 to-rose-50',
+    accent: 'from-emerald-500 to-emerald-700',
+    card: 'from-white via-emerald-50 to-amber-50',
+    hero: 'from-emerald-600 via-amber-500 to-rose-500'
+  }
+}
+
 // Хранилище всех тем
-const appThemes: { dark: { colors: AppThemeColors; classes: AppThemeClasses } } = {
+const appThemes: Record<string, { colors: AppThemeColors; classes: AppThemeClasses }> = {
   dark: {
     colors: darkThemeColors,
     classes: darkThemeClasses
+  },
+  'han-tagam': {
+    colors: hanTagamColors,
+    classes: hanTagamClasses
   }
 }
 
 /**
  * Получить CSS классы для указанной темы
  */
-export function getAppThemeClasses(theme: AppTheme = 'dark'): AppThemeClasses {
-  return appThemes.dark.classes
+export function getAppThemeClasses(theme: string = 'dark'): AppThemeClasses {
+  return (appThemes[theme] || appThemes['dark']).classes
 }
 
 /**
  * Получить цвета для указанной темы
  */
-export function getAppThemeColors(theme: AppTheme = 'dark'): AppThemeColors {
-  return appThemes.dark.colors
+export function getAppThemeColors(theme: string = 'dark'): AppThemeColors {
+  return (appThemes[theme] || appThemes['dark']).colors
 }
 
 /**
  * Получить полную тему
  */
-export function getAppTheme(theme: AppTheme = 'dark') {
-  return appThemes.dark
+export function getAppTheme(theme: string = 'dark') {
+  return appThemes[theme] || appThemes['dark']
 }
 
 // Обратная совместимость с админской системой тем

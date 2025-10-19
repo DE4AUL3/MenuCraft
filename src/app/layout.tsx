@@ -1,7 +1,7 @@
 import "./globals.css";
 export const metadata = {
-  title: "MenuCraft — QR-меню для ресторанов",
-  description: "Готовый к продакшену шаблон Next.js для QR-меню с админкой и мультиязычностью.",
+  title: "Han Tagam — QR-меню для ресторанов",
+  description: "Han Tagam — элегантное светлое QR-меню с админкой и мультиязычностью.",
   keywords: [
     'QR меню',
     'ресторан',
@@ -31,16 +31,16 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: 'MenuCraft — QR-меню для ресторанов',
-    description: 'Готовый к продакшену шаблон Next.js для QR-меню с админкой и мультиязычностью.',
+    title: 'Han Tagam — QR-меню',
+    description: 'Han Tagam — элегантное светлое QR-меню для кафе и ресторанов',
     url: 'http://localhost:3000',
-    siteName: 'MenuCraft',
+    siteName: 'Han Tagam',
     images: [
       {
-        url: '/panda_logo.jpg',
-        width: 800,
-        height: 600,
-        alt: 'MenuCraft Logo',
+        url: '/han_tagam.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Han Tagam',
       },
     ],
     locale: 'ru_RU',
@@ -89,7 +89,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="h-full">
-      <body className="h-full bg-white dark:bg-black text-gray-900 dark:text-white mobile-app-feel safe-area-padding">
+      <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--han-bg, #fffaf5)', color: 'var(--han-text, #0f1724)'}}>
         <CartProvider>
           <ErrorBoundary>
             <ColorThemeInitializer />

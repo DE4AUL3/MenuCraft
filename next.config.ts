@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     unoptimized: true,
   },
+  eslint: {
+    // Netlify не устанавливает devDependencies по умолчанию в production builds,
+    // поэтому отключаем автоматический запуск ESLint во время сборки.
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
