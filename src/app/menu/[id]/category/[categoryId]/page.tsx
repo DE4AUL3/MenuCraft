@@ -165,14 +165,8 @@ export default function CategoryPage() {
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Back Button and Title */}
+            {/* Title only - back navigation removed on category listing */}
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.push(`/menu/${restaurantId}`)}
-                className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
-              >
-                <ArrowLeft className="w-6 h-6 text-slate-700" />
-              </button>
               <div>
                 <h1 className="text-lg sm:text-xl font-bold text-slate-900">
                   {currentLanguage === 'tk' ? category.nameTk : category.name}

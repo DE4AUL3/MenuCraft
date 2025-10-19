@@ -76,7 +76,7 @@ export const viewport = {
 };
 import { CartProvider } from "@/hooks/useCart";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
-import FloatingCartButton from '@/components/FloatingCartButton';
+// FloatingCartButton intentionally removed from global layout to avoid overlap with FloatingCallButton
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import Analytics from '@/components/Analytics';
 import { Toaster } from 'react-hot-toast';
@@ -95,7 +95,6 @@ export default function RootLayout({
             <ColorThemeInitializer />
             <div className="min-h-screen smooth-scroll">
               {children}
-              <FloatingCartButton />
               <PWAInstallBanner />
               <Analytics />
               <Toaster 

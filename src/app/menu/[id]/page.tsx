@@ -56,6 +56,18 @@ export default function MenuPage() {
 
   // Импортируем тему
   const { light: theme } = themes;
+
+  // Вычисляем отображаемое имя ресторана по сегменту URL (поддерживаем числовые legacy id)
+  let restaurantDisplayName = 'Han Tagam';
+  if (typeof window !== 'undefined') {
+    const pathId = window.location.pathname.split('/')[2] || '';
+    if (pathId === 'panda-burger' || pathId === '2') restaurantDisplayName = 'Panda Burger';
+    if (pathId === 'han-tagam' || pathId === '1') restaurantDisplayName = 'Han Tagam';
+    // fallback to theme/currentRestaurant
+    if (!pathId) restaurantDisplayName = currentRestaurant === 'panda-burger' ? 'Panda Burger' : 'Han Tagam';
+  } else {
+    restaurantDisplayName = currentRestaurant === 'panda-burger' ? 'Panda Burger' : 'Han Tagam';
+  }
   return (
     <div
       className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding`}
@@ -87,7 +99,7 @@ export default function MenuPage() {
                 </div>
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold" style={{color: theme.colors.text.primary}}>
-                    Han Tagam
+                    {restaurantDisplayName}
                   </h1>
                 </div>
               </div>
@@ -131,7 +143,7 @@ export default function MenuPage() {
             {categories.map((category) => (
               <div
                 key={category.id}
-                onClick={() => router.push(`/menu/1/category/${category.id}`)}
+                onClick={() => router.push(`/menu/${currentRestaurant}/category/${category.id}`)}
                 className="group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl border overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.03] active:scale-[0.97]"
                 style={{ background: theme.colors.background.primary, borderColor: theme.colors.border.primary }}
               >

@@ -7,7 +7,7 @@ import FloatingCallButton from '@/components/FloatingCallButton';
 import Header from '@/components/Header';
 import { useTranslation } from '@/components/LanguageToggle';
 import { Category, Dish } from '@/types';
-import { ArrowLeft } from 'lucide-react';
+// back navigation intentionally removed for category listing
 import restaurantData from '../../../../data/restaurants.json';
 
 export default function CategoryPage() {
@@ -43,10 +43,10 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 transition-colors">
-      <Header restaurantName="Kemine Bistro" />
+  <Header restaurantName="Han Tagam" />
       
       <main className="container mx-auto px-4 pt-8 pb-16">
-        {/* Навигация убрана: кнопка 'Назад' скрыта на странице категории, но остаётся на странице блюд */}
+  {/* Навигация убрана: кнопка 'Назад' скрыта на странице категории (оставлена только на странице блюда) */}
 
         {/* Заголовок категории */}
         <div className="text-center mb-12">
