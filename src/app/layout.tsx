@@ -74,13 +74,8 @@ export const viewport = {
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
 };
-import { CartProvider } from "@/hooks/useCart";
-import ErrorBoundary from "@/components/ui/ErrorBoundary";
-// FloatingCartButton intentionally removed from global layout to avoid overlap with FloatingCallButton
-import PWAInstallBanner from '@/components/PWAInstallBanner';
-import Analytics from '@/components/Analytics';
-import { Toaster } from 'react-hot-toast';
-import ColorThemeInitializer from '@/components/ColorThemeInitializer';
+
+import ClientProviders from "@/components/ClientProviders";
 
 export default function RootLayout({
   children,
@@ -89,42 +84,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="h-full">
-  <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--han-bg, var(--bg-primary))', color: 'var(--han-text, var(--text-primary))'}}>
-        <CartProvider>
-          <ErrorBoundary>
-            <ColorThemeInitializer />
-            <div className="min-h-screen smooth-scroll">
-              {children}
-              <PWAInstallBanner />
-              <Analytics />
-              <Toaster 
-                position="top-right"
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: 'var(--bg-secondary)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--accent-call)',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#10b981',
-                      secondary: '#ffffff',
-                    },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: '#ef4444',
-                      secondary: '#ffffff',
-                    },
-                  },
-                }}
-              />
-            </div>
-          </ErrorBoundary>
-        </CartProvider>
+      <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--han-bg, var(--bg-primary))', color: 'var(--han-text, var(--text-primary))'}}>
+        <ClientProviders>
+          {children}
+        </ClientProviders>
       </body>
     </html>
   );

@@ -1,4 +1,6 @@
- 'use client';
+
+'use client';
+import { useLanguage } from '@/hooks/useLanguage';
 
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
@@ -21,6 +23,7 @@ interface CategoryFormData {
 }
 
 export default function CategoryManager() {
+  const { currentLanguage } = useLanguage ? useLanguage() : { currentLanguage: 'ru' };
   const [categories, setCategories] = useState<Category[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -256,10 +259,10 @@ export default function CategoryManager() {
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Добавить категорию
+          <Plus className="w-5 h-5" />
+          {currentLanguage === 'tk' ? 'Kategoriýa goşmak' : 'Добавить категорию'}
         </button>
       </div>
 
@@ -268,12 +271,12 @@ export default function CategoryManager() {
         {categories.map((category) => (
           <div
             key={category.id}
-            className={`relative bg-white dark:bg-[#282828] rounded-lg shadow-md overflow-hidden border ${
-              category.isActive ? 'border-gray-200 dark:border-gray-700' : 'border-red-300 dark:border-red-600'
-            }`}
+            className={`relative bg-white rounded-xl shadow-lg overflow-hidden border transition-all duration-200 ${
+              category.isActive ? 'border-gray-200' : 'border-red-300'
+            } hover:shadow-xl hover:-translate-y-1`}
           >
             {/* Category Image */}
-            <div className="h-32 bg-gray-200 dark:bg-gray-700 relative">
+            <div className="h-32 bg-gray-100 relative">
               {category.image ? (
                 <SmartImage
                   src={category.image}
@@ -282,19 +285,20 @@ export default function CategoryManager() {
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-2xl font-bold">
+                <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 text-2xl font-bold">
                   {category.name.charAt(0)}
                 </div>
               )}
-              
               {/* Status Badge */}
               <div className="absolute top-2 right-2">
-                <span className={`px-2 py-1 text-xs rounded-full ${
+                <span className={`px-2 py-1 text-xs rounded-full font-semibold shadow ${
                   category.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
+                    ? 'bg-green-100 text-green-700 border border-green-300' 
+                    : 'bg-red-100 text-red-700 border border-red-300'
                 }`}>
-                  {category.isActive ? 'Активна' : 'Неактивна'}
+                  {currentLanguage === 'tk'
+                    ? (category.isActive ? 'Işjeň' : 'Işjeň däl')
+                    : (category.isActive ? 'Активна' : 'Неактивна')}
                 </span>
               </div>
             </div>
@@ -302,39 +306,31 @@ export default function CategoryManager() {
             {/* Category Info */}
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-gray-900 dark:text-white">
-                  {category.name}
+                <h3 className="font-semibold text-gray-900">
+                  {currentLanguage === 'tk' ? category.nameTk : category.name}
                 </h3>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="text-sm text-gray-400">
                   #{category.sortOrder}
                 </span>
               </div>
-              
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                {category.nameTk}
+              <p className="text-sm text-gray-500 mb-2">
+                {currentLanguage === 'tk' ? category.descriptionTk : category.description}
               </p>
-              
-              {category.description && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
-                  {category.description}
-                </p>
-              )}
-
               {/* Actions */}
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => handleEdit(category)}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm rounded-lg font-medium hover:bg-blue-700 transition-colors gap-1"
                 >
-                  <Edit2 className="w-3 h-3 mr-1" />
-                  Изменить
+                  <Edit2 className="w-3 h-3" />
+                  {currentLanguage === 'tk' ? 'Üýtget' : 'Изменить'}
                 </button>
                 <button
                   onClick={() => handleDelete(category.id)}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-600 text-white text-sm rounded-lg font-medium hover:bg-red-700 transition-colors gap-1"
                 >
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Удалить
+                  <Trash2 className="w-3 h-3" />
+                  {currentLanguage === 'tk' ? 'Poz' : 'Удалить'}
                 </button>
               </div>
             </div>

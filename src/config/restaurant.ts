@@ -237,9 +237,9 @@ export interface RestaurantConfig {
 export const defaultConfig: RestaurantConfig = {
   restaurant: {
     id: 'template-restaurant',
-    name: 'Restaurant Template',
-    description: 'Шаблон ресторана для клонирования',
-    logo: '/logo.svg',
+  name: 'Han tagam',
+  description: 'Han tagam — ресторан национальной кухни',
+  logo: '/logo-hantagam.svg',
     favicon: '/favicon.ico',
     
     contact: {

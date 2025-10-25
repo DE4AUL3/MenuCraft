@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { rateLimit, createRateLimiter } from './lib/rateLimit';
 
-// Создаем ограничитель запросов для API с более строгими лимитами
+// Создаем ограничитель запросов для API с более мягкими лимитами
 const apiRateLimiter = createRateLimiter({
-  limit: 60,         // 60 запросов
+  limit: 1000,       // 1000 запросов
   windowMs: 60000,   // за 1 минуту
 });
 

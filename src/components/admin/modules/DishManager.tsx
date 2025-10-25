@@ -17,14 +17,86 @@ import {
 } from 'lucide-react'
 import { Dish, Category } from '@/types/common'
 import { dataService } from '@/lib/dataService'
+import { useLanguage } from '@/hooks/useLanguage'
+
+// Локальные переводы для DishManager
+const dishManagerTexts = {
+  ru: {
+    title: 'Управление блюдами',
+    total: 'Всего блюд',
+    active: 'Активных',
+    add: 'Добавить блюдо',
+    search: 'Поиск блюд...',
+    allCategories: 'Все категории',
+    showInactive: 'Показать неактивные',
+    notFound: 'Блюда не найдены',
+    tryChangeFilters: 'Попробуйте изменить фильтры поиска',
+    startAdd: 'Начните с добавления первого блюда',
+    edit: 'Изменить',
+    unavailable: 'Недоступно',
+    inactive: 'Неактивно',
+    price: 'Цена (ТМТ) *',
+    category: 'Категория *',
+    nameRu: 'Название (Русский) *',
+    nameTk: 'Название (Туркменский) *',
+    descRu: 'Описание (Русский)',
+    descTk: 'Описание (Туркменский)',
+    image: 'Изображение блюда',
+    save: 'Сохранить изменения',
+    create: 'Создать блюдо',
+    cancel: 'Отмена',
+    activeStatus: 'Активно',
+    availableStatus: 'Доступно',
+    editDish: 'Редактировать блюдо',
+    addDish: 'Добавить новое блюдо',
+    delete: 'Удалить',
+    loading: 'Загрузка блюд...'
+  },
+  tk: {
+    title: 'Tagamlary dolandyrmak',
+    total: 'Jemi tagam',
+    active: 'Işjeň',
+    add: 'Tagam goşmak',
+    search: 'Tagam gözleg...',
+    allCategories: 'Ähli kategoriýalar',
+    showInactive: 'Işjeň däl görkez',
+    notFound: 'Tagam tapylmady',
+    tryChangeFilters: 'Gözleg süzgüçlerini üýtgedip görüň',
+    startAdd: 'Ilki tagam goşuň',
+    edit: 'Üýtget',
+    unavailable: 'Elýeterli däl',
+    inactive: 'Işjeň däl',
+    price: 'Bahasy (TMT) *',
+    category: 'Kategoriýa *',
+    nameRu: 'Ady (Rusça) *',
+    nameTk: 'Ady (Türkmençe) *',
+    descRu: 'Düşündiriş (Rusça)',
+    descTk: 'Düşündiriş (Türkmençe)',
+    image: 'Tagamyň suraty',
+    save: 'Üýtgetmeleri ýatda sakla',
+    create: 'Tagam döret',
+    cancel: 'Goýbolsun',
+    activeStatus: 'Işjeň',
+    availableStatus: 'Elýeterli',
+    editDish: 'Tagamy üýtget',
+    addDish: 'Täze tagam goş',
+    delete: 'Poz',
+    loading: 'Tagamlar ýüklenýär...'
+  }
+};
 import ImageUpload from '@/components/ui/ImageUpload'
 import SmartImage from '@/components/ui/SmartImage'
 
 interface DishManagerProps {
-  theme?: 'light' | 'dark'
+  theme?: 'light' | 'dark';
+  language?: 'ru' | 'tk';
+  setLanguage?: (lang: 'ru' | 'tk') => void;
 }
 
-export default function DishManager({ theme = 'light' }: DishManagerProps) {
+export default function DishManager({ theme = 'light', language }: DishManagerProps) {
+  // Используем проброшенный язык, fallback на useLanguage если не передан
+  const { currentLanguage } = useLanguage();
+  const lang = language || currentLanguage;
   const [dishes, setDishes] = useState<Dish[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -343,22 +415,38 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
     )
   }
 
+  // Получаем выбранную категорию
+  const selectedCatObj = selectedCategory === 'all' ? null : categories.find(cat => cat.id === selectedCategory);
+
   return (
     <div className={`p-6 ${styles.bg} ${styles.text} rounded-lg`}>
+      {/* Баннер категории */}
+      {selectedCatObj?.dishPageImage && (
+        <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
+          <SmartImage
+            src={selectedCatObj.dishPageImage}
+            alt={lang === 'ru' ? selectedCatObj.name : selectedCatObj.nameTk}
+            className="w-full h-48 object-cover"
+          />
+          <div className="absolute left-6 top-6 bg-black/60 text-white px-4 py-2 rounded-xl text-lg font-semibold shadow-lg">
+            {lang === 'ru' ? selectedCatObj.name : selectedCatObj.nameTk}
+          </div>
+        </div>
+      )}
       {/* Заголовок и кнопка добавления */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold">Управление блюдами</h2>
+          <h2 className="text-2xl font-bold">{dishManagerTexts[lang].title}</h2>
           <p className={styles.textMuted}>
-            Всего блюд: {dishes.length} | Активных: {dishes.filter(d => d.isActive).length}
+            {dishManagerTexts[lang].total}: {dishes.length} | {dishManagerTexts[lang].active}: {dishes.filter(d => d.isActive).length}
           </p>
         </div>
         <button
           onClick={() => openModal()}
-          className={`px-4 py-2 ${styles.buttonBg} text-white rounded-lg flex items-center gap-2 transition-colors`}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 transition-all duration-200 transform hover:scale-105"
         >
-          <Plus className="w-4 h-4" />
-          Добавить блюдо
+          <Plus className="w-5 h-5" />
+          {dishManagerTexts[lang].add}
         </button>
       </div>
 
@@ -369,7 +457,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Поиск блюд..."
+            placeholder={dishManagerTexts[lang].search}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full pl-10 pr-4 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
@@ -382,10 +470,10 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
           onChange={(e) => setSelectedCategory(e.target.value)}
           className={`px-4 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
         >
-          <option value="all">Все категории</option>
+          <option value="all">{dishManagerTexts[lang].allCategories}</option>
           {categories.map(category => (
             <option key={category.id} value={category.id}>
-              {category.name}
+              {lang === 'ru' ? category.name : category.nameTk}
             </option>
           ))}
         </select>
@@ -398,7 +486,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
             onChange={(e) => setShowInactive(e.target.checked)}
             className="rounded"
           />
-          <span>Показать неактивные</span>
+          <span>{dishManagerTexts[lang].showInactive}</span>
         </label>
       </div>
 
@@ -436,12 +524,12 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                 <div className="absolute top-2 right-2 flex gap-2">
                   {!dish.isAvailable && (
                     <span className="px-2 py-1 bg-red-500 text-white text-xs rounded">
-                      Недоступно
+                      {dishManagerTexts[currentLanguage].unavailable}
                     </span>
                   )}
                   {!dish.isActive && (
                     <span className="px-2 py-1 bg-gray-500 text-white text-xs rounded">
-                      Неактивно
+                      {dishManagerTexts[currentLanguage].inactive}
                     </span>
                   )}
                 </div>
@@ -449,10 +537,12 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
 
               {/* Информация о блюде */}
               <div className="mb-4">
-                <h3 className="font-semibold text-lg mb-1">{dish.name.ru}</h3>
-                <p className={`text-sm ${styles.textMuted} mb-2`}>{dish.name.tk}</p>
+                <h3 className="font-semibold text-lg mb-1">{dish.name[lang]}</h3>
+                <p className={`text-sm ${styles.textMuted} mb-2`}>
+                  {dish.name[lang === 'ru' ? 'tk' : 'ru']}
+                </p>
                 <p className={`text-sm ${styles.textMuted} line-clamp-2`}>
-                  {dish.description?.ru || 'Описание отсутствует'}
+                  {dish.description?.[lang] || (lang === 'ru' ? 'Описание отсутствует' : 'Düşündiriş ýok')}
                 </p>
               </div>
 
@@ -460,7 +550,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-1">
                   <DollarSign className="w-4 h-4 text-green-600" />
-                  <span className="font-bold text-lg">{dish.price} ТМТ</span>
+                  <span className="font-bold text-lg">{dish.price} {lang === 'ru' ? 'ТМТ' : 'TMT'}</span>
                 </div>
               </div>
 
@@ -471,7 +561,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                   className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm flex items-center justify-center gap-1"
                 >
                   <Edit className="w-3 h-3" />
-                  Изменить
+                  {dishManagerTexts[lang].edit}
                 </button>
                 
                 <button
@@ -488,6 +578,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                 <button
                   onClick={() => handleDelete(dish.id)}
                   className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm flex items-center justify-center"
+                  title={dishManagerTexts[lang].delete}
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>
@@ -500,11 +591,11 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
       {filteredDishes.length === 0 && (
         <div className="text-center py-12">
           <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Блюда не найдены</h3>
+          <h3 className="text-xl font-semibold mb-2">{dishManagerTexts[lang].notFound}</h3>
           <p className={styles.textMuted}>
             {searchTerm || selectedCategory !== 'all' 
-              ? 'Попробуйте изменить фильтры поиска'
-              : 'Начните с добавления первого блюда'
+              ? dishManagerTexts[lang].tryChangeFilters
+              : dishManagerTexts[lang].startAdd
             }
           </p>
         </div>
@@ -528,7 +619,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
             >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold">
-                  {editingDish ? 'Редактировать блюдо' : 'Добавить новое блюдо'}
+                  {editingDish ? dishManagerTexts[lang].editDish : dishManagerTexts[lang].addDish}
                 </h3>
                 <button
                   onClick={closeModal}
@@ -542,7 +633,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                 {/* Название на русском */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Название (Русский) *
+                    {dishManagerTexts[lang].nameRu}
                   </label>
                   <input
                     type="text"
@@ -552,14 +643,14 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                       name: { ...prev.name, ru: e.target.value } as { ru: string; tk: string }
                     }))}
                     className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                    placeholder="Введите название блюда"
+                    placeholder={lang === 'ru' ? 'Введите название блюда' : 'Tagamyň adyny giriziň'}
                   />
                 </div>
 
                 {/* Название на туркменском */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Название (Туркменский) *
+                    {dishManagerTexts[lang].nameTk}
                   </label>
                   <input
                     type="text"
@@ -569,24 +660,24 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                       name: { ...prev.name, tk: e.target.value } as { ru: string; tk: string }
                     }))}
                     className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                    placeholder="Tagamyň adyny giriziň"
+                    placeholder={lang === 'ru' ? 'Введите название блюда' : 'Tagamyň adyny giriziň'}
                   />
                 </div>
 
                 {/* Категория */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Категория *
+                    {dishManagerTexts[lang].category}
                   </label>
                   <select
                     value={formData.categoryId}
                     onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
                     className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
                   >
-                    <option value="">Выберите категорию</option>
+                    <option value="">{lang === 'ru' ? 'Выберите категорию' : 'Kategoriýa saýlaň'}</option>
                     {categories.map(category => (
                       <option key={category.id} value={category.id}>
-                        {category.name}
+                        {lang === 'ru' ? category.name : category.nameTk}
                       </option>
                     ))}
                   </select>
@@ -595,7 +686,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                 {/* Цена */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Цена (ТМТ) *
+                    {dishManagerTexts[lang].price}
                   </label>
                   <input
                     type="number"
@@ -617,7 +708,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                       onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
                       className="rounded"
                     />
-                    <span>Активно</span>
+                    <span>{dishManagerTexts[lang].activeStatus}</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -626,7 +717,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                       onChange={(e) => setFormData(prev => ({ ...prev, isAvailable: e.target.checked }))}
                       className="rounded"
                     />
-                    <span>Доступно</span>
+                    <span>{dishManagerTexts[lang].availableStatus}</span>
                   </label>
                 </div>
               </div>
@@ -634,7 +725,7 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
               {/* Описание на русском */}
               <div className="mt-4">
                 <label className="block text-sm font-medium mb-2">
-                  Описание (Русский)
+                  {dishManagerTexts[lang].descRu}
                 </label>
                 <textarea
                   value={formData.description?.ru || ''}
@@ -644,14 +735,14 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                   }))}
                   rows={3}
                   className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                  placeholder="Введите описание блюда"
+                  placeholder={lang === 'ru' ? 'Введите описание блюда' : 'Tagamyň düşündirişini giriziň'}
                 />
               </div>
 
               {/* Описание на туркменском */}
               <div className="mt-4">
                 <label className="block text-sm font-medium mb-2">
-                  Описание (Туркменский)
+                  {dishManagerTexts[lang].descTk}
                 </label>
                 <textarea
                   value={formData.description?.tk || ''}
@@ -661,14 +752,14 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                   }))}
                   rows={3}
                   className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                  placeholder="Tagamyň düşündirişini giriziň"
+                  placeholder={lang === 'ru' ? 'Введите описание блюда' : 'Tagamyň düşündirişini giriziň'}
                 />
               </div>
 
               {/* Загрузка изображения */}
               <div className="mt-4">
                 <label className="block text-sm font-medium mb-2">
-                  Изображение блюда
+                  {dishManagerTexts[lang].image}
                 </label>
                 <ImageUpload
                   currentImage={formData.image}
@@ -683,13 +774,13 @@ export default function DishManager({ theme = 'light' }: DishManagerProps) {
                   className={`flex-1 px-4 py-2 ${styles.buttonBg} text-white rounded-lg flex items-center justify-center gap-2`}
                 >
                   <Save className="w-4 h-4" />
-                  {editingDish ? 'Сохранить изменения' : 'Создать блюдо'}
+                  {editingDish ? dishManagerTexts[lang].save : dishManagerTexts[lang].create}
                 </button>
                 <button
                   onClick={closeModal}
                   className={`px-4 py-2 ${styles.secondaryBg} ${styles.text} rounded-lg`}
                 >
-                  Отмена
+                  {dishManagerTexts[lang].cancel}
                 </button>
               </div>
             </motion.div>

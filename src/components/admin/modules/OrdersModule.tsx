@@ -10,9 +10,10 @@ import toast from 'react-hot-toast';
 
 interface OrdersModuleProps {
   className?: string;
+  setOrdersCount?: (count: number) => void;
 }
 
-const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
+const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '', setOrdersCount }) => {
   const { currentLanguage } = useLanguage();
   
   const [orders, setOrders] = useState<Order[]>([]);
@@ -54,7 +55,7 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
 
             return {
               id: order.id,
-              customerName: order.client?.name || order.phoneNumber || '',
+              customerName: order.phoneNumber || order.client?.phoneNumber || '',
               customerPhone: order.phoneNumber || order.client?.phoneNumber || '',
               customerAddress: order.client?.address || '',
               items,
@@ -69,6 +70,7 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
             };
           }) : [];
           setOrders(mappedOrders);
+          if (setOrdersCount) setOrdersCount(mappedOrders.length);
         } else {
           toast.error(
             currentLanguage === 'ru'
@@ -77,6 +79,7 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
             { duration: 3000 }
           );
           setOrders([]);
+          if (setOrdersCount) setOrdersCount(0);
         }
       } catch (error) {
         console.error('Ошибка загрузки заказов:', error);
@@ -86,7 +89,8 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
             : 'Sargytlary ýükläp bolmady',
           { duration: 3000 }
         );
-        setOrders([]);
+  setOrders([]);
+  if (setOrdersCount) setOrdersCount(0);
       } finally {
         setLoading(false);
       }
@@ -546,10 +550,7 @@ const OrdersModule: React.FC<OrdersModuleProps> = ({ className = '' }) => {
                   {currentLanguage === 'ru' ? 'Информация о клиенте' : 'Müşderi maglumat'}
                 </h3>
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
-                  <p className="flex justify-between">
-                    <span className="font-medium">{currentLanguage === 'ru' ? 'Имя:' : 'Ady:'}</span>
-                    <span>{selectedOrder.customerName}</span>
-                  </p>
+                  {/* Имя убрано, только телефон */}
                   <p className="flex justify-between">
                     <span className="font-medium">{currentLanguage === 'ru' ? 'Телефон:' : 'Telefon:'}</span>
                     <span className="flex items-center">

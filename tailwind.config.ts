@@ -9,6 +9,9 @@ const config: Config = {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        montserrat: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         // Современная цветовая палитра
         primary: {

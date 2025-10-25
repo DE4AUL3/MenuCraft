@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import AdminSidebar from './AdminSidebar'
+import OrdersModule from './modules/OrdersModule'
+import AdminOrderNotifier from './AdminOrderNotifier'
+import { COLORS } from '@/config/colors'
 import {
   BarChart3,
   TrendingUp,
@@ -13,9 +17,11 @@ import {
   FileText,
   MessageSquare
 } from 'lucide-react'
-import AdminHeader, { AdminTheme } from './AdminHeader'
+import { AdminTheme } from './AdminHeader'
 import AdminThemeEffects from './AdminThemeEffects'
 
+import type { Language } from '@/i18n/translations';
+import { useLanguage } from '@/hooks/useLanguage';
 interface AdminLayoutProps {
   children: React.ReactNode
   activeTab?: string
@@ -152,56 +158,69 @@ export default function AdminLayout({ children, activeTab: externalActiveTab, on
     handleTabChange(tabId)
   }
 
+  // Динамическое количество заказов
+  const [ordersCount, setOrdersCount] = useState(0);
+  // Язык админки (глобальный)
+  const { currentLanguage: language, setCurrentLanguage } = useLanguage();
+  // Пробрасываем setOrdersCount в AdminOrderNotifier и OrdersModule
+  const childrenWithOrdersCount = React.Children.map(children, child => {
+    if (
+      React.isValidElement(child) &&
+      (child.type === OrdersModule ||
+        (typeof child.type === 'function' && child.type.name === 'OrdersModule'))
+    ) {
+      return React.cloneElement(child as React.ReactElement<any>, { setOrdersCount });
+    }
+    if (
+      React.isValidElement(child) &&
+      (child.type === (AdminOrderNotifier as unknown as React.FunctionComponent<any>) ||
+        (typeof child.type === 'function' && child.type.name === 'AdminOrderNotifier'))
+    ) {
+      return React.cloneElement(child as React.ReactElement<any>, { setOrdersCount });
+    }
+    return child;
+  });
   return (
-    <div className={`min-h-screen transition-all duration-300 ${getThemeClasses()} relative`}>
+    <div
+      className="min-h-screen flex transition-all duration-300 relative"
+      style={{ background: COLORS.background, color: COLORS.text }}
+    >
       <AdminThemeEffects theme={currentTheme} />
-      <AdminHeader 
-        currentTheme={currentTheme}
-        onThemeChange={setCurrentTheme}
-        restaurantName="Panda Burger"
+      <AdminSidebar
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        ordersCount={ordersCount}
+        language={language}
+        setLanguage={setCurrentLanguage}
       />
-      {/* Встроенная навигационная панель */}
-      <nav className={`border-b transition-all duration-300 ${themeStyles[currentTheme].bg} ${themeStyles[currentTheme].border} relative overflow-hidden`}>
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="flex items-center overflow-x-auto scrollbar-hide">
-            {navigationTabs.map((tab) => {
-              const isActive = activeTab === tab.id || activeTab.startsWith(`${tab.id}.`)
-              const theme = themeStyles[currentTheme]
-              
-              return (
-                <div key={tab.id} className="relative flex-shrink-0">
-                  <button
-                    onClick={() => handleTabClick(tab.id)}
-                    className={`
-                      flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-300 border-b-2 whitespace-nowrap relative group cursor-pointer
-                      ${isActive 
-                        ? `${theme.textActive} ${theme.borderActive}` 
-                        : `${theme.text} border-transparent ${theme.textHover}`
-                      }
-                      ${theme.bgHover}
-                    `}
-                    title={tab.description}
-                  >
-                    {tab.icon}
-                    <span>{tab.label}</span>
-                  </button>
-
-                  {/* Индикатор активной вкладки */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTabIndicator"
-                      className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${theme.accent}`}
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </nav>
-      <main className="transition-all duration-300 relative z-10">
-        {children}
+      <main className="flex-1 transition-all duration-300 relative z-10" style={{ background: COLORS.background, color: COLORS.text }}>
+        {React.Children.map(childrenWithOrdersCount, child => {
+          if (!React.isValidElement(child)) return child;
+          // Пробрасываем язык только в компоненты-модули/менеджеры по displayName/id
+          const typeName = (child.type as any)?.displayName || (child.type as any)?.name || '';
+          // Только для известных модулей/менеджеров
+          // Пробрасываем props только если они уже есть у child.props
+          if ([
+            'DishManager',
+            'CategoryManager',
+            'RestaurantModule',
+            'MenuItemManager',
+            'OrdersModule',
+            'OrderManager',
+            'ClientManager',
+            'ImageManager',
+            'PremiumAdminDashboardV2'
+          ].includes(typeName)) {
+            const newProps: any = {};
+            const childProps = child.props as any;
+            if (childProps && 'language' in childProps) newProps.language = language;
+            if (childProps && 'setLanguage' in childProps) newProps.setLanguage = setCurrentLanguage;
+            if (Object.keys(newProps).length > 0) {
+              return React.cloneElement(child, newProps);
+            }
+          }
+          return child;
+        })}
       </main>
     </div>
   )

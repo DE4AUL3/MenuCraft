@@ -2,53 +2,115 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { getText, type Language } from '@/i18n/translations';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, ShoppingBag, DollarSign, Package, Star } from 'lucide-react';
 import getThemeClasses from "../../../../config/colors";
 import SalesChart from "../SalesChart";
 
-interface OverviewModuleProps {
-  onSubTabChange?: (tabId: string) => void;
-  theme: string;
-}
-
-interface Stat {
+type Stat = {
   title: string;
   value: string;
   change: string;
   changeType: 'positive' | 'negative';
   icon: React.ReactNode;
   color: string;
-}
-
-interface ActivityItem {
+};
+type ActivityItem = {
   action: string;
   timestamp: string | number | Date;
-}
+};
+type OverviewModuleProps = {
+  onSubTabChange?: (tabId: string) => void;
+  theme: string;
+  language: Language;
+};
 
-const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }) => {
+const tabTranslations: Record<'basic' | 'activity', Record<Language, string>> = {
+  basic: { ru: 'Базовый', tk: 'Esasy' },
+  activity: { ru: 'Активность', tk: 'Hereketlilik' },
+};
+const statTranslations: Record<'orders' | 'revenue' | 'dishes' | 'categories', Record<Language, string>> = {
+  orders: { ru: 'Заказы', tk: 'Sargytlar' },
+  revenue: { ru: 'выручка', tk: 'girdeji' },
+  dishes: { ru: 'блюд', tk: 'taamlar' },
+  categories: { ru: 'категории', tk: 'kategoriýalar' },
+};
+const activityTitle: Record<Language, string> = { ru: 'Последняя активность', tk: 'Soňky hereketsizlik' };
+
+const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme, language }) => {
   const themeClasses = getThemeClasses(theme);
-  const [currentSubTab, setCurrentSubTab] = useState('basic');
+  const [currentSubTab, setCurrentSubTab] = useState<'basic' | 'activity'>('basic');
   const [basicStats, setBasicStats] = useState<Stat[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [salesData, setSalesData] = useState<{ date: string; value: number }[]>([]);
 
-  // Fetch basic stats from API
   useEffect(() => {
-    fetch('/api/analytics?type=overview')
-      .then(res => res.json())
-      .then(realStats => {
-        // Проверка на наличие всех нужных полей
+    // Получаем реальные данные с бэка для каждого счетчика
+    let rateLimited = false;
+    let rateLimitTimeout: NodeJS.Timeout | null = null;
+    async function fetchStats() {
+      if (rateLimited) return;
+      try {
+        // 1. Счетчик заказов и прибыль
+        const ordersRes = await fetch('/api/orders');
+        if (ordersRes.status === 429) {
+          rateLimited = true;
+          alert('Слишком много запросов. Попробуйте позже.');
+          rateLimitTimeout = setTimeout(() => { rateLimited = false; }, 60000);
+          return;
+        }
+        const orders = await ordersRes.json();
+        const totalOrders = Array.isArray(orders) ? orders.length : 0;
+        const totalRevenue = Array.isArray(orders) ? orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0) : 0;
+
+        // 2. Количество категорий
+        const categoriesRes = await fetch('/api/category');
+        if (categoriesRes.status === 429) {
+          rateLimited = true;
+          alert('Слишком много запросов. Попробуйте позже.');
+          rateLimitTimeout = setTimeout(() => { rateLimited = false; }, 60000);
+          return;
+        }
+        const categories = await categoriesRes.json();
+        const totalCategories = Array.isArray(categories) ? categories.length : 0;
+
+        // 3. Количество товаров
+        const mealsRes = await fetch('/api/meal');
+        if (mealsRes.status === 429) {
+          rateLimited = true;
+          alert('Слишком много запросов. Попробуйте позже.');
+          rateLimitTimeout = setTimeout(() => { rateLimited = false; }, 60000);
+          return;
+        }
+        const meals = await mealsRes.json();
+        const totalMeals = Array.isArray(meals) ? meals.length : 0;
+
+        // 4. График продаж
+        const salesRes = await fetch('/api/analytics?type=sales&days=30');
+        if (salesRes.status === 429) {
+          rateLimited = true;
+          alert('Слишком много запросов. Попробуйте позже.');
+          rateLimitTimeout = setTimeout(() => { rateLimited = false; }, 60000);
+          return;
+        }
+        const salesData = await salesRes.json();
+        setSalesData(Array.isArray(salesData) ? salesData.map((d: any) => ({ date: d.date, value: Math.round(d.sales) })) : []);
+
+        // Формируем массив для карточек
         const stats: Stat[] = [
-          { title: 'рестораны', value: (realStats?.totalRestaurants ?? 0).toString(), change: '', changeType: 'positive', icon: <ShoppingBag className="w-5 h-5" />, color: 'from-blue-400 to-blue-600' },
-          { title: 'выручка', value: `${realStats?.estimatedRevenue ?? 0} ТТ`, change: '', changeType: 'positive', icon: <DollarSign className="w-5 h-5" />, color: 'from-green-400 to-green-600' },
-          { title: 'блюд', value: (realStats?.totalDishes ?? 0).toString(), change: '', changeType: 'positive', icon: <Package className="w-5 h-5" />, color: 'from-purple-400 to-purple-600' },
-          { title: 'категории', value: (realStats?.totalCategories ?? 0).toString(), change: '', changeType: 'positive', icon: <Star className="w-5 h-5" />, color: 'from-yellow-400 to-orange-500' }
+          { title: statTranslations.orders[language], value: totalOrders.toString(), change: '', changeType: 'positive', icon: <ShoppingBag className="w-5 h-5" />, color: 'from-blue-400 to-blue-600' },
+          { title: statTranslations.revenue[language], value: `${totalRevenue} ТМ`, change: '', changeType: 'positive', icon: <DollarSign className="w-5 h-5" />, color: 'from-green-400 to-green-600' },
+          { title: statTranslations.dishes[language], value: totalMeals.toString(), change: '', changeType: 'positive', icon: <Package className="w-5 h-5" />, color: 'from-purple-400 to-purple-600' },
+          { title: statTranslations.categories[language], value: totalCategories.toString(), change: '', changeType: 'positive', icon: <Star className="w-5 h-5" />, color: 'from-green-400 to-green-600' }
         ];
         setBasicStats(stats);
-      })
-      .catch(err => console.error(err));
-  }, []);
+      } catch (err) {
+        console.error('Ошибка загрузки статистики', err);
+      }
+    }
+    fetchStats();
+  }, [language]);
 
   // Real-time updates: poll sales analytics and recent activity every 10s
   useEffect(() => {
@@ -87,16 +149,13 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }
         console.error('Ошибка загрузки recent orders', err);
       }
     };
-
     // Initial fetch
     fetchSales();
     fetchRecent();
-
     const interval = setInterval(() => {
       fetchSales();
       fetchRecent();
-    }, 10000); // 10s
-
+    }, 10000);
     return () => {
       mounted = false;
       clearInterval(interval);
@@ -106,11 +165,14 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-3">
-        {[{ id: 'basic', label: 'Базовый', icon: <Activity className="w-5 h-5" /> }].map(tab => (
+        {[
+          { id: 'basic', label: 'Базовый', icon: <Activity className="w-5 h-5" /> },
+          { id: 'activity', label: 'Активность', icon: <Activity className="w-5 h-5 text-green-500" /> }
+        ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => { setCurrentSubTab(tab.id); onSubTabChange?.(tab.id); }}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${currentSubTab === tab.id ? `bg-gradient-to-r ${themeClasses.accent} text-white shadow-xl` : `${themeClasses.cardBg} ${themeClasses.text} ${themeClasses.hover} shadow-md`}`}
+            onClick={() => { setCurrentSubTab(tab.id as 'basic' | 'activity'); onSubTabChange?.(tab.id); }}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${currentSubTab === tab.id ? 'bg-gradient-to-r from-blue-500 to-green-400 text-white shadow-xl' : 'bg-white text-gray-800 hover:bg-gray-50 shadow-md'}`}
           >
             {tab.icon}{tab.label}
           </button>
@@ -127,7 +189,7 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className={`p-6 rounded-xl relative overflow-hidden transition-all duration-300 hover:scale-105 ${themeClasses.cardBg} shadow-lg`}
+                    className={`p-6 rounded-xl relative overflow-hidden transition-all duration-300 hover:scale-105 bg-white shadow-lg`}
                   >
                     <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-10`} />
                     <div className="relative z-10">
@@ -135,29 +197,35 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme }
                         <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} text-white shadow-lg`}>{stat.icon}</div>
                         <div className={`text-sm font-medium px-3 py-1 rounded-full shadow-md ${stat.changeType === 'positive' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>{stat.change}</div>
                       </div>
-                      <h3 className={`text-2xl font-bold mb-1 ${themeClasses.text}`}>{stat.value}</h3>
-                      <p className={`text-sm ${themeClasses.textSecondary}`}>{stat.title}</p>
+                      <h3 className={`text-2xl font-bold mb-1 text-gray-900`}>
+                        {typeof stat.value === 'string' && stat.value.endsWith('ТТ')
+                          ? stat.value.replace(/ТТ$/, 'ТМ')
+                          : stat.value}
+                      </h3>
+                      <p className={`text-sm text-gray-500`}>{stat.title}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
-              <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
+              <div className={`p-6 rounded-xl bg-white shadow-lg`}>
                 <SalesChart data={salesData} theme={theme} />
               </div>
-              <div className={`p-6 rounded-xl ${themeClasses.cardBg} shadow-lg`}>
-                <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${themeClasses.text}`}>
-                  <Activity className="w-5 h-5 text-blue-500" /> Последняя активность
-                </h3>
-                <div className="space-y-3">
-                  {recentActivity.length ? recentActivity.map((a, i) => (
-                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${themeClasses.hover} transition-colors`}>
-                      <span className={themeClasses.text}>{a.action}</span>
-                      <span className="text-sm">{formatTimeAgo(a.timestamp)}</span>
-                    </div>
-                  )) : (
-                    <p className={themeClasses.text}>Нет активности</p>
-                  )}
-                </div>
+            </div>
+          )}
+          {currentSubTab === 'activity' && (
+            <div className={`p-6 rounded-xl bg-white shadow-lg`}>
+              <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900`}>
+                <Activity className="w-5 h-5 text-green-500" /> {activityTitle[language]}
+              </h3>
+              <div className="space-y-3">
+                {recentActivity.length ? recentActivity.map((a, i) => (
+                  <div key={i} className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors`}>
+                    <span className="text-gray-800">{a.action}</span>
+                    <span className="text-sm text-gray-500">{formatTimeAgo(a.timestamp)}</span>
+                  </div>
+                )) : (
+                  <p className="text-gray-500">Нет активности</p>
+                )}
               </div>
             </div>
           )}
