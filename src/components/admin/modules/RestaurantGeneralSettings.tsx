@@ -85,14 +85,14 @@ export default function RestaurantGeneralSettings() {
       >
         <div className="flex items-center space-x-4">
           <motion.div 
-            className="p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl shadow-lg"
+            className="p-3 bg-linear-to-br from-orange-400 to-orange-600 rounded-xl shadow-lg"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <Store className="w-6 h-6 text-white" />
           </motion.div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-gray-900">
               Общие настройки
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
@@ -104,13 +104,13 @@ export default function RestaurantGeneralSettings() {
         <motion.button
           onClick={handleSave}
           disabled={isSaving}
-          className={`inline-flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+          className="inline-flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
             saveStatus === 'success' 
               ? 'bg-green-500 text-white' 
               : saveStatus === 'error'
               ? 'bg-red-500 text-white'
-              : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl'
-          } disabled:opacity-50 disabled:cursor-not-allowed`}
+              : 'bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl'
+          } disabled:opacity-50 disabled:cursor-not-allowed" 
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -299,7 +299,7 @@ export default function RestaurantGeneralSettings() {
               </label>
               <motion.button
                 onClick={addPhoneNumber}
-                className="inline-flex items-center px-3 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center px-3 py-2 text-sm bg-linear-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -474,7 +474,7 @@ export default function RestaurantGeneralSettings() {
               }))}
               className="sr-only peer"
             />
-            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 dark:peer-focus:ring-orange-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all dark:border-gray-600 peer-checked:bg-gradient-to-r peer-checked:from-orange-500 peer-checked:to-orange-600 shadow-lg"></div>
+            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 dark:peer-focus:ring-orange-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all dark:border-gray-600 peer-checked:bg-linear-to-r peer-checked:from-orange-500 peer-checked:to-orange-600 shadow-lg"></div>
           </motion.label>
         </div>
       </motion.div>

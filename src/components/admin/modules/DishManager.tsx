@@ -32,7 +32,9 @@ const dishManagerTexts = {
     notFound: 'Блюда не найдены',
     tryChangeFilters: 'Попробуйте изменить фильтры поиска',
     startAdd: 'Начните с добавления первого блюда',
-    edit: 'Изменить',
+  edit: 'Изменить',
+  show: 'Показать',
+  hide: 'Скрыть',
     unavailable: 'Недоступно',
     inactive: 'Неактивно',
     price: 'Цена (ТМТ) *',
@@ -63,7 +65,9 @@ const dishManagerTexts = {
     notFound: 'Tagam tapylmady',
     tryChangeFilters: 'Gözleg süzgüçlerini üýtgedip görüň',
     startAdd: 'Ilki tagam goşuň',
-    edit: 'Üýtget',
+  edit: 'Üýtget',
+  show: 'Görkez',
+  hide: 'Gizle',
     unavailable: 'Elýeterli däl',
     inactive: 'Işjeň däl',
     price: 'Bahasy (TMT) *',
@@ -94,7 +98,7 @@ interface DishManagerProps {
 }
 
 export default function DishManager({ theme = 'light', language }: DishManagerProps) {
-  // Используем проброшенный язык, fallback на useLanguage если не передан
+  // Используем только глобальный currentLanguage для реактивности
   const { currentLanguage } = useLanguage();
   const lang = language || currentLanguage;
   const [dishes, setDishes] = useState<Dish[]>([])
@@ -103,16 +107,43 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showInactive, setShowInactive] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  // Для скрытия бокового меню при открытии модалки
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.classList.add('modal-open');
+      // Принудительно скрыть sidebar (admin-sidebar/AdminSidebar)
+      const sidebar = document.querySelector('.admin-sidebar') || document.querySelector('.AdminSidebar');
+      if (sidebar) {
+        (sidebar as HTMLElement).style.display = 'none';
+      }
+    } else {
+      document.body.classList.remove('modal-open');
+      // Вернуть sidebar
+      const sidebar = document.querySelector('.admin-sidebar') || document.querySelector('.AdminSidebar');
+      if (sidebar) {
+        (sidebar as HTMLElement).style.display = '';
+      }
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+      const sidebar = document.querySelector('.admin-sidebar') || document.querySelector('.AdminSidebar');
+      if (sidebar) {
+        (sidebar as HTMLElement).style.display = '';
+      }
+    };
+  }, [isModalOpen]);
   const [editingDish, setEditingDish] = useState<Dish | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Форма для добавления/редактирования блюда
-  const [formData, setFormData] = useState<Partial<Dish>>({
+  const [formData, setFormData] = useState<Partial<Dish & { dishPageImage?: string; sortOrder?: number }>>({
     name: { ru: '', tk: '' },
     description: { ru: '', tk: '' },
     price: 0,
     categoryId: '',
     image: '',
+    dishPageImage: '',
+    sortOrder: 1,
     isActive: true,
     isAvailable: true
   })
@@ -129,7 +160,7 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
       secondaryBg: 'bg-gray-100 hover:bg-gray-200'
     },
     dark: {
-      bg: 'bg-gray-900',
+      bg: '',
       border: 'border-gray-700',
       text: 'text-gray-100',
       textMuted: 'text-gray-400',
@@ -199,10 +230,14 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
     return matchesSearch && matchesCategory && matchesActive
   })
 
-  const openModal = (dish?: Dish) => {
+  const openModal = (dish?: Dish & { dishPageImage?: string; sortOrder?: number }) => {
     if (dish) {
       setEditingDish(dish)
-      setFormData({ ...dish })
+      setFormData({
+        ...dish,
+        dishPageImage: (dish as any).dishPageImage || '',
+        sortOrder: (dish as any).sortOrder || 1
+      })
     } else {
       setEditingDish(null)
       setFormData({
@@ -211,6 +246,8 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
         price: 0,
         categoryId: categories[0]?.id || '',
         image: '',
+        dishPageImage: '',
+        sortOrder: 1,
         isActive: true,
         isAvailable: true
       })
@@ -241,7 +278,16 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
         })
         return
       }
-      
+      // Проверка уникальности sortOrder
+      const currentSortOrder = formData.sortOrder || 1;
+      const duplicate = dishes.some(d => d.sortOrder === currentSortOrder && (!editingDish || d.id !== editingDish.id));
+      if (duplicate) {
+        toast.error('Порядок сортировки должен быть уникальным!', {
+          duration: 4000,
+          position: 'top-right',
+        });
+        return;
+      }
       // Подготавливаем данные для API
       const dishData = {
         nameRu: formData.name.ru,
@@ -250,7 +296,11 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
         descriptionTk: formData.description?.tk || '',
         price: formData.price || 0,
         categoryId: formData.categoryId,
-        image: formData.image || ''
+        image: formData.image || '',
+        dishPageImage: formData.dishPageImage || '',
+        sortOrder: currentSortOrder,
+        isActive: formData.isActive,
+        isAvailable: formData.isAvailable
       }
 
       if (editingDish) {
@@ -262,7 +312,6 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
           },
           body: JSON.stringify(dishData)
         })
-        
         if (!response.ok) {
           let msg = 'Ошибка при обновлении блюда'
           try {
@@ -278,17 +327,18 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
           } catch {}
           throw new Error(msg)
         }
-        
         const updatedDish = await response.json()
-        
-        // Обновляем состояние с преобразованным объектом
         setDishes(prev => prev.map(d => d.id === editingDish.id ? {
           ...d,
           name: { ru: updatedDish.nameRu, tk: updatedDish.nameTk },
           description: { ru: updatedDish.descriptionRu || '', tk: updatedDish.descriptionTk || '' },
           price: updatedDish.price,
           image: updatedDish.image,
-          categoryId: updatedDish.categoryId
+          categoryId: updatedDish.categoryId,
+          dishPageImage: updatedDish.dishPageImage || '',
+          sortOrder: updatedDish.sortOrder || 1,
+          isActive: updatedDish.isActive,
+          isAvailable: updatedDish.isAvailable
         } : d))
       } else {
         // Создание через API
@@ -299,7 +349,6 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
           },
           body: JSON.stringify(dishData)
         })
-        
         if (!response.ok) {
           let msg = 'Ошибка при создании блюда'
           try {
@@ -315,10 +364,7 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
           } catch {}
           throw new Error(msg)
         }
-        
         const newDish = await response.json()
-        
-        // Добавляем в состояние с преобразованным объектом
         setDishes(prev => [...prev, {
           id: newDish.id,
           name: { ru: newDish.nameRu, tk: newDish.nameTk },
@@ -326,20 +372,19 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
           price: newDish.price,
           image: newDish.image,
           categoryId: newDish.categoryId,
-          isActive: true,
-          isAvailable: true,
+          dishPageImage: newDish.dishPageImage || '',
+          sortOrder: newDish.sortOrder || 1,
+          isActive: newDish.isActive,
+          isAvailable: newDish.isAvailable,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         }])
       }
-
       closeModal()
       toast.success(editingDish ? 'Блюдо обновлено!' : 'Блюдо добавлено!', {
         duration: 3000,
         position: 'top-right',
       })
-      
-      // Перезагружаем данные для обновления списка
       loadData()
     } catch (error) {
       console.error('Ошибка сохранения блюда:', error)
@@ -403,10 +448,13 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
   const handleImageUpload = (imageUrl: string | null) => {
     setFormData(prev => ({ ...prev, image: imageUrl || '' }))
   }
+  const handleBannerUpload = (imageUrl: string | null) => {
+    setFormData(prev => ({ ...prev, dishPageImage: imageUrl || '' }))
+  }
 
   if (loading) {
     return (
-      <div className={`p-6 ${styles.bg} ${styles.text} rounded-lg`}>
+      <div className="p-6 bg-white text-gray-900 rounded-lg">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           <span className="ml-2">Загрузка блюд...</span>
@@ -421,10 +469,10 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
   return (
     <div className={`p-6 ${styles.bg} ${styles.text} rounded-lg`}>
       {/* Баннер категории */}
-      {selectedCatObj?.dishPageImage && (
-        <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
+      {(selectedCatObj?.dishPageImage || selectedCatObj?.image) && (
+        <div className="mb-6 rounded-xl overflow-hidden shadow-lg relative">
           <SmartImage
-            src={selectedCatObj.dishPageImage}
+            src={selectedCatObj.dishPageImage || selectedCatObj.image}
             alt={lang === 'ru' ? selectedCatObj.name : selectedCatObj.nameTk}
             className="w-full h-48 object-cover"
           />
@@ -433,17 +481,17 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
           </div>
         </div>
       )}
-      {/* Заголовок и кнопка добавления */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Заголовок и кнопка добавления — стиль как у категорий */}
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold">{dishManagerTexts[lang].title}</h2>
-          <p className={styles.textMuted}>
+          <h2 className="text-2xl font-bold text-gray-900">{dishManagerTexts[lang].title}</h2>
+          <p className="text-gray-600 dark:text-gray-400">
             {dishManagerTexts[lang].total}: {dishes.length} | {dishManagerTexts[lang].active}: {dishes.filter(d => d.isActive).length}
           </p>
         </div>
         <button
           onClick={() => openModal()}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 transition-all duration-200 transform hover:scale-105"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105"
         >
           <Plus className="w-5 h-5" />
           {dishManagerTexts[lang].add}
@@ -460,7 +508,7 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
             placeholder={dishManagerTexts[lang].search}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`w-full pl-10 pr-4 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`w-full pl-10 pr-4 py-2 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
         </div>
 
@@ -468,7 +516,7 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className={`px-4 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          className={`px-4 py-2 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
         >
           <option value="all">{dishManagerTexts[lang].allCategories}</option>
           {categories.map(category => (
@@ -479,12 +527,12 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
         </select>
 
         {/* Показать неактивные */}
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label className="flex items-center gap-2 cursor-pointer text-gray-900">
           <input
             type="checkbox"
             checked={showInactive}
             onChange={(e) => setShowInactive(e.target.checked)}
-            className="rounded"
+            className="rounded border-gray-300 focus:ring-blue-500"
           />
           <span>{dishManagerTexts[lang].showInactive}</span>
         </label>
@@ -499,14 +547,12 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className={`${styles.cardBg} ${styles.border} border rounded-lg p-4 ${
-                !dish.isActive ? 'opacity-60' : ''
-              }`}
+              className={`group bg-white border border-gray-200 rounded-2xl shadow-lg p-5 flex flex-col transition-all duration-200 hover:shadow-2xl hover:-translate-y-1 ${!dish.isActive ? 'opacity-60' : ''}`}
             >
               {/* Изображение блюда */}
               <div className="relative mb-4">
                 {dish.image ? (
-                  <div className="relative w-full h-48 rounded-lg overflow-hidden">
+                  <div className="relative w-full h-44 rounded-xl overflow-hidden">
                     <SmartImage
                       src={dish.image}
                       alt={dish.name.ru}
@@ -515,72 +561,63 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
                     />
                   </div>
                 ) : (
-                  <div className={`w-full h-48 ${styles.secondaryBg} rounded-lg flex items-center justify-center`}>
-                    <ImageIcon className="w-12 h-12 text-gray-400" />
+                  <div className="w-full h-44 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <ImageIcon className="w-12 h-12 text-gray-300" />
                   </div>
                 )}
-                
-                {/* Статус доступности */}
+                {/* Статус бейджи */}
                 <div className="absolute top-2 right-2 flex gap-2">
                   {!dish.isAvailable && (
-                    <span className="px-2 py-1 bg-red-500 text-white text-xs rounded">
+                    <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full shadow">
                       {dishManagerTexts[currentLanguage].unavailable}
                     </span>
                   )}
                   {!dish.isActive && (
-                    <span className="px-2 py-1 bg-gray-500 text-white text-xs rounded">
+                    <span className="px-2 py-1 bg-gray-400 text-white text-xs rounded-full shadow">
                       {dishManagerTexts[currentLanguage].inactive}
                     </span>
                   )}
                 </div>
               </div>
-
               {/* Информация о блюде */}
-              <div className="mb-4">
-                <h3 className="font-semibold text-lg mb-1">{dish.name[lang]}</h3>
-                <p className={`text-sm ${styles.textMuted} mb-2`}>
-                  {dish.name[lang === 'ru' ? 'tk' : 'ru']}
-                </p>
-                <p className={`text-sm ${styles.textMuted} line-clamp-2`}>
-                  {dish.description?.[lang] || (lang === 'ru' ? 'Описание отсутствует' : 'Düşündiriş ýok')}
-                </p>
+              <div className="mb-3">
+                <h3 className="font-semibold text-lg text-gray-900 mb-1 truncate">{dish.name[lang]}</h3>
+                <p className="text-xs text-gray-400 mb-1 truncate">{dish.name[lang === 'ru' ? 'tk' : 'ru']}</p>
+                <p className="text-sm text-gray-500 line-clamp-2 mb-2">{dish.description?.[lang] || (lang === 'ru' ? 'Описание отсутствует' : 'Düşündiriş ýok')}</p>
               </div>
-
               {/* Цена и детали */}
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-1">
-                  <DollarSign className="w-4 h-4 text-green-600" />
-                  <span className="font-bold text-lg">{dish.price} {lang === 'ru' ? 'ТМТ' : 'TMT'}</span>
-                </div>
-              </div>
-
-              {/* Кнопки управления */}
-              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 text-xl font-bold text-green-600">
+                  <DollarSign className="w-5 h-5" />
+                  {dish.price} {lang === 'ru' ? 'ТМТ' : 'TMT'}
+                </span>
                 <button
                   onClick={() => openModal(dish)}
-                  className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm flex items-center justify-center gap-1"
+                  className="p-2 rounded-full bg-gray-100 hover:bg-blue-100 text-blue-600 transition-colors shadow"
+                  title={dishManagerTexts[lang].edit}
                 >
-                  <Edit className="w-3 h-3" />
-                  {dishManagerTexts[lang].edit}
+                  <Edit className="w-4 h-4" />
                 </button>
-                
+              </div>
+              {/* Кнопки управления */}
+              <div className="flex items-center gap-2 mt-auto">
                 <button
                   onClick={() => toggleDishStatus(dish)}
-                  className={`px-3 py-2 rounded text-sm flex items-center justify-center ${
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm flex items-center justify-center font-medium transition-colors shadow ${
                     dish.isActive
-                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                      : 'bg-green-500 hover:bg-green-600 text-white'
+                      ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                      : 'bg-green-100 text-green-800 hover:bg-green-200'
                   }`}
                 >
-                  {dish.isActive ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  {dish.isActive ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
+                  {dish.isActive ? dishManagerTexts[lang].hide : dishManagerTexts[lang].show}
                 </button>
-                
                 <button
                   onClick={() => handleDelete(dish.id)}
-                  className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm flex items-center justify-center"
+                  className="px-3 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-sm flex items-center justify-center font-medium shadow"
                   title={dishManagerTexts[lang].delete}
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </motion.div>
@@ -612,177 +649,138 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
             onClick={(e) => e.target === e.currentTarget && closeModal()}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className={`${styles.bg} rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto`}
+              exit={{ scale: 0.98, opacity: 0 }}
+              className="bg-white text-gray-900 rounded-t-2xl md:rounded-lg p-4 md:p-6 w-full max-w-full md:max-w-2xl h-full md:max-h-[90vh] overflow-y-auto shadow-xl fixed bottom-0 left-0 right-0 md:static"
+              style={{ touchAction: 'manipulation' }}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold">
-                  {editingDish ? dishManagerTexts[lang].editDish : dishManagerTexts[lang].addDish}
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className={`p-2 ${styles.secondaryBg} rounded-lg hover:bg-gray-300`}
-                >
-                  <X className="w-4 h-4" />
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900">{editingDish ? dishManagerTexts[lang].editDish : dishManagerTexts[lang].addDish}</h3>
+                <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 p-2 rounded-lg">
+                  <X className="w-6 h-6" />
                 </button>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Название на русском */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {dishManagerTexts[lang].nameRu}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name?.ru || ''}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      name: { ...prev.name, ru: e.target.value } as { ru: string; tk: string }
-                    }))}
-                    className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                    placeholder={lang === 'ru' ? 'Введите название блюда' : 'Tagamyň adyny giriziň'}
-                  />
-                </div>
-
-                {/* Название на туркменском */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {dishManagerTexts[lang].nameTk}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name?.tk || ''}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      name: { ...prev.name, tk: e.target.value } as { ru: string; tk: string }
-                    }))}
-                    className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                    placeholder={lang === 'ru' ? 'Введите название блюда' : 'Tagamyň adyny giriziň'}
-                  />
-                </div>
-
-                {/* Категория */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {dishManagerTexts[lang].category}
-                  </label>
-                  <select
-                    value={formData.categoryId}
-                    onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
-                    className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                  >
-                    <option value="">{lang === 'ru' ? 'Выберите категорию' : 'Kategoriýa saýlaň'}</option>
-                    {categories.map(category => (
-                      <option key={category.id} value={category.id}>
-                        {lang === 'ru' ? category.name : category.nameTk}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Цена */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {dishManagerTexts[lang].price}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                    className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                    placeholder="0.00"
-                  />
-                </div>
-
-                {/* Статусы */}
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2">
+              <form className="space-y-3 md:space-y-4" onSubmit={e => { e.preventDefault(); handleSave(); }}>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{dishManagerTexts[lang].nameRu}</label>
                     <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                      className="rounded"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      required
+                      type="text"
+                      value={formData.name?.ru || ''}
+                      onChange={e => setFormData(prev => ({ ...prev, name: { ...prev.name, ru: e.target.value } as { ru: string; tk: string } }))}
+                      placeholder={lang === 'ru' ? 'Введите название блюда' : 'Tagamyň adyny giriziň'}
                     />
-                    <span>{dishManagerTexts[lang].activeStatus}</span>
-                  </label>
-                  <label className="flex items-center gap-2">
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{dishManagerTexts[lang].nameTk}</label>
                     <input
-                      type="checkbox"
-                      checked={formData.isAvailable}
-                      onChange={(e) => setFormData(prev => ({ ...prev, isAvailable: e.target.checked }))}
-                      className="rounded"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      required
+                      type="text"
+                      value={formData.name?.tk || ''}
+                      onChange={e => setFormData(prev => ({ ...prev, name: { ...prev.name, tk: e.target.value } as { ru: string; tk: string } }))}
+                      placeholder={lang === 'ru' ? 'Введите название блюда' : 'Tagamyň adyny giriziň'}
                     />
-                    <span>{dishManagerTexts[lang].availableStatus}</span>
-                  </label>
+                  </div>
                 </div>
-              </div>
-
-              {/* Описание на русском */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">
-                  {dishManagerTexts[lang].descRu}
-                </label>
-                <textarea
-                  value={formData.description?.ru || ''}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    description: { ...prev.description, ru: e.target.value } as { ru: string; tk: string }
-                  }))}
-                  rows={3}
-                  className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                  placeholder={lang === 'ru' ? 'Введите описание блюда' : 'Tagamyň düşündirişini giriziň'}
-                />
-              </div>
-
-              {/* Описание на туркменском */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">
-                  {dishManagerTexts[lang].descTk}
-                </label>
-                <textarea
-                  value={formData.description?.tk || ''}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    description: { ...prev.description, tk: e.target.value } as { ru: string; tk: string }
-                  }))}
-                  rows={3}
-                  className={`w-full px-3 py-2 ${styles.inputBg} ${styles.border} border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                  placeholder={lang === 'ru' ? 'Введите описание блюда' : 'Tagamyň düşündirişini giriziň'}
-                />
-              </div>
-
-              {/* Загрузка изображения */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">
-                  {dishManagerTexts[lang].image}
-                </label>
-                <ImageUpload
-                  currentImage={formData.image}
-                  onImageChange={handleImageUpload}
-                />
-              </div>
-
-              {/* Кнопки */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={handleSave}
-                  className={`flex-1 px-4 py-2 ${styles.buttonBg} text-white rounded-lg flex items-center justify-center gap-2`}
-                >
-                  <Save className="w-4 h-4" />
-                  {editingDish ? dishManagerTexts[lang].save : dishManagerTexts[lang].create}
-                </button>
-                <button
-                  onClick={closeModal}
-                  className={`px-4 py-2 ${styles.secondaryBg} ${styles.text} rounded-lg`}
-                >
-                  {dishManagerTexts[lang].cancel}
-                </button>
-              </div>
+                {/* Описание убрано по требованию */}
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{dishManagerTexts[lang].category}</label>
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      required
+                      value={formData.categoryId}
+                      onChange={e => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
+                    >
+                      <option value="">{lang === 'ru' ? 'Выберите категорию' : 'Kategoriýa saýlaň'}</option>
+                      {categories.map(category => (
+                        <option key={category.id} value={category.id}>{lang === 'ru' ? category.name : category.nameTk}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2">
+                      {dishManagerTexts[lang].price}
+                      <span className="text-xs text-gray-400">(шаг 0.5)</span>
+                    </label>
+                    <div className="flex rounded-lg border border-gray-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+                      <button
+                        type="button"
+                        className="px-3 text-lg text-gray-500 hover:text-blue-600 focus:outline-none disabled:opacity-40"
+                        aria-label="Уменьшить цену"
+                        disabled={formData.price === 0 || formData.price === undefined || formData.price === null}
+                        onClick={() => setFormData(prev => ({ ...prev, price: Math.max(0, (typeof prev.price === 'number' ? prev.price : 0) - 0.5) }))}
+                      >
+                        –
+                      </button>
+                      <input
+                        className="w-full px-3 py-2 text-center text-lg font-semibold bg-transparent outline-none border-0 focus:ring-0 text-gray-900"
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        value={formData.price === 0 ? '' : formData.price ?? ''}
+                        onChange={e => {
+                          const val = e.target.value;
+                          setFormData(prev => ({ ...prev, price: val === '' ? 0 : Math.max(0, parseFloat(val)) }))
+                        }}
+                        placeholder="0.00"
+                        inputMode="decimal"
+                      />
+                      <button
+                        type="button"
+                        className="px-3 text-lg text-gray-500 hover:text-blue-600 focus:outline-none"
+                        aria-label="Увеличить цену"
+                        onClick={() => setFormData(prev => ({ ...prev, price: (typeof prev.price === 'number' ? prev.price : 0) + 0.5 }))}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Порядок сортировки</label>
+                    <input
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      type="number"
+                      min="1"
+                      value={formData.sortOrder || 1}
+                      onChange={e => setFormData(prev => ({ ...prev, sortOrder: parseInt(e.target.value) || 1 }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Статус</label>
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      value={formData.isActive ? 'active' : 'inactive'}
+                      onChange={e => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
+                    >
+                      <option value="active">Активно</option>
+                      <option value="inactive">Неактивно</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{dishManagerTexts[lang].image}</label>
+                    <ImageUpload currentImage={formData.image} onImageChange={handleImageUpload} />
+                    <p className="text-xs text-gray-500 mt-1">Рекомендуемый размер: 600x400px (соотношение 3:2, мобильный формат)</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 md:flex-row md:gap-4 pt-3 md:pt-4">
+                  <button type="submit" className="w-full md:flex-1 inline-flex items-center justify-center px-4 py-3 md:py-2 bg-blue-600 text-white rounded-lg transition-colors hover:bg-blue-700 text-base md:text-sm">
+                    <Save className="w-4 h-4 mr-2" />
+                    {editingDish ? dishManagerTexts[lang].save : dishManagerTexts[lang].create}
+                  </button>
+                  <button type="button" onClick={closeModal} className="w-full md:w-auto px-4 py-3 md:py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors text-base md:text-sm">
+                    {dishManagerTexts[lang].cancel}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}

@@ -1,5 +1,10 @@
+
 @import "tailwindcss";
 @import "./fonts.css";
+/* Скрывать боковое меню при открытии модального окна DishManager */
+.modal-open .admin-sidebar, .modal-open .AdminSidebar {
+  display: none !important;
+}
 
 /* CSS переменные для простой темы */
 :root {

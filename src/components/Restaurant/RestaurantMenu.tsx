@@ -185,17 +185,17 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+  <div className="min-h-screen bg-white">
       
       {/* Хедер ресторана */}
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+  <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
 
             {/* Информация о ресторане */}
             <div className="flex-1 text-center">
-              <h1 className="text-xl font-light text-gray-900 dark:text-white">{restaurant.name}</h1>
-              <div className="flex items-center justify-center gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <h1 className="text-xl font-light text-gray-900">{restaurant.name}</h1>
+              <div className="flex items-center justify-center gap-4 mt-1 text-sm text-gray-500">
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                   <span>{restaurant.rating}</span>
@@ -228,17 +228,17 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
       </div>
 
       {/* Категории */}
-      <div className="sticky top-20 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-20 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {categories.map(category => (
+          <div className="flex gap-2 flex-wrap">
+            {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-2 rounded-full whitespace-nowrap transition-all font-medium ${
                   selectedCategory === category
-                    ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {category}
@@ -252,11 +252,11 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
       <div className="container mx-auto px-4 py-6">
         <div className="grid gap-4 md:gap-6">
           {filteredItems.map(item => (
-            <div key={item.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div key={item.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 
                 {/* Изображение */}
-                <div className="w-full sm:w-32 h-32 bg-gray-50 dark:bg-gray-800 flex items-center justify-center relative overflow-hidden">
+                <div className="w-full sm:w-32 h-32 bg-gray-50 flex items-center justify-center relative overflow-hidden">
                   <div className="text-4xl opacity-60">
                     {item.category === 'Основные блюда' ? '🍽️' : 
                      item.category === 'Салаты' ? '🥗' : 
@@ -266,17 +266,17 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
                   {/* Бейджи */}
                   <div className="absolute top-2 left-2 flex flex-col gap-1">
                     {item.isPopular && (
-                      <span className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs px-2 py-1 rounded-full font-medium">
+                      <span className="bg-gray-900 text-white text-xs px-2 py-1 rounded-full font-medium">
                         Хит
                       </span>
                     )}
                     {item.isSpicy && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                         🌶️
                       </span>
                     )}
                     {item.isVegetarian && (
-                      <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                         🌱
                       </span>
                     )}
@@ -289,13 +289,13 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
                     
                     {/* Информация о блюде */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
                         {item.name}
                       </h3>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
+                      <p className="text-gray-500 text-sm mb-3">
                         {item.description}
                       </p>
-                      <div className="text-xl font-semibold text-gray-900 dark:text-white">
+                      <div className="text-xl font-semibold text-gray-900">
                         {item.price} сом
                       </div>
                     </div>
@@ -306,16 +306,16 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => removeFromCart(item.id)}
-                            className="w-10 h-10 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+                            className="w-10 h-10 bg-red-50 text-red-600 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
-                          <span className="text-lg font-semibold text-gray-900 dark:text-white min-w-[24px] text-center">
+                          <span className="text-lg font-semibold text-gray-900 min-w-6 text-center">
                             {getItemQuantity(item.id)}
                           </span>
                           <button
                             onClick={() => addToCart(item)}
-                            className="w-10 h-10 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full flex items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+                            className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -323,7 +323,7 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
                       ) : (
                         <button
                           onClick={() => addToCart(item)}
-                          className="bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-full flex items-center gap-2 transition-colors font-medium"
+                          className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-full flex items-center gap-2 transition-colors font-medium"
                         >
                           <Plus className="w-4 h-4" />
                           <span>Добавить</span>
@@ -341,10 +341,10 @@ export default function RestaurantMenu({ restaurant }: RestaurantMenuProps) {
         {filteredItems.length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🍽️</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Блюда не найдены
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600">
               В выбранной категории пока нет блюд
             </p>
           </div>

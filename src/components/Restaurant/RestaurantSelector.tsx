@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, MapPin, Phone, Star } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
+import { useLanguage } from '@/hooks/useLanguage';
 import { getRestaurantByDomain } from '../../lib/domain';
 import SmartImage from '../ui/SmartImage';
 
@@ -28,6 +29,7 @@ interface Restaurant {
 export default function RestaurantSelector() {
   const router = useRouter();
   const { setRestaurant } = useTheme();
+  const { currentLanguage } = useLanguage();
   const [selectedRestaurant, setSelectedRestaurant] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +43,7 @@ export default function RestaurantSelector() {
     if (domainRestaurant) {
       setIsLoading(true);
       setRestaurant(domainRestaurant.id);
-      router.push(`/menu/${domainRestaurant.id}`);
+      router.push(`/menu/${domainRestaurant.id}?lang=${currentLanguage}`);
     }
 
     // Загружаем рестораны из API
@@ -63,13 +65,12 @@ export default function RestaurantSelector() {
 
   const handleRestaurantSelect = (restaurantId: string) => {
     if (isLoading) return;
-    
     setSelectedRestaurant(restaurantId);
     setIsLoading(true);
     setRestaurant(restaurantId);
     // Плавный переход
     setTimeout(() => {
-      router.push(`/menu/${restaurantId}`);
+      router.push(`/menu/${restaurantId}?lang=${currentLanguage}`);
     }, 200);
   };
 
@@ -78,9 +79,9 @@ export default function RestaurantSelector() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+  <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
       {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-rose-50">
+  <div className="relative overflow-hidden bg-linear-to-br from-blue-50 via-white to-rose-50">
         <div className="absolute inset-0 opacity-40" />
         <div className="max-w-5xl mx-auto px-6 py-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 backdrop-blur text-slate-600 text-sm mb-6 border border-slate-100">
@@ -114,7 +115,7 @@ export default function RestaurantSelector() {
               >
                 {/* Restaurant Image */}
                 <div className="relative h-48 overflow-hidden">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${restaurant.gradient} opacity-80`} />
+                  <div className={`absolute inset-0 bg-linear-to-br ${restaurant.gradient} opacity-80`} />
                   <SmartImage
                     src={restaurant.image}
                     alt={restaurant.name}
@@ -185,7 +186,7 @@ export default function RestaurantSelector() {
                     </span>
                     <div className={`
                       w-10 h-10 rounded-full flex items-center justify-center
-                      bg-gradient-to-br ${restaurant.gradient}
+                      bg-linear-to-br ${restaurant.gradient}
                       group-hover:scale-110 transition-transform duration-300
                       shadow-lg
                     `}>

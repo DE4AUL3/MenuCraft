@@ -239,7 +239,7 @@ export default function PremiumRestaurantSelector() {
                         </p>
                       </div>
                       <div className="ml-4 p-3 rounded-full transition-all duration-300" style={{background: theme.colors.accent.call, color: theme.colors.text.primary}}>
-                        <ArrowRight className="w-6 h-6 text-[inherit]" />
+                        <ArrowRight className="w-6 h-6 text-inherit" />
                       </div>
                     </div>
                     {/* Features and info removed for a cleaner card */}
@@ -252,11 +252,11 @@ export default function PremiumRestaurantSelector() {
                       whileTap={{ scale: 0.98 }}
                     >
                       {/* Enhanced shimmer effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
+                      <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
                       
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         {getText('viewMenu', currentLanguage)}
-                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform text-[inherit]" />
+                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform text-inherit" />
                       </span>
                     </motion.button>
                   </div>

@@ -126,6 +126,7 @@ export interface CartSettings {
   id: string;
   restaurantId: string;
   deliveryZones: DeliveryZone[];
+  deliveryPrice: number; // Новое поле: глобальная цена доставки
   minOrderAmount: number;
   freeDeliveryAmount?: number;
   currency: string;

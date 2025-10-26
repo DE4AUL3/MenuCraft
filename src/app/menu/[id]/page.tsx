@@ -192,7 +192,7 @@ export default function MenuPage() {
                 style={{ background: theme.colors.background.primary, borderColor: theme.colors.border.primary }}
               >
                 {/* Category Image */}
-                <div className={`relative h-32 sm:h-36 bg-gradient-to-br ${category.gradient || 'from-slate-500 to-slate-700'} overflow-hidden`}>
+                <div className={`relative h-32 sm:h-36 bg-linear-to-br ${category.gradient || 'from-slate-500 to-slate-700'} overflow-hidden`}>
                   {category.image ? (
                     <Image
                       src={category.image}
@@ -204,7 +204,7 @@ export default function MenuPage() {
                   ) : null}
                   
                   {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
                   
                   {/* Category Image */}
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -222,9 +222,9 @@ export default function MenuPage() {
                   </div>
                 </div>
                 
-                {/* Category Info */}
-                <div className="p-4 text-center bg-white/10 backdrop-blur-md border-t border-white/20">
-                  <h3 className="font-bold text-sm sm:text-base mb-1 transition-colors duration-300" style={{color: theme.colors.text.primary}}>
+                {/* Category Info (compact for mobile) */}
+                <div className="px-2 py-2 sm:px-4 sm:py-4 text-center bg-white/10 backdrop-blur-md border-t border-white/20">
+                  <h3 className="font-semibold text-xs sm:text-base mb-0.5 sm:mb-1 leading-tight sm:leading-normal transition-colors duration-300" style={{color: theme.colors.text.primary}}>
                     {currentLanguage === 'tk' ? (category.nameTk || category.name) : category.name}
                   </h3>
                 </div>

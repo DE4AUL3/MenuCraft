@@ -147,7 +147,7 @@ export default function AdminHeader({
                   >
                     <button
                       onClick={() => handleThemeChange('dark')}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors bg-gradient-to-r ${theme.colors.accent} text-white`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors bg-linear-to-r ${theme.colors.accent} text-white`}
                     >
                       {theme.icon}
                       <span className="text-white">
@@ -194,31 +194,44 @@ export default function AdminHeader({
                       <h3 className={`font-medium ${theme.colors.text}`}>Уведомления</h3>
                     </div>
                     
-                    <div className="max-h-96 overflow-y-auto">
+                    <div className="max-h-96 overflow-y-auto space-y-2 px-2 py-2">
                       {[
                         { title: 'Новый заказ #2847', message: 'Лагман + Зеленый чай - 54 ТМТ', time: '2 мин назад', type: 'order' },
                         { title: 'Заказ готов #2845', message: 'Пицца Маргарита - готова к выдаче', time: '10 мин назад', type: 'ready' },
                         { title: 'Высокая активность', message: '12 заказов за последний час', time: '30 мин назад', type: 'analytics' }
-                      ].map((notification, index) => (
-                        <div
-                          key={index}
-                          className={`p-4 border-b last:border-b-0 ${theme.colors.border} ${theme.colors.hover} cursor-pointer`}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <div className={`font-medium ${theme.colors.text} text-sm`}>
-                                {notification.title}
-                              </div>
-                              <div className={`text-sm ${theme.colors.textSecondary} mt-1`}>
-                                {notification.message}
-                              </div>
+                      ].map((notification, index) => {
+                        let icon, accent;
+                        switch (notification.type) {
+                          case 'order':
+                            icon = <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20 text-green-600 mr-3"><Bell className="w-5 h-5" /></span>;
+                            accent = 'border-green-500/60 bg-green-900/10';
+                            break;
+                          case 'ready':
+                            icon = <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 text-blue-600 mr-3"><Sun className="w-5 h-5" /></span>;
+                            accent = 'border-blue-500/60 bg-blue-900/10';
+                            break;
+                          case 'analytics':
+                            icon = <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-400/20 text-yellow-700 mr-3"><Palette className="w-5 h-5" /></span>;
+                            accent = 'border-yellow-400/60 bg-yellow-900/10';
+                            break;
+                          default:
+                            icon = <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-500/20 text-gray-400 mr-3"><Bell className="w-5 h-5" /></span>;
+                            accent = 'border-gray-500/40 bg-gray-900/10';
+                        }
+                        return (
+                          <div
+                            key={index}
+                            className={`flex items-start gap-2 p-3 rounded-lg border ${accent} transition hover:scale-[1.01] hover:shadow-md cursor-pointer group`}
+                          >
+                            {icon}
+                            <div className="flex-1 min-w-0">
+                              <div className={`font-semibold ${theme.colors.text} text-sm truncate group-hover:underline`}>{notification.title}</div>
+                              <div className={`text-sm ${theme.colors.textSecondary} mt-0.5 truncate`}>{notification.message}</div>
                             </div>
-                            <div className={`text-xs ${theme.colors.textSecondary}`}>
-                              {notification.time}
-                            </div>
+                            <div className={`text-xs ${theme.colors.textSecondary} whitespace-nowrap ml-2 mt-1`}>{notification.time}</div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                     
                     <div className={`p-3 border-t ${theme.colors.border}`}>
@@ -238,7 +251,7 @@ export default function AdminHeader({
                 className={`profile-button flex items-center gap-2 p-2 rounded-lg transition-all duration-200 ${theme.colors.hover}`}
                 title="Профиль"
               >
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${theme.colors.accent} flex items-center justify-center text-white font-medium text-sm`}>
+                <div className={`w-8 h-8 rounded-full bg-linear-to-r ${theme.colors.accent} flex items-center justify-center text-white font-medium text-sm`}>
                   A
                 </div>
                 <ChevronDown className={`w-4 h-4 ${theme.colors.textSecondary}`} />
@@ -254,7 +267,7 @@ export default function AdminHeader({
                   >
                     <div className={`p-4 border-b ${theme.colors.border}`}>
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${theme.colors.accent} flex items-center justify-center text-white font-medium`}>
+                        <div className={`w-10 h-10 rounded-full bg-linear-to-r ${theme.colors.accent} flex items-center justify-center text-white font-medium`}>
                           A
                         </div>
                         <div>

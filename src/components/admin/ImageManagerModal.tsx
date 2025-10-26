@@ -62,7 +62,7 @@ export default function ImageManagerModal({
       >
         {/* Заголовок */}
         <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+          <h2 className="text-lg font-medium text-gray-900">
             {title}
           </h2>
           <button

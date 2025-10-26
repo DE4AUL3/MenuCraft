@@ -48,13 +48,10 @@ const CopyPhoneButton: React.FC<CopyPhoneButtonProps> = ({ phone, className = ''
       title={currentLanguage === 'ru' ? 'Скопировать номер' : 'Belgini göçür'}
     >
       {copied ? (
-        <Check className="w-3 h-3 mr-1" />
+        <Check className="w-3 h-3" />
       ) : (
-        <Copy className="w-3 h-3 mr-1" />
+        <Copy className="w-3 h-3" />
       )}
-      {copied 
-        ? (currentLanguage === 'ru' ? 'Скопировано' : 'Göçürildi') 
-        : (currentLanguage === 'ru' ? 'Скопировать' : 'Göçür')}
     </button>
   );
 };

@@ -90,7 +90,7 @@ export const getCSSVariableColor = (variableName: string): string => {
 // Объект цветов для simpleTheme.ts
 export const COLORS = {
   // Светлая тема
-  background: '#ffffff',
+  background: '#fcf9f9',
   surface: '#f3f4f6',
   border: '#e5e7eb',
   text: '#18181b',

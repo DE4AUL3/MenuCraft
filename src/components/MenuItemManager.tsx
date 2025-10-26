@@ -225,13 +225,13 @@ export default function MenuItemManager() {
       </div>
 
       {/* Category Filter */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide py-2 snap-x">
         <button
           onClick={() => setSelectedCategory('all')}
-          className={`px-4 py-2 rounded-lg transition-colors ${
+          className={`px-4 py-2 rounded-lg transition-colors snap-center ${
             selectedCategory === 'all'
               ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           }`}
         >
           Все товары ({menuItems.length})
@@ -240,10 +240,10 @@ export default function MenuItemManager() {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-2 rounded-lg transition-colors snap-center ${
               selectedCategory === category.id
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
             {category.name} ({menuItems.filter(item => item.categoryId === category.id).length})
@@ -256,12 +256,12 @@ export default function MenuItemManager() {
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            className={`bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border ${
-              item.isAvailable ? 'border-gray-200 dark:border-gray-700' : 'border-red-300 dark:border-red-600'
+            className={`bg-white rounded-lg shadow-md overflow-hidden border ${
+              item.isAvailable ? 'border-gray-200' : 'border-red-300'
             }`}
           >
             {/* Item Image */}
-            <div className="h-32 bg-gray-200 dark:bg-gray-700 relative">
+            <div className="h-32 bg-gray-200 relative">
               {item.image ? (
                 <SmartImage
                   src={item.image}
@@ -309,10 +309,10 @@ export default function MenuItemManager() {
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <h3 className="font-semibold text-gray-900">
                     {item.name}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-gray-600">
                     {item.nameTk}
                   </p>
                 </div>
@@ -321,7 +321,7 @@ export default function MenuItemManager() {
                 </span>
               </div>
               
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">
+              <p className="text-xs text-gray-500 mb-2 line-clamp-2">
                 {item.description}
               </p>
 
@@ -356,7 +356,7 @@ export default function MenuItemManager() {
       {/* No Items Message */}
       {filteredItems.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500">
             {selectedCategory === 'all' ? 'Нет товаров' : 'Нет товаров в этой категории'}
           </p>
         </div>

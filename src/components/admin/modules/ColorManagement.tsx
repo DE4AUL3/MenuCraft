@@ -69,7 +69,7 @@ export default function ColorManagement() {
       {/* Заголовок */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl">
+          <div className="p-3 bg-linear-to-br from-purple-500 to-pink-600 rounded-xl">
             <Palette className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -114,7 +114,7 @@ export default function ColorManagement() {
 
       {/* Текущая тема */}
       <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+  <h2 className="text-lg font-semibold mb-4 text-gray-900">
           Текущая тема: {selectedTheme.name}
         </h2>
         <div className="flex items-center gap-4">

@@ -1,3 +1,62 @@
+function getStatusBadgeClass(status: string) {
+  const baseClass = 'px-2 py-1 rounded-full text-xs font-semibold shadow-sm';
+  switch (status) {
+    case 'new':
+    case 'pending':
+      return `${baseClass} bg-gray-100 text-gray-800 border border-gray-200`;
+    case 'confirmed':
+      return `${baseClass} bg-yellow-100 text-yellow-800 border border-yellow-200`;
+    case 'preparing':
+      return `${baseClass} bg-orange-50 text-orange-700 border border-orange-200`;
+    case 'ready':
+    case 'delivering':
+      return `${baseClass} bg-emerald-50 text-emerald-700 border border-emerald-200`;
+    case 'delivered':
+    case 'completed':
+      return `${baseClass} bg-green-50 text-green-700 border border-green-200`;
+    case 'cancelled':
+      return `${baseClass} bg-red-50 text-red-700 border border-red-200`;
+    default:
+      return baseClass;
+  }
+}
+// Локальные утилиты для статусов, дат, валюты и названия блюда
+const statusLabels: Record<string, { ru: string; tk: string }> = {
+  new: { ru: 'Новый', tk: 'Täze' },
+  pending: { ru: 'Ожидающий', tk: 'Garaşýan' },
+  confirmed: { ru: 'Подтвержден', tk: 'Tassyklandy' },
+  preparing: { ru: 'Готовится', tk: 'Taýýarlanýar' },
+  ready: { ru: 'Готов', tk: 'Taýýar' },
+  delivering: { ru: 'Доставляется', tk: 'Eltip berilýär' },
+  delivered: { ru: 'Доставлен', tk: 'Eltip berildi' },
+  completed: { ru: 'Завершен', tk: 'Tamamlandy' },
+  cancelled: { ru: 'Отменен', tk: 'Ýatyryldy' },
+};
+
+function getStatusText(status: string, language: 'ru' | 'tk') {
+  return statusLabels[status]?.[language] || status;
+}
+
+function formatDate(dateString: string, language: 'ru' | 'tk') {
+  const date = new Date(dateString);
+  return date.toLocaleString(language === 'ru' ? 'ru-RU' : 'tk-TM', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function formatCurrency(amount: number) {
+  return `${amount.toFixed(2)} TMT`;
+}
+
+function getDishTitle(item: any, lang: 'ru' | 'tk' = 'ru') {
+  if (lang === 'ru') {
+    return item.dishName || item.raw?.meal?.nameRu || item.raw?.meal?.name || item.nameRu || item.title || '';
+  }
+  return item.dishNameTk || item.raw?.meal?.nameTk || item.raw?.meal?.name || item.nameTk || '';
+}
 import React from 'react';
 import { Clock, User, Phone, MapPin, Package, ChevronRight } from 'lucide-react';
 import CopyPhoneButton from './CopyPhoneButton';
@@ -21,258 +80,118 @@ const OrderCard: React.FC<OrderCardProps> = ({
 }) => {
   const { currentLanguage } = useLanguage();
 
-  const getStatusBadgeClass = (status: Order['status']) => {
-    const baseClass = 'px-2 py-1 rounded-full text-xs font-medium';
-    switch (status) {
-      case 'new':
-      case 'pending':
-        return `${baseClass} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`;
-      case 'confirmed':
-        return `${baseClass} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200`;
-      case 'preparing':
-        return `${baseClass} bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200`;
-      case 'ready':
-      case 'delivering':
-        return `${baseClass} bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200`;
-      case 'delivered':
-      case 'completed':
-        return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
-      case 'cancelled':
-        return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200`;
-      default:
-        return baseClass;
-    }
-  };
+  // Кнопка "Подтвердить" только для new/pending
+  const showConfirmButton = activeTab === 'active' && (order.status === 'new' || order.status === 'pending');
 
-  const getStatusText = (status: Order['status']) => {
-    switch (status) {
-      case 'new':
-      case 'pending':
-        return currentLanguage === 'ru' ? 'Новый' : 'Täze';
-      case 'confirmed':
-        return currentLanguage === 'ru' ? 'Подтвержден' : 'Tassyklandy';
-      case 'preparing':
-        return currentLanguage === 'ru' ? 'Готовится' : 'Taýýarlanýar';
-      case 'ready':
-        return currentLanguage === 'ru' ? 'Готов' : 'Taýýar';
-      case 'delivering':
-        return currentLanguage === 'ru' ? 'Доставляется' : 'Eltip berilýär';
-      case 'delivered':
-        return currentLanguage === 'ru' ? 'Доставлен' : 'Eltip berildi';
-      case 'completed':
-        return currentLanguage === 'ru' ? 'Завершен' : 'Tamamlandy';
-      case 'cancelled':
-        return currentLanguage === 'ru' ? 'Отменен' : 'Ýatyryldy';
-      default:
-        return status;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString(currentLanguage === 'ru' ? 'ru-RU' : 'tk-TM', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `${amount.toFixed(2)} ТМ`;
-  };
-
-  const getDishTitle = (item: any, lang: 'ru' | 'tk' = 'ru') => {
-    // Возможные поля: dishName, dishNameTk, raw.meal.nameRu, raw.meal.nameTk, nameRu
-    if (lang === 'ru') {
-      return item.dishName || item.raw?.meal?.nameRu || item.raw?.meal?.name || item.nameRu || item.title || '';
-    }
-    return item.dishNameTk || item.raw?.meal?.nameTk || item.raw?.meal?.name || item.nameTk || '';
-  };
-
-  // Находим следующий статус для заказа
-  const getNextStatus = (currentStatus: Order['status']): Order['status'] | null => {
-    switch (currentStatus) {
-      case 'new':
-      case 'pending':
-        return 'confirmed';
-      case 'confirmed':
-        return 'preparing';
-      case 'preparing':
-        return 'ready';
-      case 'ready':
-        return 'delivered';
-      default:
-        return null;
-    }
-  };
-
-  // Кнопка следующего статуса
-  const nextStatus = getNextStatus(order.status);
-  
-  const getNextStatusButton = () => {
-    if (!nextStatus) return null;
-
-    let buttonText: string;
-    let buttonColor: string;
-
-    switch (nextStatus) {
-      case 'confirmed':
-        buttonText = currentLanguage === 'ru' ? 'Подтвердить' : 'Tassykla';
-        buttonColor = 'bg-green-600 hover:bg-green-700';
-        break;
-      case 'preparing':
-        buttonText = currentLanguage === 'ru' ? 'Готовить' : 'Taýýarla';
-        buttonColor = 'bg-orange-600 hover:bg-orange-700';
-        break;
-      case 'ready':
-        buttonText = currentLanguage === 'ru' ? 'Готово' : 'Taýýar';
-        buttonColor = 'bg-blue-600 hover:bg-blue-700';
-        break;
-      case 'delivered':
-        buttonText = currentLanguage === 'ru' ? 'Доставлено' : 'Eltip berildi';
-        buttonColor = 'bg-purple-600 hover:bg-purple-700';
-        break;
-      default:
-        buttonText = currentLanguage === 'ru' ? 'Далее' : 'Indiki';
-        buttonColor = 'bg-blue-600 hover:bg-blue-700';
-    }
-
-    return (
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onStatusChange(order.id, nextStatus);
-        }}
-        disabled={loading}
-        className={`px-3 py-1.5 ${buttonColor} text-white text-sm rounded-md transition-colors disabled:opacity-50 flex-grow`}
-      >
-        {buttonText}
-      </button>
-    );
-  };
+  // Для вкладки история: показывать только статус "Подтвержден" или "Отклонен"
+  if (activeTab === 'history' && !(order.status === 'confirmed' || order.status === 'cancelled')) {
+    return null;
+  }
 
   return (
-    <div 
-      className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+    <div
+      className={
+        `group block rounded-2xl border overflow-hidden cursor-pointer backdrop-blur-sm p-0
+        bg-white
+        border-gray-100
+        shadow-sm hover:shadow-xl transition-all duration-200
+        hover:border-emerald-400 hover:bg-emerald-50/60
+        active:scale-[0.98]`
+      }
+      style={{ boxShadow: '0 2px 12px 0 rgba(16, 185, 129, 0.08)' }}
       onClick={onClick}
     >
-      {/* Шапка карточки со статусом */}
-      <div className={`px-4 py-2 flex items-center justify-between ${
-        order.status === 'cancelled' ? 'bg-red-50 dark:bg-red-900/30' :
-        order.status === 'delivered' || order.status === 'completed' ? 'bg-green-50 dark:bg-green-900/30' :
-        'bg-blue-50 dark:bg-blue-900/30'
-      }`}>
-        <div className="flex items-center">
-          <span className="text-sm font-medium mr-2">#{order.id.slice(-6)}</span>
-          <span className={getStatusBadgeClass(order.status)}>
-            {getStatusText(order.status)}
+      {/* Верхняя часть: статус, номер, дата */}
+  <div className="flex items-center justify-between px-6 pt-6 pb-2">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 text-lg font-bold shadow-md group-hover:bg-emerald-200/80 transition-colors">
+            <Package className="w-6 h-6" />
           </span>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-base font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">#{order.id.slice(-6)}</span>
+              <span className={getStatusBadgeClass(order.status)}>{getStatusText(order.status, currentLanguage === 'ru' ? 'ru' : 'tk')}</span>
+            </div>
+            <div className="text-xs text-gray-500 flex items-center">
+              <Clock className="w-3 h-3 mr-1" />
+              {formatDate(order.createdAt, currentLanguage === 'ru' ? 'ru' : 'tk')}
+            </div>
+          </div>
         </div>
-        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-          <Clock className="w-3 h-3 mr-1" />
-          {formatDate(order.createdAt)}
+        <div className="text-right">
+          <p className="font-extrabold text-xl text-emerald-900 group-hover:text-emerald-900 transition-colors">{formatCurrency(order.totalAmount)}</p>
+          <span className="text-xs text-gray-400 group-hover:text-emerald-600 transition-colors">{order.items.length} {currentLanguage === 'ru' ? 'позиций' : 'pozisiýa'}</span>
         </div>
       </div>
 
-      {/* Основное содержимое карточки */}
-      <div className="px-4 py-3">
+      {/* Контент: клиент, состав заказа, кнопки */}
+      <div className="px-6 pb-6 pt-2">
         {/* Информация о клиенте */}
-        <div className="flex flex-col space-y-2 mb-3">
-          <div className="flex items-start">
-            <User className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-0.5 mr-2" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {order.customerName}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-start">
-            <Phone className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-0.5 mr-2" />
-            <div className="flex items-center">
-              <p className="text-sm text-gray-700 dark:text-gray-300 mr-2">
-                {order.customerPhone}
-              </p>
-              <CopyPhoneButton phone={order.customerPhone} />
-            </div>
-          </div>
-          
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 mb-4">
+    <div className="flex items-center gap-2">
+  <Phone className="w-4 h-4 text-gray-500" />
+  <span className="text-sm text-gray-900">{order.customerPhone}</span>
+  <CopyPhoneButton phone={order.customerPhone} />
+    </div>
           {order.customerAddress && (
-            <div className="flex items-start">
-              <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-0.5 mr-2" />
-              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                {order.customerAddress}
-              </p>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <span className="text-sm text-gray-600 line-clamp-1">{order.customerAddress}</span>
             </div>
           )}
         </div>
 
         {/* Состав заказа */}
-        <div className="mb-3">
-          <h4 className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400 mb-2">
+        <div className="mb-4">
+          <h4 className="text-xs font-semibold uppercase text-gray-500 mb-2 tracking-wider">
             {currentLanguage === 'ru' ? 'Состав заказа' : 'Sargyt düzümi'}
           </h4>
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-md p-2">
+          <div className="bg-white rounded-xl p-3 border border-gray-100 group-hover:border-emerald-300 transition-colors">
             {order.items.slice(0, 2).map((item, index) => (
               <div key={index} className="flex justify-between py-1 text-sm">
                 <div className="flex items-baseline">
-                  <span className="font-medium text-gray-800 dark:text-gray-200">
-                    {item.quantity}×
-                  </span>
-                    <span className="ml-2 text-gray-700 dark:text-gray-300 line-clamp-1">
-                      {currentLanguage === 'ru' ? getDishTitle(item, 'ru') : getDishTitle(item, 'tk')}
-                    </span>
+                  <span className="font-medium text-gray-800">{item.quantity}×</span>
+                  <span className="ml-2 text-gray-700 line-clamp-1">{currentLanguage === 'ru' ? getDishTitle(item, 'ru') : getDishTitle(item, 'tk')}</span>
                 </div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  {formatCurrency(item.total)}
-                </span>
+                <span className="text-emerald-900">{formatCurrency(item.total)}</span>
               </div>
             ))}
-            
             {order.items.length > 2 && (
-              <div className="text-xs text-blue-600 dark:text-blue-400 flex items-center justify-center mt-1">
-                <span className="mr-1">
-                  +{order.items.length - 2} {currentLanguage === 'ru' ? 'еще' : 'has-da'}
-                </span>
+              <div className="text-xs text-emerald-600 flex items-center justify-center mt-1 font-semibold group-hover:text-emerald-800 transition-colors">
+                <span className="mr-1">+{order.items.length - 2} {currentLanguage === 'ru' ? 'еще' : 'has-da'}</span>
                 <ChevronRight className="w-3 h-3" />
               </div>
             )}
           </div>
         </div>
 
-        {/* Итоговая сумма и кнопки управления */}
-        <div className="flex flex-col space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center text-gray-600 dark:text-gray-400">
-              <Package className="w-4 h-4 mr-1" />
-              <span className="text-xs">
-                {order.items.length} {currentLanguage === 'ru' ? 'позиций' : 'pozisiýa'}
-              </span>
-            </div>
-            <p className="font-bold text-gray-900 dark:text-white">
-              {formatCurrency(order.totalAmount)}
-            </p>
-          </div>
-          
-          {/* Кнопки действий для активных заказов */}
-          {activeTab === 'active' && (
-            <div className="flex gap-2">
-              {getNextStatusButton()}
-              
+        {/* Кнопки управления */}
+        {activeTab === 'active' && (
+          <div className="flex gap-2 mt-2">
+            {showConfirmButton && (
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
-                  onStatusChange(order.id, 'cancelled');
+                  onStatusChange(order.id, 'confirmed');
                 }}
                 disabled={loading}
-                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors disabled:opacity-50"
+                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md transition-colors disabled:opacity-50 grow"
               >
-                {currentLanguage === 'ru' ? 'Отменить' : 'Ýatyr'}
+                {currentLanguage === 'ru' ? 'Подтвердить' : 'Tassykla'}
               </button>
-            </div>
-          )}
-        </div>
+            )}
+            <button
+              onClick={e => {
+                e.stopPropagation();
+                onStatusChange(order.id, 'cancelled');
+              }}
+              disabled={loading}
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors disabled:opacity-50 grow"
+            >
+              {currentLanguage === 'ru' ? 'Отменить' : 'Ýatyr'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

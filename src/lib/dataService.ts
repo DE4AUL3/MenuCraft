@@ -695,10 +695,20 @@ class DataService {
 
   getCartSettings(restaurantId: string): CartSettings | null {
     const settings = storageSync.getItem(`cart_settings_${restaurantId}`, null);
-    return settings as CartSettings | null;
+    if (!settings) return null;
+    // Обеспечить наличие deliveryPrice для обратной совместимости
+    const s: any = settings;
+    if (typeof s.deliveryPrice !== 'number') {
+      s.deliveryPrice = 0;
+    }
+    return settings as CartSettings;
   }
 
   saveCartSettings(settings: CartSettings): CartSettings {
+    // Гарантировать наличие deliveryPrice
+    if (typeof settings.deliveryPrice !== 'number') {
+      settings.deliveryPrice = 0;
+    }
     storageSync.setItem(`cart_settings_${settings.restaurantId}`, settings);
     this.emitEventInternal('cart_settings_updated', settings);
     return settings;
@@ -709,13 +719,14 @@ class DataService {
     if (!existing) {
       throw new Error('Настройки корзины не найдены');
     }
-
     const updated = {
       ...existing,
       ...updates,
       updatedAt: new Date().toISOString()
     };
-
+    if (typeof updated.deliveryPrice !== 'number') {
+      updated.deliveryPrice = 0;
+    }
     return this.saveCartSettings(updated);
   }
 

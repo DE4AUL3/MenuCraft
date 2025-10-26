@@ -45,7 +45,6 @@ export default function AdminOrderNotifier({ setOrdersCount }: { setOrdersCount?
         if (!res.ok) return;
         const orders = await res.json();
         if (!Array.isArray(orders)) return;
-        if (setOrdersCount) setOrdersCount(orders.length);
 
         // Сравниваем id заказов, чтобы определить новые
         const newIds = orders.map((o: any) => o.id);
@@ -67,7 +66,6 @@ export default function AdminOrderNotifier({ setOrdersCount }: { setOrdersCount?
         const orders = await res.json();
         if (!Array.isArray(orders)) return;
         prevOrderIds.current = orders.map((o: any) => o.id);
-        if (setOrdersCount) setOrdersCount(orders.length);
       } catch {}
     })();
 

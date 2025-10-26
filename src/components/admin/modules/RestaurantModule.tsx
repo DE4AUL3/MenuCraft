@@ -118,12 +118,14 @@ export default function RestaurantModule(props: RestaurantModuleProps) {
             // Цвета для иконок и border активной вкладки
             let iconColor = '';
             let borderColor = '';
+            let extraActive = '';
             if (tab.id === 'categories') {
               iconColor = 'text-blue-500';
               borderColor = 'border-blue-500';
             } else if (tab.id === 'dishes') {
               iconColor = 'text-purple-500';
               borderColor = 'border-purple-500';
+              extraActive = 'border-b-4 border-purple-500 bg-white';
             } else if (tab.id === 'cart') {
               iconColor = 'text-green-500';
               borderColor = 'border-green-500';
@@ -135,7 +137,7 @@ export default function RestaurantModule(props: RestaurantModuleProps) {
                 onClick={() => setCurrentSubTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105
                   bg-white text-gray-800 hover:bg-gray-50 shadow-md
-                  ${isActive ? `border-b-4 ${borderColor}` : 'border-b-4 border-transparent'}
+                  ${isActive ? (tab.id === 'dishes' ? extraActive : `border-b-4 ${borderColor}`) : 'border-b-4 border-transparent'}
                 `}
                 title={tab.description}
               >
