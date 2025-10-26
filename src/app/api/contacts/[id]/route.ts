@@ -47,7 +47,7 @@ export async function GET(
         client.orders[client.orders.length - 1].createdAt.toISOString() : null,
       createdAt: client.createdAt.toISOString(),
       updatedAt: client.updatedAt.toISOString(),
-      recentOrders: client.orders.map(order => ({
+  recentOrders: client.orders.map((order: any) => ({
         id: order.id,
         date: order.createdAt.toISOString(),
         status: order.status,

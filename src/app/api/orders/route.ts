@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/databaseService';
-import type { OrderStatus } from '@prisma/client';
+
 
 export async function GET(request: Request) {
   try {
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const status = searchParams.get('status');
 
   // Построение условия поиска
-  const whereCondition: { status?: OrderStatus | { in: OrderStatus[] } } = {};
+  const whereCondition: any = {};
     
     if (status) {
       if (status === 'active') {
@@ -20,11 +20,11 @@ export async function GET(request: Request) {
           in: ['DELIVERED', 'CANCELLED'],
         };
       } else if (status !== 'all') {
-        // Приводим строковой параметр к UpperCase и валидируем против допустимых значений OrderStatus
+        // Приводим строковой параметр к UpperCase и валидируем против допустимых значений статусов
         const upper = status.toUpperCase();
-        const allowed: OrderStatus[] = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED', 'CANCELLED'];
-        if (allowed.includes(upper as OrderStatus)) {
-          whereCondition.status = upper as OrderStatus;
+        const allowed = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED', 'CANCELLED'];
+        if (allowed.includes(upper)) {
+          whereCondition.status = upper;
         }
       }
     }
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     });
 
     // Преобразуем данные в формат, ожидаемый на фронтенде
-    const formattedOrders = orders.map(order => {
+  const formattedOrders = orders.map((order: any) => {
       // Преобразуем статус из ENUM в нижний регистр для соответствия интерфейсу
       let status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
       const s = order.status.toLowerCase();
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
         status: status,
         createdAt: order.createdAt.toISOString(),
         updatedAt: order.updatedAt.toISOString(),
-        items: order.orderItems.map(item => ({
+  items: order.orderItems.map((item: any) => ({
           id: item.id,
           dishId: item.mealId,
           mealId: item.mealId, // Для совместимости с разными частями кода
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
           amount: item.amount, // Для совместимости с разными частями кода
           total: item.price * item.amount
         })),
-        subtotal: order.orderItems.reduce((sum, item) => sum + item.price * item.amount, 0),
+  subtotal: order.orderItems.reduce((sum: number, item: any) => sum + item.price * item.amount, 0),
         deliveryFee: 0 // Пока нет поля доставки, можно добавить позже
       };
     });
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
       totalAmount: newOrder.totalAmount,
       status: newOrder.status,
       createdAt: newOrder.createdAt.toISOString(),
-      items: newOrder.orderItems.map(item => ({
+  items: newOrder.orderItems.map((item: any) => ({
         id: item.id,
         mealId: item.mealId,
         price: item.price,

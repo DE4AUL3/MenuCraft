@@ -20,7 +20,7 @@ export async function GET(
     });
     
     // Преобразуем данные в формат, ожидаемый фронтендом
-    const formattedCategories = categories.map((cat) => ({
+  const formattedCategories = categories.map((cat: any) => ({
       id: cat.id,
       name: cat.nameRu,
       nameTk: cat.nameTk,

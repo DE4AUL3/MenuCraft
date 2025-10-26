@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     });
 
     // Форматируем данные для фронтенда
-    const formattedClients = await Promise.all(clients.map(async (client) => {
+  const formattedClients = await Promise.all(clients.map(async (client: any) => {
       // Получаем количество заказов
       const orderCount = await prisma.order.count({
         where: { clientId: client.id }

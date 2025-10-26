@@ -47,7 +47,7 @@ export async function GET(
       status: status,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
-      items: order.orderItems.map(item => ({
+  items: order.orderItems.map((item: any) => ({
         id: item.id,
         dishId: item.mealId,
         mealId: item.mealId, // Для совместимости
@@ -58,7 +58,7 @@ export async function GET(
         amount: item.amount, // Для совместимости
         total: item.price * item.amount
       })),
-      subtotal: order.orderItems.reduce((sum, item) => sum + item.price * item.amount, 0),
+  subtotal: order.orderItems.reduce((sum: number, item: any) => sum + item.price * item.amount, 0),
       deliveryFee: 0 // Можно добавить поле доставки в будущем
     });
   } catch (error) {

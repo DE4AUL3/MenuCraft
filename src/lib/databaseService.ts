@@ -17,8 +17,7 @@ import {
   LocalizedOrder,
   Language,
   getLocalizedName,
-  getLocalizedDescription,
-  OrderStatus
+  getLocalizedDescription
 } from '../types/database';
 
 // Создаем единственный экземпляр Prisma Client
@@ -222,13 +221,13 @@ export class DatabaseService {
     }
     
     // Создаем заказ с элементами в транзакции
-    const order = await prisma.$transaction(async (tx) => {
+  const order = await prisma.$transaction(async (tx: any) => {
       const newOrder = await tx.order.create({
         data: {
           phoneNumber: data.phoneNumber,
           clientId: data.clientId || client.id,
           totalAmount,
-          status: OrderStatus.PENDING
+          status: 'PENDING'
         }
       });
       
@@ -295,17 +294,17 @@ export class DatabaseService {
     return orders as DatabaseOrder[];
   }
 
-  async updateOrderStatus(id: string, status: OrderStatus): Promise<DatabaseOrder> {
+  async updateOrderStatus(id: string, status: string): Promise<DatabaseOrder> {
     const order = await prisma.order.update({
       where: { id },
-      data: { status }
+      data: { status: status as any }
     });
     
     return order as DatabaseOrder;
   }
 
   async deleteOrder(id: string): Promise<void> {
-    await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
       // Сначала удаляем элементы заказа
       await tx.orderItem.deleteMany({
         where: { orderId: id }
@@ -324,9 +323,9 @@ export class DatabaseService {
     return await prisma.order.count();
   }
 
-  async getOrdersCountByStatus(status: OrderStatus): Promise<number> {
+  async getOrdersCountByStatus(status: string): Promise<number> {
     return await prisma.order.count({
-      where: { status }
+      where: { status: status as any }
     });
   }
 
@@ -334,7 +333,7 @@ export class DatabaseService {
     const result = await prisma.order.aggregate({
       where: {
         status: {
-          in: [OrderStatus.DELIVERED, OrderStatus.READY]
+          in: ['DELIVERED', 'READY']
         }
       },
       _sum: {
@@ -363,7 +362,7 @@ export class DatabaseService {
     });
 
     const mealsWithDetails = await Promise.all(
-      popularMeals.map(async (item) => {
+      popularMeals.map(async (item: any) => {
         const meal = await this.getMealById(item.mealId);
         return {
           meal: meal!,

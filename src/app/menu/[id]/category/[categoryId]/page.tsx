@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+// framer-motion removed from server component to avoid SSR/runtime issues
 import { useRouter, useParams } from 'next/navigation'
 import { ShoppingCart, Globe, ArrowLeft, Plus, Minus } from 'lucide-react'
 import Image from 'next/image'
@@ -178,14 +178,8 @@ export default function CategoryPage() {
     return imageService.getImageUrl(category.image)
   }
 
-  const pageVariants: any = {
-    hidden: { opacity: 0, y: 10 },
-    enter: { opacity: 1, y: 0, transition: { duration: 0.28 } },
-    exit: { opacity: 0, y: -6, transition: { duration: 0.18 } }
-  }
-
   return (
-    <motion.div variants={pageVariants} initial="hidden" animate="enter" exit="exit" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+  <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 transition-opacity duration-300">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -244,6 +238,7 @@ export default function CategoryPage() {
           alt={currentLanguage === 'tk' ? category.nameTk : category.name}
           fill
           className="object-cover"
+          priority
         />
         
         {/* Dark overlay for text readability */}
@@ -269,7 +264,7 @@ export default function CategoryPage() {
                 <div
                   key={dish.id}
                   className={`group relative bg-white rounded-3xl border border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-xl ${
-                    isExpanded ? 'ring-2 ring-emerald-400 z-20' : ''
+                    isExpanded ? 'z-20' : ''
                   }`}
                 >
                   {/* Image */}
@@ -280,7 +275,7 @@ export default function CategoryPage() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent"></div>
                     
                     {/* Price floating badge */}
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200">
@@ -290,61 +285,71 @@ export default function CategoryPage() {
                   
                   {/* Content */}
                   <div className="p-4">
-                    <h3 className="font-bold text-slate-900 mb-2 leading-tight line-clamp-2">
-                      {currentLanguage === 'tk' ? dish.name.tk : dish.name.ru}
-                    </h3>
-                    
-                    {dish.description && (
-                      <p className="text-sm text-slate-600 mb-4 line-clamp-2">
-                        {currentLanguage === 'tk' ? dish.description.tk : dish.description.ru}
-                      </p>
-                    )}
-
-                    {/* Order Button */}
-                    <button
-                      onClick={() => handleOrderClick(dish.id)}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
-                    >
-                      Заказать
-                    </button>
-
-                    {/* Expanded Order Controls */}
-                    {isExpanded && (
-                      <div className="mt-4 space-y-3 animate-in slide-in-from-top duration-300">
+                    {/* Вместо отображения расширенной панели ниже — заменяем содержимое карточки целиком */}
+                    {isExpanded ? (
+                      <div className="flex flex-col justify-between h-40 md:h-32">
                         {/* Quantity Controls */}
-                        <div className="flex items-center justify-center space-x-4 bg-slate-50 rounded-2xl p-3">
+                        <div className="flex items-center justify-center gap-3 mb-2">
                           <button
                             onClick={() => decreaseQuantity(dish.id)}
                             className="w-8 h-8 bg-white rounded-full flex items-center justify-center border border-slate-200 hover:bg-slate-100 transition-colors"
+                            aria-label="Уменьшить количество"
                           >
                             <Minus className="w-4 h-4 text-slate-600" />
                           </button>
-                          <span className="font-bold text-slate-900 min-w-[2rem] text-center">
-                            {quantity}
-                          </span>
+                          <span className="font-bold text-slate-900 min-w-8 text-center">{quantity}</span>
                           <button
                             onClick={() => increaseQuantity(dish.id)}
                             className="w-8 h-8 bg-white rounded-full flex items-center justify-center border border-slate-200 hover:bg-slate-100 transition-colors"
+                            aria-label="Увеличить количество"
                           >
                             <Plus className="w-4 h-4 text-slate-600" />
                           </button>
                         </div>
 
-                        {/* Total and Add to Cart */}
-                        <div className="space-y-2">
-                          <div className="text-center">
-                            <span className="text-lg font-bold text-slate-900">
-                              Итого: {dish.price * quantity} ТМТ
-                            </span>
+                        {/* Total, Add to Cart and Back */}
+                        <div className="pt-2">
+                          <div className="text-center mb-2">
+                            <span className="text-lg font-bold text-slate-900">Итого: {dish.price * quantity} ТМТ</span>
                           </div>
-                          <button
-                            onClick={() => addToCart(dish)}
-                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
-                          >
-                            Добавить в корзину
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleOrderClick(dish.id)}
+                              className="flex-1 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-slate-700 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                              aria-label="Назад к карточке блюда"
+                            >
+                              <ArrowLeft className="w-6 h-6" />
+                            </button>
+                            <button
+                              onClick={() => addToCart(dish)}
+                              className="flex-1 flex items-center justify-center bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                              aria-label="Добавить в корзину"
+                            >
+                              <ShoppingCart className="w-6 h-6" />
+                            </button>
+                          </div>
                         </div>
                       </div>
+                    ) : (
+                      <>
+                        <h3 className="font-bold text-slate-900 mb-2 leading-tight line-clamp-2">
+                          {currentLanguage === 'tk' ? dish.name.tk : dish.name.ru}
+                        </h3>
+
+                        {dish.description && (
+                          <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+                            {currentLanguage === 'tk' ? dish.description.tk : dish.description.ru}
+                          </p>
+                        )}
+
+                        {/* Order Button */}
+                        <button
+                          onClick={() => handleOrderClick(dish.id)}
+                          className="w-full bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        >
+                          Заказать
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -355,6 +360,6 @@ export default function CategoryPage() {
       </main>
 
       <FloatingCallButton />
-    </motion.div>
+    </div>
   )
 }

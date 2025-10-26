@@ -199,6 +199,7 @@ export default function MenuPage() {
                       alt={category.name}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      priority
                     />
                   ) : null}
                   

@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       // Группируем по дням
       const salesByDate: Record<string, { sales: number; orders: number; customers: Set<string> }> = {};
       
-      orders.forEach(order => {
+  orders.forEach((order: any) => {
         const date = order.createdAt.toISOString().split('T')[0];
         if (!salesByDate[date]) {
           salesByDate[date] = { sales: 0, orders: 0, customers: new Set() };
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
 
       const dishStats: Record<string, { name: string; orders: number; revenue: number }> = {};
 
-      orderItems.forEach(item => {
+  orderItems.forEach((item: any) => {
         const mealId = item.mealId;
         if (!dishStats[mealId]) {
           dishStats[mealId] = {

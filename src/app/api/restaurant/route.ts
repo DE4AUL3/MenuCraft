@@ -8,7 +8,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' }
     });
 
-    const restaurants = items.map((r) => ({
+  const restaurants = items.map((r: any) => ({
       id: r.id,
       slug: r.slug,
       name: r.name,

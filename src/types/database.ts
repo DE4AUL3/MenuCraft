@@ -1,8 +1,4 @@
-// Типы для работы с PostgreSQL базой данных
-import { OrderStatus as PrismaOrderStatus } from '@prisma/client';
 
-// Экспортируем OrderStatus из Prisma
-export { PrismaOrderStatus as OrderStatus };
 
 export interface DatabaseClient {
   id: string;
@@ -44,7 +40,7 @@ export interface DatabaseOrder {
   phoneNumber: string;
   clientId?: string | null;
   totalAmount: number;
-  status: PrismaOrderStatus;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -118,7 +114,7 @@ export interface UpdateMeal {
 }
 
 export interface UpdateOrder {
-  status?: PrismaOrderStatus;
+  status?: string;
   totalAmount?: number;
 }
 
@@ -154,7 +150,7 @@ export interface LocalizedOrder {
   phoneNumber: string;
   clientId?: string | null;
   totalAmount: number;
-  status: PrismaOrderStatus;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
   client?: DatabaseClient;
