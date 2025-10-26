@@ -310,22 +310,22 @@ export default function CategoryPage() {
                         {/* Total, Add to Cart and Back */}
                         <div className="pt-2">
                           <div className="text-center mb-2">
-                            <span className="text-lg font-bold text-slate-900">Итого: {dish.price * quantity} ТМТ</span>
+                            <span className="text-base sm:text-lg font-bold text-slate-900">Итого: {dish.price * quantity} ТМТ</span>
                           </div>
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleOrderClick(dish.id)}
-                              className="flex-1 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-slate-700 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                              className="flex-1 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-slate-700 py-2 sm:py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                               aria-label="Назад к карточке блюда"
                             >
-                              <ArrowLeft className="w-6 h-6" />
+                              <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
                             <button
                               onClick={() => addToCart(dish)}
-                              className="flex-1 flex items-center justify-center bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                              className="flex-1 flex items-center justify-center bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-2 sm:py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                               aria-label="Добавить в корзину"
                             >
-                              <ShoppingCart className="w-6 h-6" />
+                              <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
                           </div>
                         </div>
