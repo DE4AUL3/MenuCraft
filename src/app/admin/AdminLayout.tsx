@@ -1,7 +1,12 @@
+interface AdminLayoutProps {
+  children: React.ReactNode;
+  activeSection?: string;
+}
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { 
   LayoutDashboard, 
   UtensilsCrossed, 
@@ -13,24 +18,10 @@ import {
   Palette
 } from 'lucide-react';
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-  activeSection?: string;
-}
-
 export default function AdminLayout({ children, activeSection = 'dashboard' }: AdminLayoutProps) {
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const authState = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    const isAdmin = localStorage.getItem('isAdmin');
-    if (isAdmin !== 'true') {
-      router.push('/admin');
-    } else {
-      setIsAuthorized(true);
-    }
-  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem('isAdmin');
@@ -52,13 +43,14 @@ export default function AdminLayout({ children, activeSection = 'dashboard' }: A
     { id: 'settings', name: 'Настройки', icon: Settings, href: '/admin/settings' },
   ];
 
-  if (!isAuthorized) {
+  if (authState === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600"></div>
       </div>
     );
   }
+  if (authState === 'unauthorized') return null;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black flex">

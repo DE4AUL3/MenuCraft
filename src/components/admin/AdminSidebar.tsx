@@ -21,11 +21,11 @@ interface AdminSidebarProps {
   activeTab: string;
   onTabChange?: (tab: string) => void;
   ordersCount?: number;
-  language: Language;
-  setLanguage: (lang: Language) => void;
   navigationTabs: Array<any>;
 }
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, ordersCount = 0, language, setLanguage, navigationTabs }) => {
+import { useLanguage } from '@/hooks/useLanguage';
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, ordersCount = 0, navigationTabs }) => {
+  const { currentLanguage: language, setCurrentLanguage: setLanguage } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(true);
   const logo = defaultConfig.restaurant.logo;

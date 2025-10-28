@@ -93,14 +93,34 @@ import SmartImage from '@/components/ui/SmartImage'
 
 interface DishManagerProps {
   theme?: 'light' | 'dark';
-  language?: 'ru' | 'tk';
-  setLanguage?: (lang: 'ru' | 'tk') => void;
 }
 
-export default function DishManager({ theme = 'light', language }: DishManagerProps) {
-  // Используем только глобальный currentLanguage для реактивности
-  const { currentLanguage } = useLanguage();
-  const lang = language || currentLanguage;
+export default function DishManager({ theme = 'light' }: DishManagerProps) {
+  const { currentLanguage: lang } = useLanguage();
+  const themeStyles = {
+    light: {
+      bg: 'bg-white',
+      border: 'border-gray-200',
+      text: 'text-gray-900',
+      textMuted: 'text-gray-600',
+      cardBg: 'bg-gray-50',
+      inputBg: 'bg-white',
+      buttonBg: 'bg-blue-600 hover:bg-blue-700',
+      secondaryBg: 'bg-gray-100 hover:bg-gray-200'
+    },
+    dark: {
+      bg: '',
+      border: 'border-gray-700',
+      text: 'text-gray-100',
+      textMuted: 'text-gray-400',
+      cardBg: 'bg-gray-800',
+      inputBg: 'bg-gray-800',
+      buttonBg: 'bg-blue-600 hover:bg-blue-700',
+      secondaryBg: 'bg-gray-700 hover:bg-gray-600'
+    }
+  };
+  const themeKey: 'light' | 'dark' = theme === 'dark' ? 'dark' : 'light';
+  const styles = themeStyles[themeKey];
   const [dishes, setDishes] = useState<Dish[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -148,30 +168,7 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
     isAvailable: true
   })
 
-  const themeStyles = {
-    light: {
-      bg: 'bg-white',
-      border: 'border-gray-200',
-      text: 'text-gray-900',
-      textMuted: 'text-gray-600',
-      cardBg: 'bg-gray-50',
-      inputBg: 'bg-white',
-      buttonBg: 'bg-blue-600 hover:bg-blue-700',
-      secondaryBg: 'bg-gray-100 hover:bg-gray-200'
-    },
-    dark: {
-      bg: '',
-      border: 'border-gray-700',
-      text: 'text-gray-100',
-      textMuted: 'text-gray-400',
-      cardBg: 'bg-gray-800',
-      inputBg: 'bg-gray-800',
-      buttonBg: 'bg-blue-600 hover:bg-blue-700',
-      secondaryBg: 'bg-gray-700 hover:bg-gray-600'
-    }
-  }
 
-  const styles = themeStyles[theme]
 
   useEffect(() => {
     loadData()
@@ -569,12 +566,12 @@ export default function DishManager({ theme = 'light', language }: DishManagerPr
                 <div className="absolute top-2 right-2 flex gap-2">
                   {!dish.isAvailable && (
                     <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full shadow">
-                      {dishManagerTexts[currentLanguage].unavailable}
+                      {dishManagerTexts[lang].unavailable}
                     </span>
                   )}
                   {!dish.isActive && (
                     <span className="px-2 py-1 bg-gray-400 text-white text-xs rounded-full shadow">
-                      {dishManagerTexts[currentLanguage].inactive}
+                      {dishManagerTexts[lang].inactive}
                     </span>
                   )}
                 </div>

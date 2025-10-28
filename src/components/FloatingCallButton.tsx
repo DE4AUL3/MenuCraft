@@ -24,7 +24,7 @@ export default function FloatingCallButton() {
           boxShadow: `0 25px 50px -12px var(--accent-call)50`
         }}>
           {/* Внутреннее свечение */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           
           {/* Иконка */}
           <Phone className="w-6 h-6 relative z-10 group-hover:rotate-12 transition-transform duration-300" />

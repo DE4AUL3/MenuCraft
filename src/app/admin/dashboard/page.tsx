@@ -1,33 +1,41 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import PremiumAdminDashboard from '@/components/PremiumAdminDashboardV2';
 
-export default function AdminDashboardPage() {
+// 🔐 Универсальный хук для проверки аутентификации администратора
+function useAdminAuth() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authState, setAuthState] = React.useState<'loading' | 'authorized' | 'unauthorized'>('loading');
 
-  useEffect(() => {
-    // Проверяем аутентификацию
-    const isAdmin = localStorage.getItem('isAdmin');
-    if (isAdmin !== 'true') {
-      router.push('/admin');
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+    if (isAdmin) {
+      setAuthState('authorized');
     } else {
-      setIsAuthenticated(true);
+      setAuthState('unauthorized');
+      router.replace('/admin');
     }
   }, [router]);
 
-  if (!isAuthenticated) {
+  return authState;
+}
+
+export default function AdminDashboardPage() {
+  const authState = useAdminAuth();
+
+  if (authState === 'loading') {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Проверка доступа...</p>
-        </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600 dark:text-gray-400">Проверка доступа...</p>
       </div>
     );
   }
+
+  if (authState === 'unauthorized') return null;
 
   return <PremiumAdminDashboard />;
 }

@@ -136,7 +136,7 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className="min-h-screen bg-gradient-to-min-w-8 from-slate-50 via-white to-slate-100">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -169,7 +169,7 @@ export default function CategoryPage() {
               </button>
               <button
                 onClick={() => router.push('/cart')}
-                className="relative p-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                className="relative p-3 bg-gradient-to-min-w-8 from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartState.items.length > 0 && (
@@ -245,7 +245,7 @@ export default function CategoryPage() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-min-w-8 from-black/20 via-transparent to-transparent"></div>
                     
                     {/* Price floating badge */}
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200">
@@ -268,7 +268,7 @@ export default function CategoryPage() {
                     {/* Order Button */}
                     <button
                       onClick={() => handleOrderClick(dish.id)}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                      className="w-full bg-gradient-to-min-w-8 from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                     >
                       Заказать
                     </button>
@@ -284,7 +284,7 @@ export default function CategoryPage() {
                           >
                             <Minus className="w-4 h-4 text-slate-600" />
                           </button>
-                          <span className="font-bold text-slate-900 min-w-[2rem] text-center">
+                          <span className="font-bold text-slate-900 min-w-8 text-center">
                             {quantity}
                           </span>
                           <button
@@ -304,7 +304,7 @@ export default function CategoryPage() {
                           </div>
                           <button
                             onClick={() => addToCart(dish)}
-                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                            className="w-full bg-gradient-to-min-w-8 from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                           >
                             Добавить в корзину
                           </button>

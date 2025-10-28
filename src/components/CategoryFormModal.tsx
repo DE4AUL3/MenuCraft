@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Save, X } from 'lucide-react';
 import ImageUpload from '@/components/ui/ImageUpload';
@@ -35,10 +35,18 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
   editingId,
 }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
+  const [didFocus, setDidFocus] = useState(false);
 
   // Focus trap + Esc
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen && !didFocus) {
+      nameInputRef.current?.focus();
+      setDidFocus(true);
+    }
+    if (!isOpen && didFocus) {
+      setDidFocus(false);
+    }
     const node = modalRef.current;
     const focusableSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
     const focusable = node ? Array.from(node.querySelectorAll<HTMLElement>(focusableSelector)) : [];
@@ -65,10 +73,9 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         }
       }
     };
-    setTimeout(() => first?.focus(), 0);
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, didFocus]);
 
   if (!isOpen) return null;
 
@@ -89,7 +96,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.98, y: 10 }}
         transition={{ duration: 0.16 }}
-        className="bg-white dark:bg-[#282828] rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+  className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border border-gray-200"
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="p-6">
@@ -105,18 +112,19 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               <X className="w-6 h-6" />
             </button>
           </div>
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-6">
             {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Название (RU)
                 </label>
                 <input
+                  ref={nameInputRef}
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
                   required
                 />
               </div>
@@ -128,13 +136,13 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                   type="text"
                   value={formData.nameTk}
                   onChange={(e) => setFormData({ ...formData, nameTk: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
                   required
                 />
               </div>
             </div>
             {/* Descriptions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Описание (RU)
@@ -142,7 +150,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
                   rows={3}
                 />
               </div>
@@ -153,41 +161,27 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                 <textarea
                   value={formData.descriptionTk}
                   onChange={(e) => setFormData({ ...formData, descriptionTk: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
                   rows={3}
                 />
               </div>
             </div>
-            {/* Image Upload */}
+            {/* Image Upload (card only) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Изображение категории (для карточки)
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Изображение категории
               </label>
               <ImageUpload
                 currentImage={formData.image}
                 onImageChange={(imageUrl: string | null) => setFormData({ ...formData, image: imageUrl || '' })}
                 placeholder="Добавить изображение категории"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Рекомендуемый размер: 300x200px (соотношение 3:2)
-              </p>
-            </div>
-            {/* Dish Page Image Upload */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Изображение для страницы блюд (заголовок)
-              </label>
-              <ImageUpload
-                currentImage={formData.dishPageImage}
-                onImageChange={(imageUrl) => setFormData({ ...formData, dishPageImage: imageUrl || '' })}
-                placeholder="Добавить изображение для страницы блюд"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Рекомендуемый размер: 1200x300px (широкий баннер)
+              <p className="text-xs text-gray-500 mt-1">
+                Рекомендуемый размер: 300x200px (3:2)
               </p>
             </div>
             {/* Sort Order and Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Порядок сортировки
@@ -197,7 +191,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                   min="1"
                   value={formData.sortOrder}
                   onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
                 />
               </div>
               <div>
@@ -207,7 +201,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                 <select
                   value={formData.isActive ? 'active' : 'inactive'}
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'active' })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
                 >
                   <option value="active">Активна</option>
                   <option value="inactive">Неактивна</option>
@@ -219,7 +213,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               <button
                 type="submit"
                 disabled={isSaving}
-                className={`flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg transition-colors ${isSaving ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+                className={`flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg transition-colors text-base font-semibold shadow ${isSaving ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
               >
                 {isSaving ? (
                   <svg className="animate-spin w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="4" opacity="0.25" /><path d="M22 12a10 10 0 0 1-10 10" stroke="white" strokeWidth="4" strokeLinecap="round" /></svg>
@@ -231,7 +225,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-300 dark:bg-[#212121] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-[#282828] transition-colors"
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-base font-semibold shadow"
               >
                 Отмена
               </button>

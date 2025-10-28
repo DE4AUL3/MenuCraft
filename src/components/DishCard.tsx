@@ -53,7 +53,7 @@ export default function DishCard({ dish }: DishCardProps) {
           className="object-cover"
           priority={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-min-w-8 from-black/30 to-transparent" />
         <div className="absolute bottom-3 left-3 z-10">
           <div className={`px-3 py-1 rounded-full backdrop-blur-sm ${isDark ? 'bg-black/60' : 'bg-white/80'}`}>
             <span className="text-lg font-bold text-emerald-600">{dish.price} сом</span>
@@ -62,7 +62,7 @@ export default function DishCard({ dish }: DishCardProps) {
       </div>
 
       {/* Lower content: swapped in-place when orderMode toggles */}
-      <div className="p-4 h-[180px] md:h-[160px] flex flex-col justify-between transition-all duration-200">
+  <div className="p-4 h-[180px] md:h-40 flex flex-col justify-between transition-all duration-200">
         {!orderMode ? (
           <>
             <div>

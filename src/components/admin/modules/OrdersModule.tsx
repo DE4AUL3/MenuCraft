@@ -30,7 +30,7 @@ function TabButton({ label, icon, active, onClick }: TabButtonProps) {
   );
 }
 import toast from 'react-hot-toast';
-import type { Language } from '@/hooks/useLanguage';
+import { useLanguage } from '@/hooks/useLanguage';
 import type { Order } from '@/types/common';
 
 // ─────────────────────────────────────────────
@@ -54,7 +54,6 @@ function useOrdersAnalytics(orders: Order[]) {
 interface OrdersModuleProps {
   className?: string;
   setOrdersCount?: (count: number) => void;
-  language?: Language;
 }
 
 type Tab = 'active' | 'history' | 'analytics';
@@ -133,8 +132,8 @@ const statusLabels: Record<string, { ru: string; tk: string }> = {
 export default function OrdersModule({
   className = '',
   setOrdersCount,
-  language = 'ru',
 }: OrdersModuleProps) {
+  const { currentLanguage: language } = useLanguage();
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const fetchOrders = async (signal?: AbortSignal) => {

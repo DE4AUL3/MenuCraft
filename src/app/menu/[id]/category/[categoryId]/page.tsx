@@ -1,4 +1,7 @@
+
 "use client"
+
+import ContactsModal from '@/components/ContactsModal'
 
 import { useState, useEffect, useRef } from 'react'
 // framer-motion removed from server component to avoid SSR/runtime issues
@@ -15,17 +18,27 @@ import type { Category, Dish } from '@/types/common'
 
 
 export default function CategoryPage() {
-  // Хуки должны быть только внутри компонента!
+  // Все хуки должны быть вызваны до любого return!
+  const [showContacts, setShowContacts] = useState(false)
   const [fade, setFade] = useState<'in' | 'out'>('in')
   const prevCategoryId = useRef<string | null>(null)
   const params = useParams()
   const categoryId = params?.categoryId as string
   const restaurantId = params?.id as string
-
   const [categories, setCategories] = useState<Category[]>([])
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { currentLanguage, setCurrentLanguage, toggleLanguage } = useLanguage()
+  const { state: cartState, dispatch } = useCart()
+  const { light: theme } = themes
+  const [isLoading, setIsLoading] = useState(true)
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
+  const [quantities, setQuantities] = useState<Record<string, number>>({})
+  const [category, setCategory] = useState<Category | null>(null)
+  const [dishes, setDishes] = useState<Dish[]>([])
 
-  // Загружаем все категории для навигации
   useEffect(() => {
+    let isMounted = true;
     const loadCategories = async () => {
       try {
         const response = await fetch('/api/category')
@@ -42,7 +55,7 @@ export default function CategoryPage() {
             isActive: cat.status,
             sortOrder: cat.order
           }))
-          setCategories(transformedCategories)
+          if (isMounted) setCategories(transformedCategories)
         }
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -50,19 +63,8 @@ export default function CategoryPage() {
       }
     }
     loadCategories()
+    return () => { isMounted = false }
   }, [restaurantId])
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { currentLanguage, setCurrentLanguage, toggleLanguage } = useLanguage()
-  const { state: cartState, dispatch } = useCart()
-  const { light: theme } = themes
-
-  const [isLoading, setIsLoading] = useState(true)
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
-  const [quantities, setQuantities] = useState<Record<string, number>>({})
-  const [category, setCategory] = useState<Category | null>(null)
-  const [dishes, setDishes] = useState<Dish[]>([])
-
 
   // Синхронизируем язык с query-параметром lang
   useEffect(() => {
@@ -72,41 +74,64 @@ export default function CategoryPage() {
     }
   }, [searchParams, setCurrentLanguage]);
 
+  // scrollIntoView для активной категории — хуки всегда должны быть на верхнем уровне
   useEffect(() => {
-    // Если категория изменилась, запускаем анимацию исчезновения
-    if (prevCategoryId.current && prevCategoryId.current !== categoryId) {
-      setFade('out')
-      // После анимации исчезновения загружаем данные и показываем fade-in
-      setTimeout(() => {
-        loadCategoryData()
-      }, 200)
-    } else {
-      loadCategoryData()
+    const activeBtn = document.querySelector(`[data-cat="${categoryId}"]`);
+    if (activeBtn) {
+      try {
+        (activeBtn as HTMLElement).scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } catch (e) {
+        // ignore
+      }
     }
-    prevCategoryId.current = categoryId
+  }, [categoryId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    // Если категория изменилась, запускаем анимацию исчезновения
+    const run = async () => {
+      setIsLoading(true);
+      if (prevCategoryId.current && prevCategoryId.current !== categoryId) {
+        setFade('out')
+        setTimeout(async () => {
+          await loadCategoryData();
+          if (isMounted) setIsLoading(false);
+        }, 200)
+      } else {
+        await loadCategoryData();
+        if (isMounted) setIsLoading(false);
+      }
+      prevCategoryId.current = categoryId
+    }
+    run();
+    return () => { isMounted = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId])
 
   const loadCategoryData = async () => {
     try {
-      // Загружаем категорию
-      const categoryResponse = await fetch('/api/category')
-      const categories = await categoryResponse.json()
-      const foundCategory = categories.find((cat: any) => cat.id === categoryId)
+      // Используем уже загруженные категории, если есть
+      let foundCategory = categories.find((cat) => cat.id === categoryId);
+      if (!foundCategory) {
+        const response = await fetch('/api/category');
+        const data = await response.json();
+        foundCategory = data.find((cat: any) => cat.id === categoryId);
+      }
+      if (!foundCategory) return;
       const transformedCategory: Category = {
         id: foundCategory.id,
-        name: foundCategory.nameRu,
+        name: foundCategory.name,
         nameTk: foundCategory.nameTk,
-        image: foundCategory.imageCard,
-        gradient: 'from-slate-500 to-slate-700',
-        description: foundCategory.descriptionRu || '',
+        image: foundCategory.image,
+        gradient: foundCategory.gradient || 'from-slate-500 to-slate-700',
+        description: foundCategory.description || '',
         descriptionTk: foundCategory.descriptionTk || '',
-        isActive: foundCategory.status,
-        sortOrder: foundCategory.order,
+        isActive: foundCategory.isActive,
+        sortOrder: foundCategory.sortOrder,
         createdAt: foundCategory.createdAt,
         updatedAt: foundCategory.updatedAt
-      }
-      setCategory(transformedCategory)
+      };
+      setCategory(transformedCategory);
 
       // Попытка использовать предзагруженные данные из window/session cache для мгновенного отображения
       let meals: any[] | null = null
@@ -141,8 +166,6 @@ export default function CategoryPage() {
       setTimeout(() => setFade('in'), 10)
     } catch (error) {
       console.error('Error loading data:', error)
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -197,6 +220,9 @@ export default function CategoryPage() {
     }))
   }
 
+
+  // --- UI ниже ---
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -225,18 +251,16 @@ export default function CategoryPage() {
     )
   }
 
-  // Получаем изображение для заголовка категории
-  const getCategoryHeaderImage = () => {
-    if (category.dishPageImage) {
-      return imageService.getImageUrl(category.dishPageImage)
-    }
-    return imageService.getImageUrl(category.image)
-  }
+  // Получаем изображение для заголовка категории (упрощённо)
+  const getCategoryHeaderImage = () => imageService.getImageUrl(category.dishPageImage || category.image)
+
+  // scrollIntoView для активной категории
+  
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 transition-opacity duration-300">
+  <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 transition-opacity duration-300">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
+  <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Back Button + Title */}
@@ -269,6 +293,14 @@ export default function CategoryPage() {
                   {currentLanguage === 'ru' ? 'TM' : 'RU'}
                 </span>
               </button>
+      {/* Модальное окно контактов */}
+      {showContacts && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="relative">
+            <ContactsModal onClose={() => setShowContacts(false)} />
+          </div>
+        </div>
+      )}
               <button
                 onClick={() => router.push('/cart')}
                 className="relative p-3 text-white rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
@@ -291,21 +323,10 @@ export default function CategoryPage() {
   <div className="sticky top-[72px] z-20 bg-white/90 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x">
-            {/* Получаем все категории из API и отображаем */}
-            {/* Для этого потребуется состояние categories и useEffect, как на странице меню */}
-            {/* Здесь пример с моком, ниже будет реальный код */}
-            {/* categories.map((cat) => ( */}
-            {/*   <button */}
-            {/*     key={cat.id} */}
-            {/*     onClick={() => router.push(`/menu/${restaurantId}/category/${cat.id}`)} */}
-            {/*     className={`px-6 py-2 rounded-full whitespace-nowrap transition-all font-medium snap-center ${cat.id === categoryId ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`} */}
-            {/*   > */}
-            {/*     {currentLanguage === 'tk' ? cat.nameTk : cat.name} */}
-            {/*   </button> */}
-            {/* )) */}
             {categories && categories.length > 0 && categories.map((cat: Category) => (
               <button
                 key={cat.id}
+                data-cat={cat.id}
                 onClick={() => router.push(`/menu/${restaurantId}/category/${cat.id}`)}
                 className={`px-6 py-2 rounded-full whitespace-nowrap transition-all font-medium snap-center ${cat.id === categoryId ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
@@ -317,7 +338,17 @@ export default function CategoryPage() {
       </div>
 
       {/* Menu Items */}
-  <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-opacity duration-200 ${fade === 'out' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+  <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300 ${fade === 'out' ? 'opacity-0 scale-[0.99] pointer-events-none' : 'opacity-100 scale-100'}`}>
+  {/* Плавающая кнопка корзины для мобильных */}
+  {cartState.items.length > 0 && (
+    <button
+      onClick={() => router.push('/cart')}
+      className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white p-4 rounded-full shadow-xl hover:bg-emerald-700 transition-all block md:hidden"
+      style={{ boxShadow: '0 4px 24px 0 rgba(16, 185, 129, 0.25)' }}
+    >
+      <ShoppingCart className="w-5 h-5" />
+    </button>
+  )}
         {dishes.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">В этой категории пока нет блюд</p>
@@ -346,8 +377,8 @@ export default function CategoryPage() {
               <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent"></div>
                     
                     {/* Price floating badge */}
-                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200">
-                      <span className="text-sm font-bold text-slate-900">{dish.price} ТМТ</span>
+                    <div className="absolute top-3 right-3 px-4 py-1.5 rounded-2xl border border-emerald-200 bg-linear-to-br from-white/90 to-emerald-50 shadow-lg flex items-center">
+                      <span className="text-sm font-extrabold text-emerald-700 drop-shadow-sm">{dish.price} ТМТ</span>
                     </div>
                   </div>
                   
@@ -405,7 +436,7 @@ export default function CategoryPage() {
                         </h3>
 
                         {dish.description && (
-                          <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+                          <p className="text-xs text-slate-600 mb-4 line-clamp-2">
                             {currentLanguage === 'tk' ? dish.description.tk : dish.description.ru}
                           </p>
                         )}
@@ -413,7 +444,7 @@ export default function CategoryPage() {
                         {/* Order Button */}
                         <button
                           onClick={() => handleOrderClick(dish.id)}
-                          className="w-full bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                          className="w-full bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 rounded-2xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
                           Заказать
                         </button>

@@ -55,6 +55,12 @@ export default function AdminOrderNotifier({ setOrdersCount }: { setOrdersCount?
           playSound(audioRef);
         }
         prevOrderIds.current = newIds;
+
+        // Считаем только активные заказы и обновляем бейдж
+        if (setOrdersCount) {
+          const activeCount = orders.filter((o: any) => ['new', 'pending', 'preparing', 'ready', 'delivering'].includes(o.status)).length;
+          setOrdersCount(activeCount);
+        }
       } catch {}
     }
 
@@ -66,6 +72,11 @@ export default function AdminOrderNotifier({ setOrdersCount }: { setOrdersCount?
         const orders = await res.json();
         if (!Array.isArray(orders)) return;
         prevOrderIds.current = orders.map((o: any) => o.id);
+        // Считаем только активные заказы и обновляем бейдж при инициализации
+        if (setOrdersCount) {
+          const activeCount = orders.filter((o: any) => ['new', 'pending', 'preparing', 'ready', 'delivering'].includes(o.status)).length;
+          setOrdersCount(activeCount);
+        }
       } catch {}
     })();
 

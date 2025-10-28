@@ -169,8 +169,6 @@ export default function AdminLayout({ children, activeTab: externalActiveTab, on
         activeTab={activeTab}
         onTabChange={handleTabChange}
         ordersCount={ordersCount}
-        language={language}
-        setLanguage={setCurrentLanguage}
         navigationTabs={navigationTabs}
       />
       <main className="flex-1 transition-all duration-300 relative z-10 bg-white text-gray-900">
