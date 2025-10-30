@@ -12,7 +12,7 @@ const goldEleganceColors: AppThemeColors = {
     border: '#e8e4dc'
   },
   accent: {
-    primary: 'from-[#d4af37] to-[#b8860b]', // благородное золото
+  primary: 'from-[#d4af37] to-[#d8a62b]', // благородное золото
     secondary: 'from-[#c5a572] to-[#d4af37]', // тёплое золото
     success: 'from-emerald-500 to-green-600',
     warning: 'from-amber-500 to-orange-500',
@@ -34,7 +34,7 @@ const goldEleganceClasses: AppThemeClasses = {
   textMuted: 'text-[#9a8f7a]',
 
   hover: 'hover:bg-[#f4f0e6]',
-  accent: 'bg-linear-to-r from-[#d4af37] to-[#b8860b]',
+  accent: 'bg-linear-to-r from-[#d4af37] to-[#d8a62b]',
   accentSecondary: 'bg-linear-to-r from-[#c5a572] to-[#d4af37]',
 
   success: 'text-emerald-600 bg-emerald-50',
@@ -46,9 +46,9 @@ const goldEleganceClasses: AppThemeClasses = {
 
   gradients: {
     main: 'bg-gradient-to-br from-[#fffefc] via-[#faf6ed] to-[#f2e6c9]',
-    accent: 'from-[#d4af37] to-[#b8860b]',
+  accent: 'from-[#d4af37] to-[#d8a62b]',
     card: 'from-[#fffefc] via-[#faf6ed] to-[#f2e6c9]',
-    hero: 'from-[#d4af37] via-[#c5a572] to-[#b8860b]'
+  hero: 'from-[#d4af37] via-[#c5a572] to-[#d8a62b]'
   }
 }
 /**
@@ -321,14 +321,6 @@ const hanTagamClasses: AppThemeClasses = {
 
 // Хранилище всех тем
 const appThemes: Record<string, { colors: AppThemeColors; classes: AppThemeClasses }> = {
-  dark: {
-    colors: darkThemeColors,
-    classes: darkThemeClasses
-  },
-  'han-tagam': {
-    colors: hanTagamColors,
-    classes: hanTagamClasses
-  },
   'gold-elegance': {
     colors: goldEleganceColors,
     classes: goldEleganceClasses
@@ -338,22 +330,22 @@ const appThemes: Record<string, { colors: AppThemeColors; classes: AppThemeClass
 /**
  * Получить CSS классы для указанной темы
  */
-export function getAppThemeClasses(theme: string = 'dark'): AppThemeClasses {
-  return (appThemes[theme] || appThemes['dark']).classes
+ export function getAppThemeClasses(theme: string = 'gold-elegance'): AppThemeClasses {
+   return (appThemes[theme] || appThemes['gold-elegance']).classes
 }
 
 /**
  * Получить цвета для указанной темы
  */
-export function getAppThemeColors(theme: string = 'dark'): AppThemeColors {
-  return (appThemes[theme] || appThemes['dark']).colors
+ export function getAppThemeColors(theme: string = 'gold-elegance'): AppThemeColors {
+   return (appThemes[theme] || appThemes['gold-elegance']).colors
 }
 
 /**
  * Получить полную тему
  */
-export function getAppTheme(theme: string = 'dark') {
-  return appThemes[theme] || appThemes['dark']
+ export function getAppTheme(theme: string = 'gold-elegance') {
+   return appThemes[theme] || appThemes['gold-elegance']
 }
 
 // Обратная совместимость с админской системой тем

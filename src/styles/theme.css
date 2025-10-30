@@ -1,36 +1,12 @@
 /* theme.css — централизованные CSS-переменные для тем */
 
+/* Только одна тема: gold-elegance */
 :root {
-  /* Светлая тема (по умолчанию) */
   --color-bg: #ffffff;
   --color-text: #111111;
-  --color-primary: #0070f3;
+  --color-primary: #d4af37;
   --color-secondary: #e2e8f0;
-  --color-accent: #f59e0b;
-}
-
-[data-theme="dark"] {
-  --color-bg: #0f172a;
-  --color-text: #f8fafc;
-  --color-primary: #3b82f6;
-  --color-secondary: #1e293b;
-  --color-accent: #facc15;
-}
-
-[data-theme="brand1"] {
-  --color-bg: #f0fff4;
-  --color-text: #064e3b;
-  --color-primary: #10b981;
-  --color-secondary: #d1fae5;
-  --color-accent: #34d399;
-}
-
-[data-theme="brand2"] {
-  --color-bg: #fff7ed;
-  --color-text: #7c2d12;
-  --color-primary: #ea580c;
-  --color-secondary: #fed7aa;
-  --color-accent: #fbbf24;
+  --color-accent: #b8860b;
 }
 
 /* Можно добавить сколько угодно тем */

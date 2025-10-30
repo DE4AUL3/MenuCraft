@@ -346,7 +346,7 @@ export default function CategoryPage() {
                         <div className="flex items-center justify-center gap-2 mb-1.5">
                           <button
                             onClick={() => decreaseQuantity(dish.id)}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center border transition-colors ${theme.bgSecondary} ${theme.text}`}
+                            className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${theme.bgSecondary} ${theme.text}`}
                             aria-label="Уменьшить количество"
                           >
                             <Minus className="w-4 h-4" />
@@ -354,7 +354,7 @@ export default function CategoryPage() {
                           <span className={`font-bold min-w-8 text-center ${theme.text}`}>{quantity}</span>
                           <button
                             onClick={() => increaseQuantity(dish.id)}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center border transition-colors ${theme.bgSecondary} ${theme.text}`}
+                            className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${theme.bgSecondary} ${theme.text}`}
                             aria-label="Увеличить количество"
                           >
                             <Plus className="w-4 h-4" />

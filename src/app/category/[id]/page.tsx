@@ -9,7 +9,6 @@ import { useTranslation } from '@/components/LanguageToggle';
 import { Category, Dish } from '@/types';
 import { getAppThemeClasses } from '@/styles/appTheme';
 // back navigation intentionally removed for category listing
-import restaurantData from '../../../../data/restaurants.json';
 
 export default function CategoryPage() {
   const params = useParams();
@@ -18,18 +17,14 @@ export default function CategoryPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const categoryId = params.id as string;
-    
-    // Ищем категорию в первом ресторане (Kemine Bistro)
-    const restaurant = restaurantData.restaurants[0];
-    const foundCategory = restaurant.categories.find(cat => cat.id === categoryId);
-    
-    if (foundCategory) {
-      setCategory(foundCategory);
-      setDishes(foundCategory.dishes);
-    }
-  }, [params.id]);
+  // TODO: Production: Получать категорию и блюда по id через API/SSR/Server Actions
+  // Пример:
+  // useEffect(() => {
+  //   fetchCategoryAndDishes(params.id).then(({category, dishes}) => {
+  //     setCategory(category);
+  //     setDishes(dishes);
+  //   });
+  // }, [params.id]);
 
   // Используем gold-elegance тему
   const theme = getAppThemeClasses('gold-elegance');
