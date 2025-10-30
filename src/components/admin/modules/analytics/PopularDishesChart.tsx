@@ -1,7 +1,7 @@
 'use client'
 
 import { Star, TrendingUp, Package } from 'lucide-react'
-import { DishData, formatCurrency } from './mockData'
+import { DishData, formatCurrency } from '@/components/admin/modules/analytics/mockData'
 import SmartImage from '@/components/ui/SmartImage'
 
 interface PopularDishesChartProps {
@@ -99,12 +99,12 @@ export default function PopularDishesChart({ data, theme = 'light' }: PopularDis
             >
               <div className="flex items-center gap-4">
                 {/* Ранг */}
-                <div className={`flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r ${getCategoryColor(dish.category)} text-white font-bold text-sm shadow-lg`}>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-lg bg-linear-to-r ${getCategoryColor(dish.category)} text-white font-bold text-sm shadow-lg`}>
                   {index + 1}
                 </div>
 
                 {/* Изображение блюда */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="w-12 h-12 rounded-lg bg-gray-200/50 flex items-center justify-center overflow-hidden">
                     {dish.image ? (
                       <SmartImage 
@@ -133,7 +133,7 @@ export default function PopularDishesChart({ data, theme = 'light' }: PopularDis
                   </div>
                   
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-sm px-2 py-1 rounded-full bg-gradient-to-r ${getCategoryColor(dish.category)} text-white text-xs font-medium`}>
+                    <span className={`text-sm px-2 py-1 rounded-full bg-linear-to-r ${getCategoryColor(dish.category)} text-white text-xs font-medium`}>
                       {dish.category}
                     </span>
                     <div className="text-right">
@@ -149,14 +149,14 @@ export default function PopularDishesChart({ data, theme = 'light' }: PopularDis
                   {/* Прогресс-бар */}
                   <div className={`h-2 rounded-full overflow-hidden ${themeClasses.progressBg}`}>
                     <div 
-                      className={`h-full bg-gradient-to-r ${getCategoryColor(dish.category)} transition-all duration-500 ease-out`}
+                      className={`h-full bg-linear-to-r ${getCategoryColor(dish.category)} transition-all duration-500 ease-out`}
                       style={{ width: `${progressWidth}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Индикатор роста */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="flex items-center gap-1 text-green-500">
                     <TrendingUp className="w-4 h-4" />
                     <span className="text-sm font-medium">

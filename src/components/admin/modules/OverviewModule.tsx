@@ -87,7 +87,7 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme, 
         const totalMeals = Array.isArray(meals) ? meals.length : 0;
 
         // 4. График продаж
-        const salesRes = await fetch('/api/analytics?type=sales&days=30');
+  const salesRes = await fetch('/api/analytics?type=sales&days=7');
         if (salesRes.status === 429) {
           rateLimited = true;
           alert('Слишком много запросов. Попробуйте позже.');
@@ -118,7 +118,7 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme, 
 
     const fetchSales = async () => {
       try {
-        const res = await fetch('/api/analytics?type=sales&days=30');
+  const res = await fetch('/api/analytics?type=sales&days=7');
         if (!res.ok) return;
         const data = await res.json();
         // data: [{ date, sales, orders, customers }]
