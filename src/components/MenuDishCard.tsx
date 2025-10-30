@@ -1,7 +1,9 @@
 "use client";
 
+
 import DishCard from '@/components/DishCard';
 import type { Dish as CommonDish } from '@/types/common';
+import { useTheme } from '@/hooks/useTheme';
 
 interface MenuDishCardProps {
   dish: CommonDish;
@@ -9,7 +11,7 @@ interface MenuDishCardProps {
 }
 
 export default function MenuDishCard({ dish, language = 'ru' }: MenuDishCardProps) {
-  // Map common dish (with localized name/description) to simple Dish shape used by DishCard
+  const { currentTheme } = useTheme();
   const simpleDish = {
     id: dish.id,
     name: language === 'tk' ? dish.name.tk : dish.name.ru,
@@ -19,7 +21,14 @@ export default function MenuDishCard({ dish, language = 'ru' }: MenuDishCardProp
   };
 
   return (
-    <div className="group relative bg-white rounded-3xl border border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-xl">
+    <div
+      className="group relative rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl"
+      style={{
+        background: currentTheme.colors.background.primary,
+        border: `1.5px solid ${currentTheme.colors.border.primary}`,
+        color: currentTheme.colors.text.primary
+      }}
+    >
       <DishCard dish={simpleDish} />
     </div>
   );

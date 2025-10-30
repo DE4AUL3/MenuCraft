@@ -22,7 +22,7 @@ export default function RestaurantModule(props: RestaurantModuleProps) {
   const { className = '', theme = 'light' } = props;
   const [currentSubTab, setCurrentSubTab] = useState<SubTab>('categories');
   const [stats, setStats] = useState<{categories: number; dishes: number; zones: number}>({categories: 0, dishes: 0, zones: 0});
-  const { currentLanguage: lang } = useLanguage ? useLanguage() : { currentLanguage: 'ru' };
+  const { currentLanguage: lang } = useLanguage();
 
   // Тексты для переводов
   const t = {

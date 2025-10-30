@@ -11,7 +11,7 @@ import { useCart } from '@/hooks/useCart'
 import { Category } from '@/types/menu'
 import { imageService } from '@/lib/imageService'
 import FloatingCallButton from '@/components/FloatingCallButton'
-import { themes } from '@/styles/simpleTheme'
+import { getAppThemeColors, getAppThemeClasses } from '@/styles/appTheme'
 
 export default function MenuPage() {
   const router = useRouter()
@@ -55,8 +55,9 @@ export default function MenuPage() {
     loadCategories()
   }, [])
 
-  // Импортируем тему
-  const { light: theme } = themes;
+  // Используем gold-elegance тему
+  const themeColors = getAppThemeColors('gold-elegance');
+  const themeClasses = getAppThemeClasses('gold-elegance');
 
   // Вычисляем отображаемое имя ресторана по сегменту URL (поддерживаем числовые legacy id)
   let restaurantDisplayName = 'Han Tagam';
@@ -81,13 +82,13 @@ export default function MenuPage() {
       initial="hidden"
       animate="enter"
       exit="exit"
-      className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding`}
-      style={{ background: theme.colors.background.secondary }}
+  className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding ${themeClasses.bg}`}
+  style={{ background: themeColors.primary.background }}
     >
       {/* Header */}
       <header
-        className={`sticky top-0 z-40 backdrop-blur-lg border-b`}
-        style={{ background: theme.colors.background.primary, borderColor: theme.colors.border.primary }}
+        className={`sticky top-0 z-40 backdrop-blur-lg border-b ${themeClasses.background} ${themeClasses.border}`}
+        style={{ background: themeColors.primary.background, borderColor: themeColors.secondary.border }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
@@ -104,7 +105,7 @@ export default function MenuPage() {
                   />
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold" style={{color: theme.colors.text.primary}}>
+                  <h1 className={`text-xl sm:text-2xl font-bold ${themeClasses.text}`}> 
                     {restaurantDisplayName}
                   </h1>
                 </div>
@@ -116,23 +117,22 @@ export default function MenuPage() {
               {/* Language Toggle */}
               <button
                 onClick={toggleLanguage}
-                className="flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200"
+                className="p-2 rounded-full transition-colors duration-200 border-0 bg-transparent hover:bg-transparent focus:outline-none"
+                style={{ boxShadow: 'none' }}
+                aria-label="Сменить язык"
               >
-                <Globe className="w-5 h-5 text-slate-900" />
-                <span className="text-sm font-medium" style={{color: theme.colors.text.primary}}>
-                  {currentLanguage === 'ru' ? 'TM' : 'RU'}
-                </span>
+                <Globe className="w-6 h-6" style={{ color: '#d4af37' }} />
               </button>
 
               {/* Cart */}
               <button
                 onClick={() => router.push('/cart')}
-                className="relative p-2 text-white rounded-xl transition-colors duration-200"
-                style={{ background: theme.colors.accent.call }}
+                className={`relative p-2 rounded-xl transition-colors duration-200 ${themeClasses.accent}`}
+                style={{ color: '#fff', background: 'linear-gradient(90deg, #d4af37 0%, #b8860b 100%)' }}
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartState.items.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-[#d4af37] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartState.items.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 )}
@@ -188,11 +188,11 @@ export default function MenuPage() {
                     }
                   } catch (e) {}
                 }}
-                className="group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl border overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.03] active:scale-[0.97]"
-                style={{ background: theme.colors.background.primary, borderColor: theme.colors.border.primary }}
+                className={`group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.03] active:scale-[0.97] ${themeClasses.card}`}
+                style={{}}
               >
                 {/* Category Image */}
-                <div className={`relative h-32 sm:h-36 bg-linear-to-br ${category.gradient || 'from-slate-500 to-slate-700'} overflow-hidden`}>
+                <div className={`relative h-32 sm:h-36 bg-linear-to-br ${themeClasses.gradients.card} overflow-hidden`}>
                   {category.image ? (
                     <Image
                       src={category.image}
@@ -208,7 +208,7 @@ export default function MenuPage() {
                   
                   {/* Category Image */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-full sm:w-full sm:h-full backdrop-blur-md border flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300" style={{background: theme.colors.background.secondary, borderColor: theme.colors.border.primary}}>
+                    <div className="w-full h-full sm:w-full sm:h-full backdrop-blur-md flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300 bg-white">
                       {category.image ? (
                         <Image
                           src={imageService.getImageUrl(category.image)}
@@ -223,8 +223,8 @@ export default function MenuPage() {
                 </div>
                 
                 {/* Category Info (compact for mobile) */}
-                <div className="px-2 py-2 sm:px-4 sm:py-4 text-center bg-white/10 backdrop-blur-md border-t border-white/20">
-                  <h3 className="font-semibold text-xs sm:text-base mb-0.5 sm:mb-1 leading-tight sm:leading-normal transition-colors duration-300" style={{color: theme.colors.text.primary}}>
+                <div className={`px-2 py-2 sm:px-4 sm:py-4 text-center ${themeClasses.bgSecondary} backdrop-blur-md border-t ${themeClasses.border}`}>
+                  <h3 className={`font-semibold text-xs sm:text-base mb-0.5 sm:mb-1 leading-tight sm:leading-normal transition-colors duration-300 ${themeClasses.text}`}>
                     {currentLanguage === 'tk' ? (category.nameTk || category.name) : category.name}
                   </h3>
                 </div>

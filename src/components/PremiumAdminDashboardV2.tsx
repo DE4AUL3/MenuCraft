@@ -88,7 +88,7 @@ export default function PremiumAdminDashboardV2({
     >
       {/* Уведомления и звук для новых заказов */}
       {/* setOrdersCount будет проброшен через AdminLayout */}
-      {/** @ts-ignore */}
+
       <AdminOrderNotifier />
       <div className="p-6">
         <AnimatePresence mode="wait">

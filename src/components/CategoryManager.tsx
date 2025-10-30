@@ -24,7 +24,7 @@ interface CategoryFormData {
 }
 
 export default function CategoryManager() {
-  const { currentLanguage } = useLanguage ? useLanguage() : { currentLanguage: 'ru' };
+  const { currentLanguage } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

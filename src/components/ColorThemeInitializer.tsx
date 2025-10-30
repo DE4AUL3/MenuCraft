@@ -1,22 +1,8 @@
-'use client';
+"use client";
+import React from "react";
 
-
-
-import { useEffect } from 'react';
-import { getSavedColorTheme, applyColorTheme, setDefaultColors } from '@/lib/themeService';
-
-
-
+// Минимальный компонент-заглушка для инициализации темы
 export default function ColorThemeInitializer() {
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    const root = document.documentElement;
-    const theme = getSavedColorTheme();
-    if (theme) {
-      applyColorTheme(theme, root);
-    } else {
-      setDefaultColors(root);
-    }
-  }, []);
-  return null; // Этот компонент ничего не рендерит
+	// Здесь можно добавить логику инициализации темы, если потребуется
+	return null;
 }

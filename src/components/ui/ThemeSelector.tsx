@@ -20,7 +20,7 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
       name: 'Темная',
       description: 'Современная темная тема',
       colors: ['#0f172a', '#1e293b', '#3b82f6', '#8b5cf6'],
-      preview: 'bg-gray-900 border-gray-700'
+  preview: 'bg-bg border-accent'
     }
   ]
 
@@ -54,7 +54,7 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
         className="relative"
       >
         <span className="hidden md:inline">Тема</span>
-        <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary-500 rounded-full border-2 border-white" />
+  <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-bg" />
       </Button>
 
       <AnimatePresence>
@@ -79,8 +79,8 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
             >
               <Card variant="glass" className="p-6 w-80 max-w-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-primary-500" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold text-text">
                     Выбор темы
                   </h3>
                 </div>
@@ -95,18 +95,18 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
                       }}
                       className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                         currentTheme === theme.id
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                          ? 'border-primary bg-primary/10'
+                          : 'border-accent hover:border-primary'
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900 dark:text-white mb-1">
+                          <div className="font-medium text-text mb-1">
                             {theme.name}
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                          <div className="text-sm text-text/70 mb-2">
                             {theme.description}
                           </div>
                           
@@ -115,7 +115,7 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
                             {theme.colors.map((color, index) => (
                               <div
                                 key={index}
-                                className="w-4 h-4 rounded-full border border-gray-300"
+                                className="w-4 h-4 rounded-full border border-accent"
                                 style={{ backgroundColor: color }}
                               />
                             ))}
@@ -126,7 +126,7 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="flex-shrink-0 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center"
+                            className="shrink-0 w-6 h-6 bg-primary rounded-full flex items-center justify-center"
                           >
                             <Check className="w-4 h-4 text-white" />
                           </motion.div>
@@ -136,8 +136,8 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
                   ))}
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                <div className="mt-4 pt-4 border-t border-accent">
+                  <p className="text-xs text-text/60 text-center">
                     Тема сохраняется автоматически
                   </p>
                 </div>

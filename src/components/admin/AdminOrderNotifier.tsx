@@ -36,8 +36,7 @@ export default function AdminOrderNotifier({ setOrdersCount }: { setOrdersCount?
   }, []);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    let isMounted = true;
+  let isMounted = true;
 
     async function poll() {
       try {
@@ -80,7 +79,7 @@ export default function AdminOrderNotifier({ setOrdersCount }: { setOrdersCount?
       } catch {}
     })();
 
-    interval = setInterval(() => {
+    const interval = setInterval(() => {
       if (isMounted) poll();
     }, 10000);
 

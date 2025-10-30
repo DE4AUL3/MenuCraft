@@ -165,18 +165,18 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme, 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-3">
-        {[
-          { id: 'basic', label: 'Базовый', icon: <Activity className="w-5 h-5" /> },
-          { id: 'activity', label: 'Активность', icon: <Activity className="w-5 h-5 text-green-500" /> }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => { setCurrentSubTab(tab.id as 'basic' | 'activity'); onSubTabChange?.(tab.id); }}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${currentSubTab === tab.id ? 'bg-gradient-to-r from-blue-500 to-green-400 text-white shadow-xl' : 'bg-white text-gray-800 hover:bg-gray-50 shadow-md'}`}
-          >
-            {tab.icon}{tab.label}
-          </button>
-        ))}
+          {[
+            { id: 'basic', label: 'Базовый', icon: <Activity className="w-5 h-5" /> },
+            { id: 'activity', label: 'Активность', icon: <Activity className="w-5 h-5 text-green-500" /> }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => { setCurrentSubTab(tab.id as 'basic' | 'activity'); onSubTabChange?.(tab.id); }}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${currentSubTab === tab.id ? 'bg-linear-to-r from-blue-500 to-green-400 text-white shadow-xl' : 'bg-white text-gray-800 hover:bg-gray-50 shadow-md'}`}
+            >
+              {tab.icon}{tab.label}
+            </button>
+          ))}
       </div>
       <AnimatePresence mode="wait">
         <motion.div key={currentSubTab} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
@@ -191,10 +191,10 @@ const OverviewModule: React.FC<OverviewModuleProps> = ({ onSubTabChange, theme, 
                     transition={{ delay: i * 0.1 }}
                     className={`p-6 rounded-xl relative overflow-hidden transition-all duration-300 hover:scale-105 bg-white shadow-lg`}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-10`} />
+                    <div className={`absolute inset-0 bg-linear-to-br ${stat.color} opacity-10`} />
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} text-white shadow-lg`}>{stat.icon}</div>
+                        <div className={`p-3 rounded-xl bg-linear-to-br ${stat.color} text-white shadow-lg`}>{stat.icon}</div>
                         <div className={`text-sm font-medium px-3 py-1 rounded-full shadow-md ${stat.changeType === 'positive' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>{stat.change}</div>
                       </div>
                       <h3 className={`text-2xl font-bold mb-1 text-gray-900`}>

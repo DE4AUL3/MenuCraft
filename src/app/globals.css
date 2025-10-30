@@ -1,4 +1,4 @@
-
+@import "../styles/theme.css";
 @import "tailwindcss";
 @import "./fonts.css";
 /* Скрывать боковое меню при открытии модального окна DishManager */

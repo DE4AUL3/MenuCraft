@@ -54,39 +54,39 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
 
   const variantClasses = {
     primary: `
-      bg-blue-600 hover:bg-blue-700 text-white
-      focus:ring-blue-500 shadow-lg hover:shadow-xl
-      ${glow ? 'shadow-blue-500/25 hover:shadow-blue-500/40' : ''}
+      bg-primary hover:bg-primary/80 text-bg
+      focus:ring-primary shadow-lg hover:shadow-xl
+      ${glow ? 'shadow-primary/25 hover:shadow-primary/40' : ''}
     `,
     secondary: `
-      bg-gray-600 hover:bg-gray-700 text-white
-      focus:ring-gray-500 shadow-lg hover:shadow-xl
-      ${glow ? 'shadow-gray-500/25 hover:shadow-gray-500/40' : ''}
+      bg-secondary hover:bg-secondary/80 text-text
+      focus:ring-secondary shadow-lg hover:shadow-xl
+      ${glow ? 'shadow-secondary/25 hover:shadow-secondary/40' : ''}
     `,
     outline: `
-      border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white
-      focus:ring-blue-500 bg-transparent hover:shadow-lg
-      ${glow ? 'hover:shadow-blue-500/25' : ''}
+      border-2 border-primary text-primary hover:bg-primary hover:text-bg
+      focus:ring-primary bg-transparent hover:shadow-lg
+      ${glow ? 'hover:shadow-primary/25' : ''}
     `,
     ghost: `
-      text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20
-      focus:ring-blue-500 bg-transparent
+      text-primary hover:bg-primary/10
+      focus:ring-primary bg-transparent
     `,
     gradient: `
-      bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 
-      hover:from-blue-700 hover:via-purple-700 hover:to-pink-700
-      text-white focus:ring-purple-500 shadow-lg hover:shadow-xl
-      ${glow ? 'shadow-purple-500/25 hover:shadow-purple-500/40' : ''}
+      bg-gradient-to-r from-primary via-accent to-accent 
+      hover:from-primary/80 hover:via-accent/80 hover:to-accent/80
+      text-bg focus:ring-accent shadow-lg hover:shadow-xl
+      ${glow ? 'shadow-accent/25 hover:shadow-accent/40' : ''}
     `,
     neon: `
-      bg-black border-2 border-cyan-400 text-cyan-400 
-      hover:bg-cyan-400 hover:text-black hover:shadow-cyan-400/50
-      focus:ring-cyan-400 shadow-lg hover:shadow-xl
+      bg-bg border-2 border-accent text-accent 
+      hover:bg-accent hover:text-bg hover:shadow-accent/50
+      focus:ring-accent shadow-lg hover:shadow-xl
       neon-glow
     `,
     glass: `
-      glass-card text-gray-900 dark:text-white hover:bg-white/20 dark:hover:bg-white/10
-      focus:ring-white/50 backdrop-blur-lg border border-white/20
+      glass-card text-text hover:bg-bg/20
+      focus:ring-bg/50 backdrop-blur-lg border border-bg/20
     `
   }
 
@@ -119,7 +119,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       {/* Background animation */}
       {variant === 'gradient' && (
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 opacity-0 transition-opacity duration-300"
+          className="absolute inset-0 bg-linear-to-r from-primary via-accent to-accent opacity-0 transition-opacity duration-300"
           whileHover={{ opacity: 1 }}
         />
       )}

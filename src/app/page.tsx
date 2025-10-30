@@ -42,7 +42,7 @@ export default function Home() {
   // Если автопереход отключен, показываем стартовую страницу
   if (!autoRedirect && mounted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50 relative overflow-hidden">
+  <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-emerald-50 relative overflow-hidden">
         {/* Animated Background Elements */}
          <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-linear-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl animate-pulse"></div>
@@ -54,7 +54,7 @@ export default function Home() {
           <div className="text-center max-w-2xl mx-auto">
             {/* Hero Icon */}
             <div className="mb-8 relative">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl shadow-2xl transform hover:scale-110 transition-all duration-300">
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-linear-to-br from-emerald-500 to-teal-600 rounded-3xl shadow-2xl transform hover:scale-110 transition-all duration-300">
                 <QrCode className="w-12 h-12 text-white" />
               </div>
               <div className="absolute -top-2 -right-2">
@@ -92,9 +92,9 @@ export default function Home() {
             <div className="space-y-4 max-w-md mx-auto">
               <button
                 onClick={() => router.push('/select-restaurant')}
-                className="group relative w-full px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl overflow-hidden"
+                className="group relative w-full px-8 py-4 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative flex items-center justify-center gap-3">
                   <QrCode className="w-5 h-5" />
                   <span>Выбрать ресторан</span>

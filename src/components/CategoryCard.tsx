@@ -21,14 +21,14 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       className="group block"
     >
       <div 
-        className={`relative rounded-2xl overflow-hidden shadow-lg border ${
+        className={`relative rounded-2xl overflow-hidden shadow-lg ${
           isDarkMode
-            ? 'bg-gray-800 border-gray-700'
-            : 'bg-white border-gray-200'
+            ? 'bg-gray-800'
+            : 'bg-white'
         }`}
       >
-        {/* Изображение - чистое фото без эффектов */}
-        <div className="h-64 overflow-hidden rounded-t-2xl">
+  {/* Изображение - чистое фото без эффектов */}
+  <div className="h-64 overflow-hidden rounded-t-2xl">
           <SmartImage
             src={category.image || '/images/categories/placeholder.jpg'}
             alt={category.name}
@@ -38,9 +38,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
         </div>
         
         {/* Контент */}
-        <div className={`relative p-4 ${
-          isDarkMode ? 'bg-gray-800' : 'bg-white'
-        }`}>
+        <div className={`relative p-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}> 
           <h3 
             className={`text-lg font-bold mb-4 ${
               isDarkMode ? 'text-white' : 'text-gray-900'

@@ -70,11 +70,11 @@ export function Card({
   }
 
   const variantClasses = {
-    default: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
-    hover: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600',
-    glass: 'glass-card border border-white/20',
-    gradient: 'bg-gradient-to-br from-white via-blue-50 to-purple-50 dark:from-gray-800 dark:via-blue-900/20 dark:to-purple-900/20 border border-gray-200 dark:border-gray-700',
-    neon: 'bg-gray-900 border-2 border-cyan-400 neon-glow'
+    default: 'bg-bg border border-accent',
+    hover: 'bg-bg border border-accent hover:border-primary',
+    glass: 'glass-card border border-accent/20',
+  gradient: 'bg-linear-to-br from-bg via-primary/10 to-accent/10 border border-accent',
+    neon: 'bg-primary border-2 border-accent neon-glow'
   }
 
   const motionProps = animate ? {
@@ -106,7 +106,7 @@ export function Card({
       {/* Background effects */}
       {variant === 'gradient' && isHovered && (
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30"
+          className="absolute inset-0 bg-linear-to-br from-primary/10 to-accent/10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -353,7 +353,7 @@ export function StatsCard({
   return (
     <Card variant="default" className="relative overflow-hidden">
       {/* Background gradient */}
-      <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${colorClasses[color]} opacity-10 rounded-full blur-xl`} />
+  <div className={`absolute top-0 right-0 w-20 h-20 bg-linear-to-br ${colorClasses[color]} opacity-10 rounded-full blur-xl`} />
       
       <div className="relative z-10 flex items-center justify-between">
         <div className="space-y-2">
@@ -384,7 +384,7 @@ export function StatsCard({
 
         {icon && (
           <motion.div
-            className={`p-3 bg-gradient-to-br ${colorClasses[color]} text-white rounded-lg`}
+            className={`p-3 bg-linear-to-br ${colorClasses[color]} text-white rounded-lg`}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}

@@ -312,7 +312,7 @@ export default function AnalyticsModule({
             onClick={() => handleSubTabClick(tab.id)}
             className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${
               currentSubTab === tab.id
-                ? `bg-gradient-to-r ${themeClasses.accent} text-white shadow-xl`
+                ? `${themeClasses.accent} text-white shadow-xl`
                 : `${themeClasses.cardBg} ${themeClasses.text} ${themeClasses.hover} shadow-md`
             }`}
           >

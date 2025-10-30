@@ -30,28 +30,28 @@ const toastIcons = {
 
 const toastStyles = {
   success: {
-    bg: 'bg-emerald-50 dark:bg-emerald-900/30',
-    border: 'border-emerald-200 dark:border-emerald-700',
-    icon: 'text-emerald-600 dark:text-emerald-400',
-    text: 'text-emerald-900 dark:text-emerald-100'
+    bg: 'bg-success/10',
+    border: 'border-success',
+    icon: 'text-success',
+    text: 'text-success'
   },
   error: {
-    bg: 'bg-red-50 dark:bg-red-900/30',
-    border: 'border-red-200 dark:border-red-700',
-    icon: 'text-red-600 dark:text-red-400',
-    text: 'text-red-900 dark:text-red-100'
+    bg: 'bg-red-100',
+    border: 'border-red-400',
+    icon: 'text-red-600',
+    text: 'text-red-900'
   },
   warning: {
-    bg: 'bg-yellow-50 dark:bg-yellow-900/30',
-    border: 'border-yellow-200 dark:border-yellow-700',
-    icon: 'text-yellow-600 dark:text-yellow-400',
-    text: 'text-yellow-900 dark:text-yellow-100'
+    bg: 'bg-accent/10',
+    border: 'border-accent',
+    icon: 'text-accent',
+    text: 'text-accent'
   },
   info: {
-    bg: 'bg-blue-50 dark:bg-blue-900/30',
-    border: 'border-blue-200 dark:border-blue-700',
-    icon: 'text-blue-600 dark:text-blue-400',
-    text: 'text-blue-900 dark:text-blue-100'
+    bg: 'bg-primary/10',
+    border: 'border-primary',
+    icon: 'text-primary',
+    text: 'text-primary'
   }
 }
 
@@ -74,7 +74,7 @@ export default function ToastNotification({ toast, onDismiss }: ToastNotificatio
       {/* Progress bar */}
       {toast.duration && (
         <motion.div
-          className="absolute top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500"
+          className="absolute top-0 left-0 h-1 bg-linear-to-r from-blue-500 to-purple-500"
           initial={{ width: '100%' }}
           animate={{ width: '0%' }}
           transition={{ duration: toast.duration / 1000, ease: 'linear' }}
@@ -84,7 +84,7 @@ export default function ToastNotification({ toast, onDismiss }: ToastNotificatio
       <div className="p-4">
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <div className={`flex-shrink-0 ${styles.icon}`}>
+          <div className={`shrink-0 ${styles.icon}`}>
             <Icon className="w-5 h-5" />
           </div>
 
@@ -113,7 +113,7 @@ export default function ToastNotification({ toast, onDismiss }: ToastNotificatio
           {/* Close button */}
           <button
             onClick={() => onDismiss(toast.id)}
-            className={`flex-shrink-0 p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-colors ${styles.text}`}
+            className={`shrink-0 p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-colors ${styles.text}`}
           >
             <X className="w-4 h-4" />
           </button>

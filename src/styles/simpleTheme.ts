@@ -3,29 +3,53 @@ export type ThemeMode = 'light' | 'dark'
 export interface SimpleTheme {
   mode: ThemeMode
   colors: {
-    // Базовые цвета (3 оттенка белого/черного)
     background: {
-      primary: string    // Основной фон
-      secondary: string  // Вторичный фон (карточки)
-      tertiary: string   // Третичный фон (поля ввода)
+      primary: string
+      secondary: string
+      tertiary: string
+      language: string
+      activeCategory: string
+      dishImageOverlay: string
+      priceBadge: string
+      quantityBtn: string
     }
     text: {
-      primary: string    // Основной текст
-      secondary: string  // Вторичный текст
-      tertiary: string   // Слабый текст (placeholder)
+      primary: string
+      secondary: string
+      tertiary: string
+      language: string
+      activeCategory: string
+      priceBadge: string
+      quantity: string
+      total: string
+      dishDescription: string
+      cartBadge: string
     }
     border: {
-      primary: string    // Основные границы
-      secondary: string  // Слабые границы
-      tertiary: string   // Едва заметные границы
+      primary: string
+      secondary: string
+      tertiary: string
+      language: string
+      activeCategory: string
+      priceBadge: string
+      quantityBtn: string
+      cart: string
     }
-    // Акцентные цвета (только для звонка и админки)
     accent: {
-      call: string       // Кнопка звонка (зеленый)
-      admin: string      // Админ панель (синий)
-      warning: string    // Предупреждения (оранжевый)
-      danger: string     // Ошибки (красный)
-      success: string    // Успех (зеленый)
+      call: string
+      admin: string
+      warning: string
+      danger: string
+      success: string
+    }
+    shadow: {
+      cart: string
+      cartBadge: string
+      activeCategory: string
+      dishCard: string
+      dishCardActive: string
+      priceBadge: string
+      dishActionBtn: string
     }
   }
 }
@@ -37,27 +61,53 @@ export const lightTheme: SimpleTheme = {
   mode: 'light',
   colors: {
     background: {
-      primary: COLORS.background,
-      secondary: COLORS.surface,
-      tertiary: COLORS.border
+      primary: '#FAF9F6',
+      secondary: '#FFFFFF',
+      tertiary: '#FAF3E0',
+      language: '#111',
+      activeCategory: '#fff',
+      dishImageOverlay: 'linear-gradient(to top, rgba(0,0,0,0.20), transparent 80%)',
+      priceBadge: '#fff',
+      quantityBtn: '#fff',
     },
     text: {
-      primary: '#18181b',
-      secondary: '#27272a',
-      tertiary: '#6b7280'
+      primary: '#1E1E1E',
+      secondary: '#6B6B6B',
+      tertiary: '#B0AFAF',
+      language: '#fff',
+      activeCategory: '#111',
+      priceBadge: '#111',
+      quantity: '#1E1E1E',
+      total: '#1E1E1E',
+      dishDescription: '#C5A572',
+      cartBadge: '#fff',
     },
     border: {
-      primary: COLORS.border,
-      secondary: COLORS.surface,
-      tertiary: COLORS.background
+      primary: '#E8E4DC',
+      secondary: '#F3EAD9',
+      tertiary: '#FAF9F6',
+      language: '#111',
+      activeCategory: '#fff',
+      priceBadge: 'transparent',
+      quantityBtn: '#E8E4DC',
+      cart: '#C5A572',
     },
     accent: {
-      call: COLORS.accent,
-      admin: COLORS.admin,
-      warning: COLORS.warning,
-      danger: COLORS.danger,
-      success: COLORS.success
-    }
+      call: '#10b981',
+      admin: '#C5A572',
+      warning: '#D4AF37',
+      danger: '#C94E38',
+      success: '#B9965C',
+    },
+    shadow: {
+      cart: '0 4px 16px 0 rgba(197,165,114,0.18)',
+      cartBadge: '0 2px 8px 0 rgba(16,185,129,0.18)',
+      activeCategory: '0 2px 8px 0 rgba(0,0,0,0.10)',
+      dishCard: '0 2px 8px 0 rgba(197,165,114,0.08)',
+      dishCardActive: '0 4px 16px 0 rgba(197,165,114,0.18)',
+      priceBadge: '0 2px 8px 0 rgba(197,165,114,0.10)',
+      dishActionBtn: '0 2px 8px 0 rgba(197,165,114,0.10)',
+    },
   }
 }
 

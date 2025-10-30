@@ -1,3 +1,56 @@
+// 🌟 Gold Elegance Theme
+const goldEleganceColors: AppThemeColors = {
+  primary: {
+    background: '#faf9f6', // мягкий бежево-золотистый
+    surface: '#ffffff',
+    text: '#1e1e1e'
+  },
+  secondary: {
+    background: '#f7f6f1',
+    surface: '#fefcf9',
+    text: '#6b6b6b',
+    border: '#e8e4dc'
+  },
+  accent: {
+    primary: 'from-[#d4af37] to-[#b8860b]', // благородное золото
+    secondary: 'from-[#c5a572] to-[#d4af37]', // тёплое золото
+    success: 'from-emerald-500 to-green-600',
+    warning: 'from-amber-500 to-orange-500',
+    error: 'from-red-500 to-rose-600'
+  }
+}
+
+const goldEleganceClasses: AppThemeClasses = {
+  background: 'bg-[#faf9f6]',
+  surface: 'bg-white',
+  card: 'bg-white border border-[#e8e4dc]/50 shadow-sm',
+
+  bg: 'bg-[#faf9f6]',
+  bgSecondary: 'bg-[#f7f6f1]',
+  cardBg: 'bg-white border border-[#e8e4dc]/50',
+
+  text: 'text-[#1e1e1e]',
+  textSecondary: 'text-[#6b6b6b]',
+  textMuted: 'text-[#9a8f7a]',
+
+  hover: 'hover:bg-[#f4f0e6]',
+  accent: 'bg-linear-to-r from-[#d4af37] to-[#b8860b]',
+  accentSecondary: 'bg-linear-to-r from-[#c5a572] to-[#d4af37]',
+
+  success: 'text-emerald-600 bg-emerald-50',
+  warning: 'text-amber-600 bg-amber-50',
+  error: 'text-red-600 bg-red-50',
+
+  border: 'border-[#e8e4dc]',
+  borderLight: 'border-[#f2eee7]',
+
+  gradients: {
+    main: 'bg-gradient-to-br from-[#fffefc] via-[#faf6ed] to-[#f2e6c9]',
+    accent: 'from-[#d4af37] to-[#b8860b]',
+    card: 'from-[#fffefc] via-[#faf6ed] to-[#f2e6c9]',
+    hero: 'from-[#d4af37] via-[#c5a572] to-[#b8860b]'
+  }
+}
 /**
  * Универсальная система тем для всего приложения
  * Включает админ-панель, основные страницы и компоненты
@@ -151,8 +204,8 @@ const lightThemeClasses: AppThemeClasses = {
   
   // Интерактивные элементы (10%)
   hover: 'hover:bg-gray-100',
-  accent: 'bg-gradient-to-r from-blue-500 to-indigo-600',
-  accentSecondary: 'bg-gradient-to-r from-purple-500 to-pink-600',
+  accent: 'bg-linear-to-r from-blue-500 to-indigo-600',
+  accentSecondary: 'bg-linear-to-r from-purple-500 to-pink-600',
   
   // Состояния (10%)
   success: 'text-emerald-600 bg-emerald-50',
@@ -191,8 +244,8 @@ const darkThemeClasses: AppThemeClasses = {
   
   // Интерактивные элементы (10%)
   hover: 'hover:bg-slate-700/50',
-  accent: 'bg-gradient-to-r from-blue-400 to-indigo-500',
-  accentSecondary: 'bg-gradient-to-r from-purple-400 to-pink-500',
+  accent: 'bg-linear-to-r from-blue-400 to-indigo-500',
+  accentSecondary: 'bg-linear-to-r from-purple-400 to-pink-500',
   
   // Состояния (10%)
   success: 'text-emerald-400 bg-emerald-900/20',
@@ -248,8 +301,8 @@ const hanTagamClasses: AppThemeClasses = {
   textMuted: 'text-gray-500',
 
   hover: 'hover:bg-gray-50',
-  accent: 'bg-gradient-to-r from-emerald-500 to-emerald-700',
-  accentSecondary: 'bg-gradient-to-r from-amber-400 to-amber-600',
+  accent: 'bg-linear-to-r from-emerald-500 to-emerald-700',
+  accentSecondary: 'bg-linear-to-r from-amber-400 to-amber-600',
 
   success: 'text-emerald-600 bg-emerald-50',
   warning: 'text-amber-600 bg-amber-50',
@@ -275,6 +328,10 @@ const appThemes: Record<string, { colors: AppThemeColors; classes: AppThemeClass
   'han-tagam': {
     colors: hanTagamColors,
     classes: hanTagamClasses
+  },
+  'gold-elegance': {
+    colors: goldEleganceColors,
+    classes: goldEleganceClasses
   }
 }
 

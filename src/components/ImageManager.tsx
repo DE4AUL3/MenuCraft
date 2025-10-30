@@ -1,10 +1,12 @@
 'use client';
 
+
 import React, { useState, useEffect } from 'react';
 import { Upload, ImageIcon, Tag, Filter, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { imageService } from '@/lib/imageServiceDb';
 import type { ImageInfo } from '@/lib/imageServiceDb';
+import { getAppThemeClasses } from '@/styles/appTheme';
 
 type ImageCategory = 'all' | 'logos' | 'categories' | 'products' | 'other';
 
@@ -70,36 +72,47 @@ export default function ImageManager() {
     ? images 
     : images.filter(img => img.category === activeCategory);
 
+  const theme = getAppThemeClasses('gold-elegance');
+
+  // Функция для получения класса бейджа по категории
+  function getCategoryBadgeClass(category: string) {
+    switch (category) {
+      case 'logos':
+        return 'bg-[#ede7f6] text-[#6d28d9]'; // фиолетовый
+      case 'categories':
+        return 'bg-[#e3f2fd] text-[#1565c0]'; // синий
+      case 'products':
+        return 'bg-[#e8f5e9] text-[#2e7d32]'; // зелёный
+      default:
+        return 'bg-[#f5f5f5] text-[#616161]'; // серый
+    }
+  }
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className={`text-2xl font-bold ${theme.text} mb-2`}>
           Управление изображениями
         </h2>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className={`${theme.textSecondary}`}>
           Всего изображений: {images.length}
         </p>
       </div>
 
       {/* Зона загрузки */}
-      <div 
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          isDragOver 
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-            : 'border-gray-300 dark:border-gray-600'
-        }`}
+      <div
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${theme.border} ${theme.bgSecondary} ${isDragOver ? theme.hover : ''}`}
         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
         onDragLeave={(e) => { e.preventDefault(); setIsDragOver(false); }}
         onDrop={handleDrop}
       >
-        <Upload className="mx-auto w-12 h-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <Upload className={`mx-auto w-12 h-12 ${theme.textMuted} mb-4`} />
+        <h3 className={`text-lg font-semibold ${theme.text} mb-2`}>
           Загрузить изображения
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className={`${theme.textSecondary} mb-4`}>
           Перетащите файлы сюда или выберите
         </p>
-        
+
         <input
           type="file"
           multiple
@@ -110,7 +123,7 @@ export default function ImageManager() {
         />
         <label
           htmlFor="file-upload"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+          className={`inline-flex items-center gap-2 px-4 py-2 ${theme.accent} text-white rounded-lg transition-colors cursor-pointer`}
         >
           <Upload className="w-4 h-4" />
           Выбрать файлы
@@ -118,7 +131,7 @@ export default function ImageManager() {
 
         {isUploading && (
           <div className="mt-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Загрузка...</p>
+            <p className={`text-sm ${theme.textSecondary}`}>Загрузка...</p>
           </div>
         )}
       </div>
@@ -137,13 +150,13 @@ export default function ImageManager() {
             onClick={() => setActiveCategory(key as ImageCategory)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
               activeCategory === key
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-[#212121] text-gray-700 dark:text-gray-300 hover:bg-gray-200'
+                ? `${theme.accent} text-white` 
+                : `${theme.bgSecondary} ${theme.textSecondary} ${theme.hover}`
             }`}
           >
             <Icon className="w-4 h-4" />
             {label}
-            <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded">
+            <span className={`text-xs px-1.5 py-0.5 rounded ${key !== 'all' ? getCategoryBadgeClass(key) : ''}`}>
               {key === 'all' ? images.length : images.filter(img => img.category === key).length}
             </span>
           </button>
@@ -153,19 +166,19 @@ export default function ImageManager() {
       {/* Список изображений */}
       {filteredImages.length === 0 ? (
         <div className="text-center py-12">
-          <ImageIcon className="mx-auto w-16 h-16 text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
+          <ImageIcon className={`mx-auto w-16 h-16 ${theme.textMuted} mb-4`} />
+          <h3 className={`text-lg font-semibold ${theme.textSecondary} mb-2`}>
             Нет изображений
           </h3>
-          <p className="text-gray-500">
+          <p className={`${theme.textMuted}`}>
             Загрузите изображения через форму выше
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredImages.map((image) => (
-            <div key={image.id} className="bg-white dark:bg-[#282828] rounded-lg overflow-hidden shadow-md">
-              <div className="aspect-square bg-gray-200 dark:bg-gray-700">
+            <div key={image.id} className={`${theme.cardBg} rounded-lg overflow-hidden shadow-md`}>
+              <div className={`aspect-square ${theme.bgSecondary}`}>
                 <img
                   src={imageService.getImageUrl(image.url)}
                   alt={image.alt || image.filename}
@@ -177,17 +190,12 @@ export default function ImageManager() {
                 />
               </div>
               <div className="p-3">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate mb-1">
+                <h3 className={`text-sm font-medium ${theme.text} truncate mb-1`}>
                   {image.filename}
                 </h3>
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <div className={`flex items-center justify-between text-xs ${theme.textSecondary}`}>
                   <span>{imageService.formatFileSize(image.size)}</span>
-                  <span className={`px-1.5 py-0.5 rounded ${
-                    image.category === 'logos' ? 'bg-purple-100 text-purple-800' :
-                    image.category === 'categories' ? 'bg-blue-100 text-blue-800' :
-                    image.category === 'products' ? 'bg-green-100 text-green-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span className={`px-1.5 py-0.5 rounded ${getCategoryBadgeClass(image.category)}`}>
                     {image.category}
                   </span>
                 </div>

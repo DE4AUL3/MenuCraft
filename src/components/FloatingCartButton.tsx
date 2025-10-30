@@ -35,13 +35,13 @@ export default function FloatingCartButton() {
         boxShadow: `0 25px 50px -12px rgba(0,0,0,0.25)`
       }}>
         {/* Внутреннее свечение */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+  <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         {/* Иконка корзины */}
         <ShoppingCart className="w-6 h-6 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
         
         {/* Счетчик товаров */}
-        <div className="absolute -top-2 -right-2 min-w-[24px] h-6 bg-white text-xs font-bold rounded-full flex items-center justify-center" style={{ 
+  <div className="absolute -top-2 -right-2 min-w-6 h-6 bg-white text-xs font-bold rounded-full flex items-center justify-center" style={{ 
           color: 'var(--accent-call)' 
         }}>
           {totalItems > 99 ? '99+' : totalItems}

@@ -115,7 +115,7 @@ export default function SwipeCarousel({
           {children.map((child, index) => (
             <motion.div
               key={index}
-              className="flex-shrink-0 select-none"
+              className="shrink-0 select-none"
               style={{ width: `${itemWidth}%` }}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ 
@@ -135,26 +135,26 @@ export default function SwipeCarousel({
         <>
           <motion.button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white dark:hover:bg-gray-800 transition-all duration-200"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-bg/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-bg transition-all duration-200"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <ChevronLeft size={20} className="text-gray-700 dark:text-gray-300" />
+            <ChevronLeft size={20} className="text-text/80" />
           </motion.button>
 
           <motion.button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white dark:hover:bg-gray-800 transition-all duration-200"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-bg/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-bg transition-all duration-200"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <ChevronRight size={20} className="text-gray-700 dark:text-gray-300" />
+            <ChevronRight size={20} className="text-text/80" />
           </motion.button>
         </>
       )}
@@ -173,8 +173,8 @@ export default function SwipeCarousel({
               onClick={() => goToSlide(index)}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 Math.floor(currentIndex / itemsPerView) === index
-                  ? 'bg-blue-500 w-6'
-                  : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                  ? 'bg-primary w-6'
+                  : 'bg-secondary hover:bg-accent'
               }`}
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.8 }}
@@ -185,7 +185,7 @@ export default function SwipeCarousel({
 
       {/* Progress bar */}
       <motion.div
-        className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+  className="absolute bottom-0 left-0 h-1 bg-linear-to-r from-primary to-accent rounded-full"
         initial={{ width: 0 }}
         animate={{ 
           width: `${((currentIndex + 1) / totalItems) * 100}%`,

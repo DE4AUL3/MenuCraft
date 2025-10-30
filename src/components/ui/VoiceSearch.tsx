@@ -216,11 +216,11 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
     return (
       <Card variant="default" className={`p-6 ${className}`}>
         <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-text mb-2">
             Голосовой поиск недоступен
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted">
             Ваш браузер не поддерживает Web Speech API. Попробуйте Chrome или Edge.
           </p>
         </div>
@@ -234,12 +234,12 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
       <Card variant="gradient" className="p-6">
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="w-6 h-6 text-blue-600" />
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+            <Sparkles className="w-6 h-6 text-primary" />
+            <h3 className="text-xl font-bold text-text">
               Голосовой поиск
             </h3>
           </div>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted">
             Используйте голос для поиска блюд и ресторанов
           </p>
         </div>
@@ -271,7 +271,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
             <AnimatePresence>
               {isListening && (
                 <motion.div
-                  className="absolute inset-0 rounded-full border-2 border-blue-400"
+                  className="absolute inset-0 rounded-full border-2 border-primary"
                   initial={{ scale: 1, opacity: 0.7 }}
                   animate={{ 
                     scale: [1, 1.5, 1], 
@@ -290,15 +290,15 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
             {/* Индикатор уровня звука */}
             {isListening && (
               <motion.div
-                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-2 bg-accent rounded-full overflow-hidden"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
                 <motion.div
-                  className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full"
+                  className="h-full bg-linear-to-r from-success to-primary rounded-full"
                   animate={{ 
                     width: `${audioLevel}%`,
-                    background: audioLevel > 70 ? 'linear-gradient(to right, #ef4444, #f97316)' : 'linear-gradient(to right, #22c55e, #3b82f6)'
+                    background: audioLevel > 70 ? 'linear-gradient(to right, var(--color-error), var(--color-warning))' : 'linear-gradient(to right, var(--color-success), var(--color-primary))'
                   }}
                   transition={{ duration: 0.1 }}
                 />
@@ -308,7 +308,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
         </div>
 
         {/* Статус */}
-        <div className="text-center mb-4">
+  <div className="text-center mb-4">
           <AnimatePresence mode="wait">
             {isListening && (
               <motion.p
@@ -316,7 +316,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-blue-600 dark:text-blue-400 font-medium"
+                className="text-primary font-medium"
               >
                 🎤 Слушаю...
               </motion.p>
@@ -328,7 +328,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-yellow-600 dark:text-yellow-400 font-medium"
+                className="text-accent font-medium"
               >
                 ⚡ Обрабатываю...
               </motion.p>
@@ -340,7 +340,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-gray-600 dark:text-gray-400"
+                className="text-text"
               >
                 Нажмите на микрофон для начала
               </motion.p>
@@ -355,24 +355,24 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-700"
+              className="bg-bg rounded-lg p-4 mb-4 border border-accent"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
-                  <p className="text-gray-900 dark:text-white">
+                  <p className="text-text">
                     {transcript && (
-                      <span className="bg-green-100 dark:bg-green-900/20 px-1 rounded">
+                      <span className="bg-success/10 px-1 rounded">
                         {transcript}
                       </span>
                     )}
                     {interimTranscript && (
-                      <span className="text-gray-500 italic ml-1">
+                      <span className="text-muted italic ml-1">
                         {interimTranscript}
                       </span>
                     )}
                   </p>
                   {confidence > 0 && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted mt-1">
                       Уверенность: {Math.round(confidence * 100)}%
                     </p>
                   )}
@@ -381,7 +381,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
                   variant="ghost"
                   size="sm"
                   onClick={clearAll}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 >
                   <X size={16} />
                 </Button>
@@ -401,13 +401,13 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
             Найти
           </Button>
           
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className="flex bg-bg-alt rounded-lg p-1">
             <button
               onClick={() => changeLanguage('ru-RU')}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 language === 'ru-RU'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 dark:text-gray-400'
+                  ? 'bg-primary text-bg'
+                  : 'text-muted'
               }`}
             >
               РУ
@@ -416,8 +416,8 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
               onClick={() => changeLanguage('en-US')}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 language === 'en-US'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 dark:text-gray-400'
+                  ? 'bg-primary text-bg'
+                  : 'text-muted'
               }`}
             >
               EN
@@ -433,9 +433,9 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-4"
+            className="bg-error/10 border border-error rounded-lg p-4"
           >
-            <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
+            <div className="flex items-center gap-2 text-error">
               <AlertCircle size={20} />
               <span className="font-medium">{error}</span>
             </div>
@@ -447,9 +447,9 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-lg p-4"
+            className="bg-success/10 border border-success rounded-lg p-4"
           >
-            <div className="flex items-center gap-2 text-green-800 dark:text-green-300">
+            <div className="flex items-center gap-2 text-success">
               <CheckCircle size={20} />
               <span className="font-medium">{successMessage}</span>
             </div>
@@ -459,11 +459,11 @@ export default function VoiceSearch({ onSearch, placeholder = "Скажите ч
 
       {/* Подсказки */}
       <Card variant="glass" className="p-4">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+  <h4 className="font-semibold text-text mb-3 flex items-center gap-2">
           <Volume2 size={18} />
           Примеры команд:
         </h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted">
           <div>• &quot;Найди пиццу&quot;</div>
           <div>• &quot;Покажи десерты&quot;</div>
           <div>• &quot;Суши в Panda Express&quot;</div>
