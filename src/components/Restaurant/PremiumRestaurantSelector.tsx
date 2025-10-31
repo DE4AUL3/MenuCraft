@@ -100,7 +100,9 @@ export default function PremiumRestaurantSelector() {
   const handleRestaurantSelect = (restaurantId: string) => {
     setSelectedId(restaurantId);
     if (restaurantId === 'panda-burger') {
-      window.location.href = 'https://panda-burger.example.com';
+      window.location.href = 'https://pandaburger.cloud';
+    } else if (restaurantId === 'han-tagam') {
+      window.location.href = 'https://hantagam.com';
     } else {
       router.push(`/menu/${restaurantId}`);
     }
