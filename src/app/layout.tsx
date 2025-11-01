@@ -1,22 +1,22 @@
 import "./globals.css";
 export const metadata = {
-  title: "Han Tagam — QR-меню для ресторанов",
-  description: "Han Tagam — элегантное светлое QR-меню с админкой и мультиязычностью.",
+  title: "Panda Burger — QR-меню для ресторанов",
+  description: "Panda Burger — стильное тёмное QR-меню с админкой и мультиязычностью.",
   keywords: [
     'QR меню',
     'ресторан',
     'онлайн меню',
     'заказ еды',
-    'MenuCraft',
-    'cafe',
-    'restaurant menu',
+    'Panda Burger',
+    'бургер',
+    'burger',
     'digital menu',
-    'турецкая кухня',
-    'туркменская кухня'
+    'fast food',
+    'street food'
   ],
-  authors: [{ name: 'MenuCraft Team' }],
-  creator: 'MenuCraft',
-  publisher: 'MenuCraft',
+  authors: [{ name: 'Panda Burger Team' }],
+  creator: 'Panda Burger',
+  publisher: 'Panda Burger',
   formatDetection: {
     email: false,
     address: false,
@@ -31,16 +31,16 @@ export const metadata = {
     },
   },
   openGraph: {
-      title: 'Han Tagam — QR-меню',
-      description: 'Han Tagam — элегантное светлое QR-меню для кафе и ресторанов',
+      title: 'Panda Burger — QR-меню',
+      description: 'Panda Burger — стильное тёмное QR-меню для кафе и ресторанов',
       url: 'http://localhost:3000',
-      siteName: 'Han Tagam',
+      siteName: 'Panda Burger',
       images: [
         {
-          url: '/han_tagam2..jpg',
+          url: '/panda_logo.jpg',
           width: 1200,
           height: 630,
-          alt: 'Han Tagam',
+          alt: 'Panda Burger',
         },
       ],
       locale: 'ru_RU',
@@ -48,8 +48,8 @@ export const metadata = {
     },
   twitter: {
     card: 'summary_large_image',
-    title: 'MenuCraft — QR-меню для ресторанов',
-    description: 'Готовый к продакшену шаблон Next.js для QR-меню с админкой и мультиязычностью.',
+    title: 'Panda Burger — QR-меню для ресторанов',
+    description: 'Готовый к продакшену шаблон Next.js для QR-меню Panda Burger с админкой и мультиязычностью.',
     images: ['/panda_logo.jpg'],
   },
   robots: {
@@ -84,7 +84,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="h-full">
-      <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--han-bg, var(--bg-primary))', color: 'var(--han-text, var(--text-primary))'}}>
+  <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--panda-bg, var(--bg-primary))', color: 'var(--panda-text, var(--text-primary))'}}>
         <ClientProviders>
           {children}
         </ClientProviders>

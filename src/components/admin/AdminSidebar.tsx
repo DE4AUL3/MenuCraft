@@ -29,7 +29,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, ord
   const [collapsed, setCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(true);
   const logo = defaultConfig.restaurant.logo;
-  const restaurantName = defaultConfig.restaurant.name;
+  const restaurantName = 'Panda Burger';
 
   // Переводы для меню и футера
   const menuTranslations = {

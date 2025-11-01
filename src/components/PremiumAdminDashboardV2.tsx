@@ -40,6 +40,10 @@ export default function PremiumAdminDashboardV2({
   // Для простоты пока храним локально, потом можно пробросить из AdminLayout
   const [language, setLanguage] = useState<'ru' | 'tk'>('ru');
 
+  useEffect(() => {
+    document.title = 'Panda Burger — админ-панель';
+  }, []);
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':

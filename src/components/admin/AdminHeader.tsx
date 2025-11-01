@@ -42,7 +42,7 @@ const theme = {
 export default function AdminHeader({ 
   onThemeChange, 
   currentTheme = 'dark', 
-  restaurantName = 'Название Ресторана' 
+  restaurantName = 'Panda Burger' 
 }: AdminHeaderProps) {
   const router = useRouter()
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false)

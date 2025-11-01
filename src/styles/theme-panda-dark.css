@@ -1,6 +1,5 @@
-
-/* theme-panda-dark.css — глобальные переменные для Panda Burger */
-:root {
+/* theme-panda-dark.css */
+[data-theme="panda-dark"] {
   --color-bg: #0e0e10;
   --color-bg-secondary: #1a1a1d;
   --color-bg-card: #1f1f22;

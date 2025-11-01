@@ -237,9 +237,9 @@ export interface RestaurantConfig {
 export const defaultConfig: RestaurantConfig = {
   restaurant: {
     id: 'template-restaurant',
-  name: 'Han tagam',
-  description: 'Han tagam — ресторан национальной кухни',
-  logo: '/logo-hantagam.svg',
+  name: 'Panda Burger',
+  description: 'Panda Burger — стильный бургер-бар с авторским меню',
+  logo: '/panda_logo.jpg',
     favicon: '/favicon.ico',
     
     contact: {
@@ -397,18 +397,18 @@ export const defaultConfig: RestaurantConfig = {
   },
   
   seo: {
-    title: 'Restaurant Template',
-    description: 'Шаблон ресторана с меню и заказами',
-    keywords: ['ресторан', 'меню', 'доставка', 'заказ'],
-    ogImage: '/og-image.jpg'
+    title: 'Panda Burger',
+    description: 'Panda Burger — стильный бургер-бар с авторским меню и QR-меню',
+    keywords: ['бургер', 'burger', 'panda', 'меню', 'fast food', 'street food'],
+    ogImage: '/panda_logo.jpg'
   },
   
   pwa: {
-    name: 'Restaurant Template',
-    shortName: 'Restaurant',
-    description: 'Шаблон ресторана',
-    themeColor: '#f97316',
-    backgroundColor: '#ffffff',
+    name: 'Panda Burger',
+    shortName: 'Panda',
+    description: 'Panda Burger — стильный бургер-бар с QR-меню',
+    themeColor: '#18181b',
+    backgroundColor: '#18181b',
     startUrl: '/',
     display: 'standalone',
     orientation: 'portrait'
