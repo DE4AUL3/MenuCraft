@@ -74,7 +74,7 @@ export class DatabaseService {
         imageBackground: data.imageBackground,
         order: data.order,
         status: data.status ?? true,
-        restaurantId: data.restaurantId,
+        restaurantId: parseInt(data.restaurantId),
       }
     });
   }
