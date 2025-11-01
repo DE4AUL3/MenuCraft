@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 
+
 export default function AdminLogin() {
-  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -24,11 +25,11 @@ export default function AdminLogin() {
     setError('');
 
     // Простая проверка на клиенте (в реальном проекте должна быть серверная аутентификация)
-    if (email === 'admin@restaurant.kg' && password === 'admin123') {
+    if (login === 'pandaburger_admin' && password === 'xlgamburg25') {
       localStorage.setItem('isAdmin', 'true');
       router.push('/admin/dashboard');
     } else {
-      setError('Неверный email или пароль');
+      setError('Неверный логин или пароль');
     }
   };
 
@@ -47,14 +48,14 @@ export default function AdminLogin() {
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email
+              Логин
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#212121] text-gray-900 dark:text-white"
-              placeholder="admin@restaurant.kg"
+              placeholder="pandaburger_admin"
               required
             />
           </div>
@@ -69,7 +70,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#212121] text-gray-900 dark:text-white"
-                placeholder="admin123"
+                placeholder="xlgamburg25"
                 required
               />
               <button
@@ -96,11 +97,7 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Тестовые данные:</p>
-          <p>Email: admin@restaurant.kg</p>
-          <p>Пароль: admin123</p>
-        </div>
+        {/* Тестовые данные убраны по запросу */}
       </div>
     </div>
   );
