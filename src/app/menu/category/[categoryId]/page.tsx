@@ -276,7 +276,7 @@ export default function CategoryPage() {
               </button>
               <button
                 onClick={() => router.push('/cart')}
-                className={`relative p-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${theme.accent} text-white`}
+                className={`relative p-3 rounded-xl transition-all duration-300 transform hover:scale-105 bg-red-600 hover:bg-red-700 text-white`}
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartState.items.length > 0 && (
@@ -376,7 +376,7 @@ export default function CategoryPage() {
                             </button>
                             <button
                               onClick={() => addToCart(dish)}
-                              className={`flex-1 flex items-center justify-center py-2 sm:py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 ${theme.accent} text-white`}
+                              className={`flex-1 flex items-center justify-center py-2 sm:py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 bg-red-600 hover:bg-red-700 text-white`}
                               aria-label="Добавить в корзину"
                             >
                               <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
