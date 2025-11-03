@@ -191,7 +191,7 @@ export default function MenuPage() {
         <div className="mt-8 flex justify-center">
           <button
             onClick={() => router.push('/select-restaurant')}
-            className="px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-600 hover:to-gray-800 text-white shadow-lg"
+            className="px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white shadow-lg"
           >
             ← {currentLanguage === 'tk' ? 'Restoran saýlamak' : 'Выбрать другой ресторан'}
           </button>
