@@ -139,8 +139,8 @@ export default function MenuPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Categories Grid */}
         <div className="mb-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
-            {categories.map((category) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-4">
+            {categories.map((category, index) => (
               <div
                 key={category.id}
                 role="button"
@@ -179,10 +179,9 @@ export default function MenuPage() {
                           width={200}
                           height={200}
                           className="w-full h-full sm:w-full sm:h-full object-cover"
-                        
-                          loading="lazy"
+                          priority={index < 4}
+                          loading={index < 4 ? undefined : "lazy"}
                           quality={75}
-                          
                           />
                       ) : null}
                     </div>
