@@ -27,7 +27,7 @@ export default function CategoryPage() {
   const searchParams = useSearchParams()
   const { currentLanguage, setCurrentLanguage, toggleLanguage } = useLanguage()
   const { state: cartState, dispatch } = useCart()
-  const theme = getAppThemeClasses('gold-elegance')
+  const theme = getAppThemeClasses('panda-dark')
 
   // Используем gold-elegance тему
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
