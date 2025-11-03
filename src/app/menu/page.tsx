@@ -232,7 +232,6 @@ export default function MenuPage() {
       {/* Floating Phone Button */}
       <FloatingCallButton />
       <FloatingRestaurantButton />
-      <FloatingRestaurantButton />
     </motion.div>
   )
 }
