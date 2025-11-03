@@ -8,7 +8,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/hooks/useLanguage';
 import { getText } from '@/i18n/translations';
 import AnimatedContainer from '@/components/ui/AnimatedContainer';
-import { themes } from '@/styles/simpleTheme';
+import { getAppThemeColors } from '@/styles/appTheme';
 import Image from 'next/image';
 
 interface Restaurant {
@@ -34,45 +34,45 @@ const defaultRestaurants: Restaurant[] = [
   {
     id: 'panda-burger',
     name: 'Panda Burger',
-    logo: '/panda-burger-logo.svg',
+    logo: '/panda_logo.png',
     description: 'Сочные бургеры и американская кухня премиум-класса',
     descriptionTk: 'Damsly burgerler we ýokary derejeli amerikan aşhanasy',
     cuisine: 'Американская кухня',
     rating: 4.8,
     phone: '+993 (12) 123-45-67',
     address: 'г. Ашхабад, ул. Нейтральности, 15',
-    image: '/panda_logo.jpg',
-  gradient: 'from-emerald-500 via-teal-500 to-emerald-700',
+    image: '/panda_logo.png',
+    gradient: 'from-emerald-500 via-teal-500 to-emerald-700',
     features: ['Быстрая доставка', 'WiFi', 'QR заказ', 'Премиум качество'],
-  isOpen: true,
-  openingHours: '08:00 - 22:00',
+    isOpen: true,
+    openingHours: '08:00 - 22:00',
     deliveryTime: '20-30 мин',
     deliveryTimeTk: '20-30 min'
   },
   {
     id: 'han-tagam',
     name: 'Han Tagam',
-    logo: '/khan-tagam-logo.svg',
-    description: 'Традиционная туркменская кухня с современной подачей',
-    descriptionTk: 'Häzirki zaman usulynda hödürlenýän adaty türkmen aşhanasy',
+    logo: '/images/han-tagam-logo.png',
+    description: 'Традиционная туркменская кухня премиум-класса',
+    descriptionTk: 'Ýokary derejeli adaty türkmen aşhanasy',
     cuisine: 'Туркменская кухня',
     rating: 4.9,
-    phone: '+993 (65) 987-65-43',
-    address: 'г. Ашхабад, ул. Туркменбаши, 28',
-  image: '/han_tagam2..jpg',
-  gradient: 'from-emerald-500 via-teal-500 to-emerald-700',
-    features: ['Национальная кухня', 'WiFi', 'QR заказ', 'Авторские блюда'],
-  isOpen: true,
-  openingHours: '08:00 - 22:00',
-    deliveryTime: '35-45 мин',
-    deliveryTimeTk: '35-45 min'
+    phone: '+993 (12) 654-32-10',
+    address: 'г. Ашхабад, ул. Турkmенистана, 25',
+  image: '/images/han-tagam-logo.png',
+    gradient: 'from-amber-500 via-yellow-500 to-amber-700',
+    features: ['Национальные блюда', 'Халяль', 'QR заказ', 'Элитное обслуживание'],
+    isOpen: true,
+    openingHours: '09:00 - 23:00',
+    deliveryTime: '25-35 мин',
+    deliveryTimeTk: '25-35 min'
   }
 ];
 
 export default function PremiumRestaurantSelector() {
   const router = useRouter();
   const { currentLanguage } = useLanguage();
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, setRestaurant } = useTheme();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isTouch, setIsTouch] = useState(false);
   const [restaurants, setRestaurants] = useState<Restaurant[]>(defaultRestaurants);
@@ -97,14 +97,16 @@ export default function PremiumRestaurantSelector() {
     }
   }, []);
 
-  const handleRestaurantSelect = (restaurantId: string) => {
-    setSelectedId(restaurantId);
-    if (restaurantId === 'panda-burger') {
-      window.location.href = 'https://pandaburger.cloud/restaurant/1';
-    } else if (restaurantId === 'han-tagam') {
-      window.location.href = 'https://hantagam.com/restaurant/1';
+  const handleRestaurantSelect = (restaurant: Restaurant) => {
+    setSelectedId(restaurant.id);
+    setRestaurant(restaurant.id);
+    
+    if (restaurant.id === 'han-tagam') {
+      // Переход на другой домен
+      window.location.href = 'https://hantagam.com';
     } else {
-      router.push(`/menu/${restaurantId}`);
+      // Переход внутри Panda Burger
+      router.push('/menu');
     }
   };
 
@@ -124,19 +126,20 @@ export default function PremiumRestaurantSelector() {
     visible: { opacity: 1, y: 0 }
   };
 
-  // Импортируем тему
-  const { light: theme } = themes;
+  // Используем panda-dark тему
+  const themeColors = getAppThemeColors('panda-dark');
+  
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: theme.colors.background.secondary,
+      background: themeColors.primary.background,
       position: 'relative',
       overflow: 'hidden'
     }}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-  <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl animate-pulse" style={{background: theme.colors.background.secondary, opacity: 0.05}}></div>
-  <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl animate-pulse delay-1000" style={{background: theme.colors.background.tertiary, opacity: 0.05}}></div>
+  <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl animate-pulse" style={{background: themeColors.secondary.background, opacity: 0.05}}></div>
+  <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl animate-pulse delay-1000" style={{background: themeColors.secondary.surface, opacity: 0.05}}></div>
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 lg:py-16">
@@ -154,7 +157,7 @@ export default function PremiumRestaurantSelector() {
         >
           <motion.h1 
             className="text-2xl lg:text-4xl font-black mb-4"
-            style={{ color: theme.colors.text.primary }}
+            style={{ color: themeColors.primary.text }}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
@@ -164,7 +167,7 @@ export default function PremiumRestaurantSelector() {
           
           <motion.p 
             className="text-base lg:text-lg max-w-2xl mx-auto leading-relaxed"
-            style={{ color: theme.colors.text.secondary }}
+            style={{ color: themeColors.secondary.text }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
@@ -191,14 +194,14 @@ export default function PremiumRestaurantSelector() {
                 className="relative overflow-hidden rounded-3xl backdrop-blur-sm border hover:shadow-2xl transition-all duration-500"
                 style={{
                   background: selectedId === restaurant.id
-                    ? theme.colors.background.primary
-                    : theme.colors.background.primary,
-                  borderColor: theme.colors.border.primary,
-                  boxShadow: selectedId === restaurant.id ? `0 0 0 4px ${theme.colors.accent}` : undefined
+                    ? themeColors.primary.background
+                    : themeColors.primary.background,
+                  borderColor: themeColors.secondary.border,
+                  boxShadow: selectedId === restaurant.id ? `0 0 0 4px ${"#d4af37"}` : undefined
                 }}
                 whileHover={{ scale: 1.02, y: -8 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleRestaurantSelect(restaurant.id)}
+                onClick={() => handleRestaurantSelect(restaurant)}
               >
                   
                   {/* Status Badge */}
@@ -236,14 +239,27 @@ export default function PremiumRestaurantSelector() {
                     <div className="relative p-6 sm:p-8">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className="text-xl lg:text-2xl font-bold mb-2 transition-colors" style={{color: theme.colors.text.primary}}>
-                          {restaurant.name}
-                        </h3>
-                        <p className="text-sm lg:text-base line-clamp-1 sm:line-clamp-2 leading-relaxed" style={{color: theme.colors.text.secondary}}>
+                        <div className="flex items-center gap-3 mb-2">
+                          {restaurant.logo && (
+                            <div className="w-10 h-10 rounded-full bg-white p-2 shadow-md">
+                              <Image
+                                src={restaurant.logo}
+                                alt={`${restaurant.name} logo`}
+                                width={40}
+                                height={40}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                          )}
+                          <h3 className="text-xl lg:text-2xl font-bold transition-colors" style={{color: themeColors.primary.text}}>
+                            {restaurant.name}
+                          </h3>
+                        </div>
+                        <p className="text-sm lg:text-base line-clamp-1 sm:line-clamp-2 leading-relaxed" style={{color: themeColors.secondary.text}}>
                           {currentLanguage === 'tk' ? restaurant.descriptionTk : restaurant.description}
                         </p>
                       </div>
-                      <div className="ml-4 p-3 rounded-full transition-all duration-300" style={{background: theme.colors.accent.call, color: theme.colors.text.primary}}>
+                      <div className="ml-4 p-3 rounded-full transition-all duration-300" style={{background: "#facc15", color: themeColors.primary.text}}>
                         <ArrowRight className="w-6 h-6 text-inherit" />
                       </div>
                     </div>
@@ -252,7 +268,7 @@ export default function PremiumRestaurantSelector() {
                     {/* Enhanced CTA Button */}
                     <motion.button
                       className="w-full py-4 rounded-2xl font-bold text-base sm:text-lg relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
-                      style={{background: theme.colors.accent.call, color: theme.colors.text.primary}}
+                      style={{background: "#facc15", color: themeColors.primary.text}}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >

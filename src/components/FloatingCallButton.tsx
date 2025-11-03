@@ -8,7 +8,7 @@ import { getAppThemeClasses } from '@/styles/appTheme';
 
 export default function FloatingCallButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const theme = getAppThemeClasses('gold-elegance');
+  const theme = getAppThemeClasses('panda-dark');
 
   return (
     <>

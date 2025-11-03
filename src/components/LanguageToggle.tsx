@@ -15,35 +15,43 @@ interface Translations {
 const translations: Translations = {
   selectCategory: {
     ru: 'Выберите категорию блюд',
-    tm: 'Выберите категорию блюд'
+    tm: 'Tagam kategoriýasyny saýlaň'
   },
   dishes: {
     ru: 'блюд',
-    tm: 'блюд'
+    tm: 'tagam'
   },
   order: {
     ru: 'Заказать',
-    tm: 'Заказать'
+    tm: 'Sargyt etmek'
   },
   contacts: {
     ru: 'Контакты',
-    tm: 'Контакты'
+    tm: 'Habarlaşmak'
   },
   call: {
     ru: 'Позвонить',
-    tm: 'Позвонить'
+    tm: 'Jaň etmek'
   },
   saveContact: {
     ru: 'Сохранить контакт',
-    tm: 'Сохранить контакт'
+    tm: 'Kontakty ýatda saklamak'
   },
   back: {
     ru: 'Назад',
-    tm: 'Назад'
+    tm: 'Yza'
   },
   inCategory: {
     ru: 'в категории',
-    tm: 'в категории'
+    tm: 'kategoriýada'
+  },
+  cart: {
+    ru: 'Корзина',
+    tm: 'Sebet'
+  },
+  addToCart: {
+    ru: 'Добавить в корзину',
+    tm: 'Sebede goşmak'
   }
 };
 
@@ -69,31 +77,31 @@ export default function LanguageToggle() {
 
   const languages = [
     { code: 'ru' as Language, name: 'Русский', flag: '🇷🇺' },
-    { code: 'tm' as Language, name: 'Türkmençe', flag: '��' }
+    { code: 'tm' as Language, name: 'Türkmençe', flag: '🇹🇲' }
   ];
 
   const currentLanguage = languages.find(lang => lang.code === language);
 
   return (
     <div className="relative">
+      {/* Panda Burger specific button styling */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-white/20 dark:bg-white/10 text-white hover:bg-white/30 dark:hover:bg-white/20 px-3 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm border border-white/30"
+        className="p-2 rounded-full transition-colors duration-200 border-0 bg-transparent hover:bg-transparent focus:outline-none text-white"
+        style={{ boxShadow: 'none' }}
+        aria-label="Сменить язык"
       >
-        <Globe className="w-4 h-4" />
-        <span className="text-sm font-medium">
-          {currentLanguage?.flag}
-        </span>
+        <Globe className="w-6 h-6" />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-50 min-w-[140px]">
+        <div className="absolute top-full right-0 mt-2 bg-[#282828] border border-gray-600 rounded-xl shadow-lg z-50 min-w-[140px]">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
-              className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors first:rounded-t-xl last:rounded-b-xl ${
-                language === lang.code ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
+              className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-700 transition-colors first:rounded-t-xl last:rounded-b-xl ${
+                language === lang.code ? 'bg-orange-900/20 text-orange-400' : 'text-gray-300'
               }`}
             >
               <span>{lang.flag}</span>

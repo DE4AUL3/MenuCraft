@@ -30,7 +30,8 @@ export default function Home() {
   const handlePreloaderComplete = () => {
     setShowPreloader(false)
     if (autoRedirect) {
-      router.push('/select-restaurant')
+      // ИЗМЕНЕНО: теперь переходим сразу на /menu вместо /select-restaurant
+      router.push('/menu')
     }
   }
 
@@ -64,12 +65,12 @@ export default function Home() {
 
             {/* Main Title */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black bg-linear-to-r from-emerald-600 via-teal-600 to-blue-600 bg-clip-text text-transparent mb-6 leading-tight">
-              MenuCraft
+              Panda Burger
             </h1>
             
             {/* Subtitle */}
             <p className="text-lg sm:text-xl lg:text-2xl text-slate-600 mb-4 font-medium">
-              Современная система управления меню ресторанов
+              QR-меню для современного ресторана
             </p>
             
             {/* Features */}
@@ -80,7 +81,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 bg-white/70 backdrop-blur-sm px-3 py-2 rounded-full border border-slate-200">
                 <Users className="w-4 h-4 text-blue-600" />
-                <span>Мульти-ресторан</span>
+                <span>Быстрый заказ</span>
               </div>
               <div className="flex items-center gap-2 bg-white/70 backdrop-blur-sm px-3 py-2 rounded-full border border-slate-200">
                 <Clock className="w-4 h-4 text-purple-600" />
@@ -91,13 +92,13 @@ export default function Home() {
             {/* Action Buttons */}
             <div className="space-y-4 max-w-md mx-auto">
               <button
-                onClick={() => router.push('/select-restaurant')}
+                onClick={() => router.push('/menu')}
                 className="group relative w-full px-8 py-4 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl overflow-hidden"
               >
                 <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative flex items-center justify-center gap-3">
                   <QrCode className="w-5 h-5" />
-                  <span>Выбрать ресторан</span>
+                  <span>Открыть меню</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
@@ -117,7 +118,7 @@ export default function Home() {
             {/* Footer Note */}
             <div className="mt-12 text-xs text-slate-400 flex items-center justify-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Система готова к работе</span>
+              <span>Меню готово к просмотру</span>
             </div>
           </div>
         </div>

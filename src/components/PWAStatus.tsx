@@ -55,7 +55,7 @@ export default function PWAStatus() {
     if (success) {
       sendNotification('Приложение установлено!', {
         body: 'Catalog Cafe теперь доступен на вашем устройстве',
-        icon: '/panda_logo.jpg'
+        icon: '/panda_logo.png'
       })
     }
   }
@@ -91,8 +91,8 @@ export default function PWAStatus() {
       
       sendNotification('Тестовое уведомление', {
         body: 'Push уведомления работают!',
-        icon: '/panda_logo.jpg',
-        badge: '/panda_logo.jpg'
+        icon: '/panda_logo.png',
+        badge: '/panda_logo.png'
       })
       setShowNotificationTest(true)
     }

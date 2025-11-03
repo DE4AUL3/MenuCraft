@@ -18,7 +18,7 @@ export const RESTAURANTS: Record<string, RestaurantConfig> = {
     domain: 'panda-burger.local',
     theme: 'dark',
     primaryColor: 'orange', // Используем id темы из colors.ts
-    logo: '/panda-burger-logo.svg',
+    logo: '/panda_logo.png',
     phone: '+993 XX XXX XXX',
     address: 'Ашхабад, ул. Пример, 123',
     adminPrefix: '/panda-admin'

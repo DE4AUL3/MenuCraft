@@ -4,13 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 
-
 export default function AdminLogin() {
-<<<<<<< Updated upstream
-  const [login, setLogin] = useState('');
-=======
   const [username, setUsername] = useState('');
->>>>>>> Stashed changes
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -29,19 +24,11 @@ export default function AdminLogin() {
     setError('');
 
     // Простая проверка на клиенте (в реальном проекте должна быть серверная аутентификация)
-<<<<<<< Updated upstream
-    if (login === 'pandaburger_admin' && password === 'xlgamburg25') {
-      localStorage.setItem('isAdmin', 'true');
-      router.push('/admin/dashboard');
-    } else {
-      setError('Неверный логин или пароль');
-=======
     if (username === 'pandaburger_admin' && password === 'xlgamburg25') {
       localStorage.setItem('isAdmin', 'true');
       router.push('/admin/dashboard');
     } else {
       setError('Неверный логин или пароль. Проверьте данные и попробуйте снова.');
->>>>>>> Stashed changes
     }
   };
 
@@ -64,17 +51,10 @@ export default function AdminLogin() {
             </label>
             <input
               type="text"
-<<<<<<< Updated upstream
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#212121] text-gray-900 dark:text-white"
-              placeholder="pandaburger_admin"
-=======
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-[#333] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
               placeholder="Введите логин"
->>>>>>> Stashed changes
               required
             />
           </div>
@@ -89,11 +69,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#212121] text-gray-900 dark:text-white"
-<<<<<<< Updated upstream
-                placeholder="xlgamburg25"
-=======
                 placeholder="Пароль"
->>>>>>> Stashed changes
                 required
               />
               <button
@@ -124,11 +100,6 @@ export default function AdminLogin() {
             Войти
           </button>
         </form>
-<<<<<<< Updated upstream
-
-        {/* Тестовые данные убраны по запросу */}
-=======
->>>>>>> Stashed changes
       </div>
     </div>
   );

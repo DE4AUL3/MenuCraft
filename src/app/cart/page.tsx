@@ -8,6 +8,7 @@ import { useLanguage } from '@/hooks/useLanguage'
 import { useTheme } from '@/hooks/useTheme'
 import OrderForm from '@/components/OrderForm'
 import { getAppThemeClasses } from '@/styles/appTheme'
+import { getText } from '@/i18n/translations'
 
 
 export default function CartPage() {
@@ -29,7 +30,7 @@ export default function CartPage() {
   }
 
   // Используем gold-elegance тему
-  const theme = getAppThemeClasses('gold-elegance');
+  const theme = getAppThemeClasses('panda-dark');
 
   if (cartState.items.length === 0 && !showSuccessNotification) {
     return (
@@ -38,13 +39,17 @@ export default function CartPage() {
           <div className={`w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center ${theme.bgSecondary}`}>
             <span className="text-4xl">🛒</span>
           </div>
-          <h2 className={`text-2xl font-bold mb-4 ${theme.text}`}>Корзина пуста</h2>
-          <p className={`mb-8 ${theme.textSecondary}`}>Добавьте блюда из меню, чтобы сделать заказ</p>
+          <h2 className={`text-2xl font-bold mb-4 ${theme.text}`}>
+            {getText('cartEmpty', currentLanguage)}
+          </h2>
+          <p className={`mb-8 ${theme.textSecondary}`}>
+            {getText('addDishesToOrder', currentLanguage)}
+          </p>
           <button
-            onClick={() => router.push('/menu/1')}
+            onClick={() => router.push('/menu')}
             className={`${theme.accent} text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl`}
           >
-            Перейти к меню
+            {getText('backToMenu', currentLanguage)}
           </button>
         </div>
       </div>
@@ -65,8 +70,12 @@ export default function CartPage() {
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>
-                <h1 className={`text-xl font-bold ${theme.text}`}>Корзина</h1>
-                <p className={`text-sm ${theme.textSecondary}`}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)} товаров</p>
+                <h1 className={`text-xl font-bold ${theme.text}`}>
+                  {getText('cart', currentLanguage)}
+                </h1>
+                <p className={`text-sm ${theme.textSecondary}`}>
+                  {cartState.items.reduce((sum, item) => sum + item.quantity, 0)} {getText('cartItems', currentLanguage)}
+                </p>
               </div>
             </div>
           </div>
@@ -83,7 +92,7 @@ export default function CartPage() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h3 className={`text-lg font-bold mb-1 ${theme.text}`}>{currentLanguage === 'tk' ? (item.nameTk || item.name) : item.name}</h3>
-                  <p className={`text-sm mb-3 ${theme.textSecondary}`}>{item.price} ТМТ за штуку</p>
+                  <p className={`text-sm mb-3 ${theme.textSecondary}`}>{item.price} ТМТ {getText('perItem', currentLanguage)}</p>
                   <div className="flex items-center space-x-4">
                     <div className={`flex items-center space-x-2 rounded-lg p-2 ${theme.bgSecondary}`}>
                       <button
@@ -119,19 +128,19 @@ export default function CartPage() {
         </div>
         {/* Order Summary */}
         <div className={`rounded-2xl shadow-lg border p-6 mb-6 ${theme.cardBg}`}>
-          <h3 className={`text-lg font-bold mb-4 ${theme.text}`}>Итого</h3>
+          <h3 className={`text-lg font-bold mb-4 ${theme.text}`}>{getText('total', currentLanguage)}</h3>
           <div className="space-y-2 mb-4">
             <div className={`flex justify-between ${theme.textSecondary}`}>
-              <span>Сумма заказа:</span>
+              <span>{getText('orderAmount', currentLanguage)}:</span>
               <span>{cartState.totalAmount} ТМТ</span>
             </div>
             <div className={`flex justify-between ${theme.textSecondary}`}>
-              <span>Доставка:</span>
+              <span>{getText('deliveryFee', currentLanguage)}:</span>
               <span>{cartState.deliveryFee} ТМТ</span>
             </div>
             <div className={`border-t pt-2 ${theme.border}`}>
               <div className={`flex justify-between text-xl font-bold ${theme.text}`}>
-                <span>К оплате:</span>
+                <span>{getText('toPay', currentLanguage)}:</span>
                 <span>{cartState.totalAmount + cartState.deliveryFee} ТМТ</span>
               </div>
             </div>
@@ -140,7 +149,7 @@ export default function CartPage() {
             onClick={() => setShowOrderForm(true)}
             className={`w-full text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl ${theme.accent}`}
           >
-            Оформить заказ
+            {getText('checkout', currentLanguage)}
           </button>
         </div>
       </main>
@@ -157,9 +166,18 @@ export default function CartPage() {
             <div className="w-20 h-20 bg-green-500 rounded-full mx-auto mb-6 flex items-center justify-center">
               <CheckCircle2 className="w-10 h-10 text-white" />
             </div>
-            <h3 className={`text-2xl font-bold mb-4 ${theme.text}`}>Заказ принят!</h3>
-            <p className={`mb-2 ${theme.textSecondary}`}>Номер заказа: <span className="font-mono font-bold text-green-600">#{completedOrderId}</span></p>
-            <p className={`mb-6 ${theme.textSecondary}`}>Оператор свяжется с вами в ближайшее время для подтверждения заказа и уточнения деталей доставки.</p>
+            <h3 className={`text-2xl font-bold mb-4 ${theme.text}`}>
+              {currentLanguage === 'tk' ? 'Sargyt kabul edildi!' : 'Заказ принят!'}
+            </h3>
+            <p className={`mb-2 ${theme.textSecondary}`}>
+              {currentLanguage === 'tk' ? 'Sargyt belgisi:' : 'Номер заказа:'} <span className="font-mono font-bold text-green-600">#{completedOrderId}</span>
+            </p>
+            <p className={`mb-6 ${theme.textSecondary}`}>
+              {currentLanguage === 'tk' 
+                ? 'Operator sargydyň tassyklanmagy üçin we eltip bermegiň jikme-jikliklerini aýtmagy üçin ýakyn wagtda siziň bilen habarlaşar.'
+                : 'Оператор свяжется с вами в ближайшее время для подтверждения заказа и уточнения деталей доставки.'
+              }
+            </p>
             <div className={`w-full rounded-full h-2 ${theme.bgSecondary}`}>
               <div className="bg-green-500 h-2 rounded-full animate-pulse" style={{ width: '100%' }}></div>
             </div>

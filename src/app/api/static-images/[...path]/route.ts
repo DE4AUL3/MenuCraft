@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { join } from 'path';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, statSync } from 'fs';
 
-// Простой сервер для статичных изображений
+// Простой сервер для статичных изображений с поддержкой обновления без перезагрузки
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const path = url.pathname.replace('/api/static-images', '');
+    console.log("API static-images: pathname=", url.pathname, "path=", path);
     
     // Защита от выхода за пределы директории
     if (path.includes('..')) {
@@ -21,11 +22,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
     
+    // Получаем информацию о файле
+    const stats = statSync(imagePath);
+    const lastModified = stats.mtime.toUTCString();
+    
     // Определяем MIME тип
     let contentType = 'image/jpeg';
     if (path.endsWith('.png')) contentType = 'image/png';
     if (path.endsWith('.webp')) contentType = 'image/webp';
     if (path.endsWith('.svg')) contentType = 'image/svg+xml';
+    if (path.endsWith('.gif')) contentType = 'image/gif';
     
     // Читаем файл и возвращаем его содержимое
     const imageBuffer = readFileSync(imagePath);
@@ -33,7 +39,10 @@ export async function GET(request: NextRequest) {
     return new NextResponse(imageBuffer, {
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400' // Кэширование на 24 часа
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Last-Modified': lastModified,
       },
     });
   } catch (error) {

@@ -1,7 +1,7 @@
 import "./globals.css";
 export const metadata = {
-  title: "Panda Burger — QR-меню для ресторанов",
-  description: "Panda Burger — стильное тёмное QR-меню с админкой и мультиязычностью.",
+  title: "Panda Burger — Бургерная быстрого питания",
+  description: "Panda Burger — лучшие бургеры и стрит-фуд с доставкой. Сочные бургеры, картофель фри и напитки.",
   keywords: [
     'QR меню',
     'ресторан',
@@ -37,7 +37,7 @@ export const metadata = {
       siteName: 'Panda Burger',
       images: [
         {
-          url: '/panda_logo.jpg',
+          url: '/panda_logo.png',
           width: 1200,
           height: 630,
           alt: 'Panda Burger',
@@ -50,7 +50,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Panda Burger — QR-меню для ресторанов',
     description: 'Готовый к продакшену шаблон Next.js для QR-меню Panda Burger с админкой и мультиязычностью.',
-    images: ['/panda_logo.jpg'],
+    images: ['/panda_logo.png'],
   },
   robots: {
     index: true,
@@ -84,7 +84,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="h-full">
-  <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--panda-bg, var(--bg-primary))', color: 'var(--panda-text, var(--text-primary))'}}>
+      <head>
+        {/* Force cache refresh for static assets */}
+        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
+      </head>
+      <body className="h-full mobile-app-feel safe-area-padding" style={{background: 'var(--panda-bg, var(--bg-primary))', color: 'var(--panda-text, var(--text-primary))'}}>
         <ClientProviders>
           {children}
         </ClientProviders>

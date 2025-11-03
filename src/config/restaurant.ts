@@ -239,7 +239,7 @@ export const defaultConfig: RestaurantConfig = {
     id: 'template-restaurant',
   name: 'Panda Burger',
   description: 'Panda Burger — стильный бургер-бар с авторским меню',
-  logo: '/panda_logo.jpg',
+  logo: '/panda_logo.png',
     favicon: '/favicon.ico',
     
     contact: {
@@ -400,7 +400,7 @@ export const defaultConfig: RestaurantConfig = {
     title: 'Panda Burger',
     description: 'Panda Burger — стильный бургер-бар с авторским меню и QR-меню',
     keywords: ['бургер', 'burger', 'panda', 'меню', 'fast food', 'street food'],
-    ogImage: '/panda_logo.jpg'
+    ogImage: '/panda_logo.png'
   },
   
   pwa: {

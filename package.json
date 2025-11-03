@@ -8,7 +8,9 @@
     "start": "next start",
     "vercel-build": "next build",
     "lint": "eslint",
-    "test": "jest --colors"
+    "test": "jest --colors",
+    "clear-cache": "bash scripts/clear-cache.sh",
+    "force-rebuild": "rm -rf .next && npm run build"
   },
   "engines": {
     "node": ">=18.18.0"

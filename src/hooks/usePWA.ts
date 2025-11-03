@@ -227,8 +227,8 @@ export function usePWA() {
   const sendNotification = (title: string, options?: NotificationOptions): void => {
     if (Notification.permission === 'granted') {
       new Notification(title, {
-        icon: '/panda_logo.jpg',
-        badge: '/panda_logo.jpg',
+        icon: '/panda_logo.png',
+        badge: '/panda_logo.png',
         ...options
       })
     }
