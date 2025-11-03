@@ -151,7 +151,7 @@ export default function MenuPage() {
                       (window as any).__mealCache = (window as any).__mealCache || {}
                       if (!(window as any).__mealCache[category.id]) {
                         fetch(`/api/meal?categoryId=${category.id}`)
-                          .then(r => r.json())
+                          .then(r => r.ok ? r.json() : [])
                           .then(meals => {
                             (window as any).__mealCache[category.id] = meals
                             sessionStorage.setItem('mealCache:' + category.id, JSON.stringify(meals))
