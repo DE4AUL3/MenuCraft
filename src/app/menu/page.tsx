@@ -142,38 +142,6 @@ export default function MenuPage() {
                 tabIndex={0}
                 onClick={() => router.push(`/menu/category/${category.id}?restaurantId=panda-burger`)}
                 onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/menu/category/${category.id}?restaurantId=panda-burger`) }}
-                onPointerEnter={() => {
-                  try {
-                    // prefetch route
-                    (router as any).prefetch && (router as any).prefetch(`/menu/category/${category.id}?restaurantId=panda-burger`)
-                    // warm up meals API once and cache in window and sessionStorage
-                    if (typeof window !== 'undefined') {
-                      (window as any).__mealCache = (window as any).__mealCache || {}
-                      if (!(window as any).__mealCache[category.id]) {
-                        fetch(`/api/meal?categoryId=${category.id}`)
-                          .then(r => r.ok ? r.json() : [])
-                          .then(meals => {
-                            (window as any).__mealCache[category.id] = meals
-                            sessionStorage.setItem('mealCache:' + category.id, JSON.stringify(meals))
-                          })
-                      }
-                    }
-                  } catch (e) {}
-                }}
-                onFocus={() => {
-                  try {
-                    (router as any).prefetch && (router as any).prefetch(`/menu/category/${category.id}?restaurantId=panda-burger`)
-                    if (typeof window !== 'undefined') {
-                      (window as any).__mealCache = (window as any).__mealCache || {}
-                      if (!(window as any).__mealCache[category.id]) {
-                        const cached = sessionStorage.getItem('mealCache:' + category.id)
-                        if (cached) {
-                          try { (window as any).__mealCache[category.id] = JSON.parse(cached) } catch (e) {}
-                        }
-                      }
-                    }
-                  } catch (e) {}
-                }}
                 className={`group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.03] active:scale-[0.97] ${themeClasses.card}`}
                 style={{}}
               >
@@ -217,6 +185,16 @@ export default function MenuPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Back to Restaurant Selection Button */}
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={() => router.push('/select-restaurant')}
+            className="px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-600 hover:to-gray-800 text-white shadow-lg"
+          >
+            ← {currentLanguage === 'tk' ? 'Restoran saýlamak' : 'Выбрать другой ресторан'}
+          </button>
         </div>
       </main>
 
