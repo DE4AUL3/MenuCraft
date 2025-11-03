@@ -116,7 +116,7 @@ export default function MenuPage() {
               {/* Cart */}
               <button
                 onClick={() => router.push('/cart')}
-                className="relative p-2 rounded-xl transition-colors duration-200 bg-orange-500 hover:bg-orange-600 text-white"
+                className="relative p-2 rounded-xl transition-colors duration-200 bg-red-600 hover:bg-red-700 text-white"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartState.items.length > 0 && (
