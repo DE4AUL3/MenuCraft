@@ -6,15 +6,6 @@ export function middleware(req: NextRequest) {
   if (process.env.NODE_ENV === 'production' && req.nextUrl.pathname.startsWith('/test')) {
     return NextResponse.redirect(new URL('/', req.url))
   }
-
-  // Страница выбора ресторана должна быть доступна только с домена hantagam.com в продакшне
-  if (req.nextUrl.pathname.startsWith('/select-restaurant')) {
-    const host = req.headers.get('host') || ''
-    const allowed = ['hantagam.com', 'www.hantagam.com']
-    if (process.env.NODE_ENV === 'production' && !allowed.some(h => host.includes(h))) {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
-  }
   return NextResponse.next()
 }
 
