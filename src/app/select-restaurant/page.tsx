@@ -16,8 +16,7 @@ export default function SelectRestaurantPage() {
       accentColor: 'bg-[#d4af37]',
       textColor: 'text-gray-900',
       subtitleColor: 'text-gray-600',
-      borderColor: 'border-[#d4af37]',
-      hoverShadow: 'shadow-[#d4af37]/30'
+      borderColor: 'border-[#d4af37]'
     },
     {
       id: 'panda-burger',
@@ -30,8 +29,7 @@ export default function SelectRestaurantPage() {
       accentColor: 'bg-red-600',
       textColor: 'text-white',
       subtitleColor: 'text-gray-400',
-      borderColor: 'border-red-600',
-      hoverShadow: 'shadow-red-600/30'
+      borderColor: 'border-red-600'
     }
   ]
 
@@ -68,7 +66,7 @@ export default function SelectRestaurantPage() {
               onClick={() => handleRestaurantClick(restaurant.url)}
               className="group cursor-pointer"
             >
-              <div className={`${restaurant.bgColor} rounded-2xl overflow-hidden border-2 ${restaurant.borderColor} shadow-lg hover:shadow-2xl hover:${restaurant.hoverShadow} transition-all duration-300 hover:scale-[1.02]`}>
+              <div className={`${restaurant.bgColor} rounded-2xl overflow-hidden border-2 ${restaurant.borderColor} shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] ${restaurant.id === 'han-tagam' ? 'hover:shadow-yellow-500/30' : 'hover:shadow-red-600/30'}`}>
                 {/* Логотип */}
                 <div className="relative h-40 flex items-center justify-center p-6">
                   <Image

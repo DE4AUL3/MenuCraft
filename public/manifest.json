@@ -1,12 +1,15 @@
 {
-  "name": "Panda Burger - Сочные бургеры премиум класса",
-  "short_name": "Panda Burger",
-  "description": "Авторские бургеры премиум качества, картофель фри, fresh напитки и быстрая доставка",
-  "start_url": "/",
+  "name": "🐼 Panda Burger - Сочные бургеры премиум класса",
+  "short_name": "🐼 Panda Burger",
+  "description": "⭐ Авторские бургеры премиум качества, картофель фри, fresh напитки и быстрая доставка. Лучшие бургеры в городе!",
+  "start_url": "/?utm_source=pwa",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#212121",
-  "theme_color": "#212121",
+  "theme_color": "#DC2626",
   "orientation": "portrait",
+  "scope": "/",
+  "id": "panda-burger-app",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -19,8 +22,41 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
-  "categories": ["food", "restaurants"],
-  "lang": "ru"
+  "screenshots": [
+    {
+      "src": "/images/panda_logo.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Главная страница Panda Burger"
+    }
+  ],
+  "categories": ["food", "restaurants", "delivery"],
+  "lang": "ru",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Меню",
+      "short_name": "Меню",
+      "description": "Просмотр меню ресторана",
+      "url": "/menu",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Корзина", 
+      "short_name": "Корзина",
+      "description": "Оформить заказ",
+      "url": "/cart",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
 }
