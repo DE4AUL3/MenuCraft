@@ -1,20 +1,22 @@
 import "./globals.css";
+
 export const metadata = {
-  title: "Panda Burger — Бургерная быстрого питания",
-  description: "Panda Burger — лучшие бургеры и стрит-фуд с доставкой. Сочные бургеры, картофель фри и напитки.",
+  title: "Panda Burger | Сочные бургеры премиум класса с доставкой",
+  description: "Panda Burger — авторские бургеры премиум качества, картофель фри, fresh напитки и быстрая доставка. Закажите онлайн через QR-меню!",
   keywords: [
-    'QR меню',
-    'ресторан',
-    'онлайн меню',
-    'заказ еды',
     'Panda Burger',
     'бургер',
     'burger',
-    'digital menu',
+    'доставка еды',
     'fast food',
-    'street food'
+    'QR меню',
+    'заказ онлайн',
+    'премиум бургеры',
+    'авторские бургеры',
+    'картофель фри',
+    'напитки'
   ],
-  authors: [{ name: 'Panda Burger Team' }],
+  authors: [{ name: 'Panda Burger' }],
   creator: 'Panda Burger',
   publisher: 'Panda Burger',
   formatDetection: {
@@ -22,35 +24,31 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('http://localhost:3000'),
+  metadataBase: new URL('https://pandaburger.cloud'),
   alternates: {
     canonical: '/',
-    languages: {
-      'ru': '/ru',
-      'tk': '/tk',
-    },
   },
   openGraph: {
-      title: 'Panda Burger — QR-меню',
-      description: 'Panda Burger — стильное тёмное QR-меню для кафе и ресторанов',
-      url: 'http://localhost:3000',
-      siteName: 'Panda Burger',
-      images: [
-        {
-          url: '/panda_logo.png',
-          width: 1200,
-          height: 630,
-          alt: 'Panda Burger',
-        },
-      ],
-      locale: 'ru_RU',
-      type: 'website',
-    },
+    title: 'Panda Burger | Сочные бургеры премиум класса',
+    description: 'Авторские бургеры премиум качества, картофель фри, fresh напитки. Быстрая доставка. Закажите онлайн!',
+    url: 'https://pandaburger.cloud',
+    siteName: 'Panda Burger',
+    images: [
+      {
+        url: '/panda_logo.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Panda Burger - Авторские бургеры премиум класса',
+      },
+    ],
+    locale: 'ru_RU',
+    type: 'website',
+  },
   twitter: {
     card: 'summary_large_image',
-    title: 'Panda Burger — QR-меню для ресторанов',
-    description: 'Готовый к продакшену шаблон Next.js для QR-меню Panda Burger с админкой и мультиязычностью.',
-    images: ['/panda_logo.png'],
+    title: 'Panda Burger | Сочные бургеры премиум класса',
+    description: 'Авторские бургеры премиум качества, картофель фри, fresh напитки. Быстрая доставка.',
+    images: ['/panda_logo.jpg'],
   },
   robots: {
     index: true,
@@ -63,16 +61,23 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: 'google-site-verification-code',
-    yandex: 'yandex-verification-code',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
+  manifest: '/manifest.json',
 };
+
 export const viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: '#212121',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 import ClientProviders from "@/components/ClientProviders";

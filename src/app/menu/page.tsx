@@ -9,11 +9,22 @@ import { useLanguage } from '@/hooks/useLanguage'
 import { useTheme } from '@/hooks/useTheme'
 import { useCart } from '@/hooks/useCart'
 import { Category } from '@/types/menu'
-import { imageService } from '@/lib/imageService'
 import FloatingCallButton from '@/components/FloatingCallButton'
 import FloatingRestaurantButton from '@/components/FloatingRestaurantButton'
 import { getImageUrl } from "@/lib/imageUtils"
 import { getAppThemeColors, getAppThemeClasses } from '@/styles/appTheme'
+
+// Skeleton компонент для загрузки
+function CategorySkeleton() {
+  return (
+    <div className="group backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden bg-gray-800 animate-pulse">
+      <div className="relative h-32 sm:h-36 bg-gray-700" />
+      <div className="px-2 py-2 sm:px-4 sm:py-4 text-center bg-gray-800">
+        <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto" />
+      </div>
+    </div>
+  )
+}
 
 export default function MenuPage() {
   const router = useRouter()
@@ -21,6 +32,7 @@ export default function MenuPage() {
   const { currentRestaurant, setRestaurant } = useTheme()
   const { state: cartState } = useCart()
   const [categories, setCategories] = useState<Category[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Устанавливаем тему для Panda Burger
@@ -29,7 +41,10 @@ export default function MenuPage() {
     // Загружаем категории из API
     const loadCategories = async () => {
       try {
-        const response = await fetch('/api/category')
+        const response = await fetch('/api/category', {
+          // Добавляем кэширование на 60 секунд
+          next: { revalidate: 60 }
+        })
         if (response.ok) {
           const data = await response.json()
           // Трансформируем данные из БД в формат Category
@@ -48,6 +63,8 @@ export default function MenuPage() {
         }
       } catch (error) {
         console.error('Ошибка загрузки категорий:', error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -60,10 +77,16 @@ export default function MenuPage() {
 
   // Устанавливаем имя ресторана для Panda Burger
   const restaurantDisplayName = 'Panda Burger';
+  
   const pageVariants: any = {
     hidden: { opacity: 0, y: 12 },
     enter: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.2, 0.8, 0.2, 1] } },
     exit: { opacity: 0, y: -6, transition: { duration: 0.18, ease: [0.4, 0, 0.2, 1] } }
+  }
+
+  // Debounced navigation для предотвращения двойных кликов
+  const handleCategoryClick = (categoryId: string) => {
+    router.push(`/menu/category/${categoryId}?restaurantId=panda-burger`)
   }
 
   return (
@@ -72,8 +95,8 @@ export default function MenuPage() {
       initial="hidden"
       animate="enter"
       exit="exit"
-  className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding ${themeClasses.bg}`}
-  style={{ background: themeColors.primary.background }}
+      className={`min-h-screen transition-all duration-500 smooth-scroll mobile-app-feel safe-area-padding ${themeClasses.bg}`}
+      style={{ background: themeColors.primary.background }}
     >
       {/* Header */}
       <header
@@ -82,9 +105,8 @@ export default function MenuPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo & Back Button */}
+            {/* Logo */}
             <div className="flex items-center space-x-4">
-              {/* Кнопка назад убрана */}
               <div className="flex items-center space-x-3">
                 <div className="relative w-10 h-10 sm:w-12 sm:h-12">
                   <Image
@@ -92,11 +114,10 @@ export default function MenuPage() {
                     alt="Panda Burger"
                     fill
                     className="object-contain"
-                  
-                          loading="lazy"
-                          quality={75}
-                          
-                          />
+                    loading="eager"
+                    priority
+                    quality={90}
+                  />
                 </div>
                 <div>
                   <h1 className={`text-xl sm:text-2xl font-bold ${themeClasses.text}`}> 
@@ -140,70 +161,57 @@ export default function MenuPage() {
         {/* Categories Grid */}
         <div className="mb-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-4">
-            {categories.map((category, index) => (
-              <div
-                key={category.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => router.push(`/menu/category/${category.id}?restaurantId=panda-burger`)}
-                onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/menu/category/${category.id}?restaurantId=panda-burger`) }}
-                className={`group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.03] active:scale-[0.97] ${themeClasses.card}`}
-                style={{}}
-              >
-                {/* Category Image */}
-                <div className={`relative h-32 sm:h-36 bg-linear-to-br ${themeClasses.gradients.card} overflow-hidden`}>
-                  {category.image ? (
-                    <Image
-                      src={category.image}
-                      alt={category.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      priority
-                    
-                          loading="lazy"
-                          quality={75}
-                          
-                          />
-                  ) : null}
-                  
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
-                  
+            {isLoading ? (
+              // Показываем skeleton во время загрузки
+              Array.from({ length: 8 }).map((_, index) => (
+                <CategorySkeleton key={index} />
+              ))
+            ) : (
+              categories.map((category, index) => (
+                <div
+                  key={category.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleCategoryClick(category.id)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleCategoryClick(category.id) }}
+                  className={`group backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.03] active:scale-[0.97] ${themeClasses.card}`}
+                >
                   {/* Category Image */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-full sm:w-full sm:h-full backdrop-blur-md flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-300 bg-white">
-                      {category.image ? (
-                        <Image
-                          src={getImageUrl(category.image)}
-                          alt={category.name}
-                          width={200}
-                          height={200}
-                          className="w-full h-full sm:w-full sm:h-full object-cover"
-                          priority={index < 4}
-                          loading={index < 4 ? undefined : "lazy"}
-                          quality={75}
-                          />
-                      ) : null}
-                    </div>
+                  <div className={`relative h-32 sm:h-36 bg-gradient-to-br ${themeClasses.gradients.card} overflow-hidden`}>
+                    {category.image ? (
+                      <Image
+                        src={getImageUrl(category.image)}
+                        alt={category.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        priority={index < 4}
+                        loading={index < 4 ? 'eager' : 'lazy'}
+                        quality={75}
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+                      />
+                    ) : null}
+                    
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                  </div>
+                  
+                  {/* Category Info */}
+                  <div className={`px-2 py-2 sm:px-4 sm:py-4 text-center ${themeClasses.bgSecondary} backdrop-blur-md border-t ${themeClasses.border}`}>
+                    <h3 className={`font-semibold text-xs sm:text-base mb-0.5 sm:mb-1 leading-tight sm:leading-normal transition-colors duration-300 ${themeClasses.text}`}>
+                      {currentLanguage === 'tk' ? (category.nameTk || category.name) : category.name}
+                    </h3>
                   </div>
                 </div>
-                
-                {/* Category Info (compact for mobile) */}
-                <div className={`px-2 py-2 sm:px-4 sm:py-4 text-center ${themeClasses.bgSecondary} backdrop-blur-md border-t ${themeClasses.border}`}>
-                  <h3 className={`font-semibold text-xs sm:text-base mb-0.5 sm:mb-1 leading-tight sm:leading-normal transition-colors duration-300 ${themeClasses.text}`}>
-                    {currentLanguage === 'tk' ? (category.nameTk || category.name) : category.name}
-                  </h3>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
+        {/* Call & Restaurant Switch Buttons */}
+        <FloatingCallButton />
+        <FloatingRestaurantButton />
       </main>
-
-      {/* Floating Phone Button */}
-      <FloatingCallButton />
-      <FloatingRestaurantButton />
     </motion.div>
   )
 }
