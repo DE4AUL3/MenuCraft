@@ -130,18 +130,10 @@ export default function CartPage() {
         <div className={`rounded-2xl shadow-lg border p-6 mb-6 ${theme.cardBg}`}>
           <h3 className={`text-lg font-bold mb-4 ${theme.text}`}>{getText('total', currentLanguage)}</h3>
           <div className="space-y-2 mb-4">
-            <div className={`flex justify-between ${theme.textSecondary}`}>
-              <span>{getText('orderAmount', currentLanguage)}:</span>
-              <span>{cartState.totalAmount} ТМТ</span>
-            </div>
-            <div className={`flex justify-between ${theme.textSecondary}`}>
-              <span>{getText('deliveryFee', currentLanguage)}:</span>
-              <span>{cartState.deliveryFee} ТМТ</span>
-            </div>
             <div className={`border-t pt-2 ${theme.border}`}>
               <div className={`flex justify-between text-xl font-bold ${theme.text}`}>
                 <span>{getText('toPay', currentLanguage)}:</span>
-                <span>{cartState.totalAmount + cartState.deliveryFee} ТМТ</span>
+                <span>{cartState.totalAmount} ТМТ</span>
               </div>
             </div>
           </div>
